@@ -2,3 +2,17 @@ persistent_preference:
     managers:
         default:
             storage: 'persistent_preference.storage.session'
+    storage:
+#        doctrine:
+#            id: 'app.persistent_preference.storage.doctrine'
+#            enabled: true
+#            preference_class: Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Entity\UserSettings
+
+    context_providers:
+        users:
+            class: Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Entity\User
+            prefix: 'user'
+        companies:
+            class: Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Entity\Company
+            prefix: 'company'
+            identifier_method: 'getUuid'

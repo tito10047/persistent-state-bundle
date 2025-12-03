@@ -3,24 +3,24 @@
 namespace Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity]
-class RecordUuid {
-	#[ORM\Column(name: 'id', type: 'uuid', nullable: false)]
+class User {
+
+	#[ORM\Column(name: 'id', type: 'integer', nullable: false)]
 	#[ORM\Id]
-	#[ORM\GeneratedValue(strategy: 'CUSTOM')]
-	#[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
-	protected ?Uuid $id = null;
+	#[ORM\GeneratedValue(strategy: 'IDENTITY')]
+	private ?int $id = null;
 
 	#[ORM\Column(name: 'name', type: 'string', length: 255, nullable: true)]
 	private ?string $name = null;
 
-	public function getId(): ?Uuid {
+
+	public function getId(): ?int {
 		return $this->id;
 	}
 
-	public function setId(?Uuid $id): self {
+	public function setId(?int $id): self {
 		$this->id = $id;
 		return $this;
 	}

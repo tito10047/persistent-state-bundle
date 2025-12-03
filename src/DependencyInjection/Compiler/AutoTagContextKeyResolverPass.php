@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Tito10047\PersistentPreferenceBundle\Resolver\ContextKeyResolverInterface;
+use Tito10047\PersistentPreferenceBundle\Resolver\ObjectContextResolver;
 
 /**
  * Automatically adds the persistent_selection.identifier_normalizer tag to any
@@ -49,6 +50,9 @@ final class AutoTagContextKeyResolverPass implements CompilerPassInterface
             if (!is_string($class)) {
                 continue;
             }
+			if ($class == ObjectContextResolver::class){
+				continue;
+			}
 
             // Use ContainerBuilder's reflection helper to avoid triggering
             // autoload errors for vendor/dev classes that may not be present.
