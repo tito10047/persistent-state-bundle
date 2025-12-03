@@ -1,6 +1,6 @@
 <?php
 
-namespace Tito10047\PersistentSelectionBundle\DependencyInjection\Compiler;
+namespace Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

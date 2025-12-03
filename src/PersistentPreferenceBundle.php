@@ -8,13 +8,12 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 use Tito10047\PersistentPreferenceBundle\Converter\MetadataConverterInterface;
 use Tito10047\PersistentPreferenceBundle\Converter\ObjectVarsConverter;
+use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagContextKeyResolverPass;
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagIdentifierNormalizersPass;
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagIdentityLoadersPass;
 use Tito10047\PersistentPreferenceBundle\Service\PreferenceManager;
-use Tito10047\PersistentSelectionBundle\DependencyInjection\Compiler\AutoTagContextKeyResolverPass;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
-use function Symfony\Component\String\u;
 
 /**
  * @link https://symfony.com/doc/current/bundles/best_practices.html

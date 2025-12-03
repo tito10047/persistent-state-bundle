@@ -1,16 +1,16 @@
 <?php
 
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Tito10047\PersistentSelectionBundle\DependencyInjection\Compiler\AutoTagContextKeyResolverPass;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Tito10047\PersistentPreferenceBundle\Converter\MetadataConverterInterface;
+use Tito10047\PersistentPreferenceBundle\Converter\ObjectVarsConverter;
+use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagContextKeyResolverPass;
 use Tito10047\PersistentPreferenceBundle\Service\PreferenceManager;
 use Tito10047\PersistentPreferenceBundle\Service\PreferenceManagerInterface;
 use Tito10047\PersistentPreferenceBundle\Storage\SessionStorage;
 use Tito10047\PersistentPreferenceBundle\Storage\StorageInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Tito10047\PersistentPreferenceBundle\Converter\ObjectVarsConverter;
-use Tito10047\PersistentPreferenceBundle\Converter\MetadataConverterInterface;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 
 /**
  * Konfigurácia služieb pre PersistentPreferenceBundle – bez autowire/autoconfigure.
