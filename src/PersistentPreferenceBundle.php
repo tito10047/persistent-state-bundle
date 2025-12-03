@@ -9,6 +9,7 @@ use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 use Tito10047\PersistentPreferenceBundle\Converter\MetadataConverterInterface;
 use Tito10047\PersistentPreferenceBundle\Converter\ObjectVarsConverter;
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagContextKeyResolverPass;
+use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagValueTransformerPass;
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagIdentifierNormalizersPass;
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagIdentityLoadersPass;
 use Tito10047\PersistentPreferenceBundle\Service\PreferenceManager;
@@ -28,7 +29,7 @@ class PersistentPreferenceBundle extends AbstractBundle
     
     public function loadExtension(array $config, ContainerConfigurator $container, ContainerBuilder $builder): void
     {
-			$container->import('../config/services.php');
+   $container->import('../config/services.php');
 		$services = $container->services();
 		// Default metadata converter service
 		$services->set('persistent_preference.converter.object_vars', ObjectVarsConverter::class)
@@ -39,16 +40,18 @@ class PersistentPreferenceBundle extends AbstractBundle
 			$services
 				->set('persistent_preference.manager.'.$name,PreferenceManager::class)
 				->public()
-				->arg('$storage', $storage)
-				->arg('$resolvers', tagged_iterator(AutoTagContextKeyResolverPass::TAG))
-				->tag('persistent_preference.manager', ['name' => $name])
-				;
-		}
-	}
+                ->arg('$resolvers', tagged_iterator(AutoTagContextKeyResolverPass::TAG))
+                ->arg('$transformers', tagged_iterator(AutoTagValueTransformerPass::TAG))
+                ->arg('$storage', $storage)
+                ->tag('persistent_preference.manager', ['name' => $name])
+                ;
+        }
+    }
 
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);
         $container->addCompilerPass(new AutoTagContextKeyResolverPass());
+        $container->addCompilerPass(new AutoTagValueTransformerPass());
     }
 }

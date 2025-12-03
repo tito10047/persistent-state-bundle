@@ -7,20 +7,19 @@ namespace Tito10047\PersistentPreferenceBundle\Transformer;
  */
 class ScalarValueTransformer implements ValueTransformerInterface{
 
-	public function supports(mixed $value): bool {
-		// TODO: Implement transform() method.
+    public function supports(mixed $value): bool {
+        return is_scalar($value) || $value === null;
+    }
 
-	}
+    public function transform(mixed $value): mixed {
+        return $value;
+    }
 
-	public function transform(mixed $value): mixed {
-		// TODO: Implement transform() method.
-	}
+    public function supportsReverse(mixed $value): bool {
+        return is_scalar($value) || $value === null;
+    }
 
-	public function supportsReverse(mixed $value): bool {
-		// TODO: Implement supportsReverse() method.
-	}
-
-	public function reverseTransform(mixed $value): mixed {
-		// TODO: Implement reverseTransform() method.
-	}
+    public function reverseTransform(mixed $value): mixed {
+        return $value;
+    }
 }
