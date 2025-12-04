@@ -14,6 +14,7 @@ use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagIde
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagValueTransformerPass;
 use Tito10047\PersistentPreferenceBundle\Resolver\ObjectContextResolver;
 use Tito10047\PersistentPreferenceBundle\Service\PreferenceManager;
+use Tito10047\PersistentPreferenceBundle\Storage\DoctrineStorage;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ServiceConfigurator;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
@@ -35,6 +36,23 @@ class PersistentPreferenceBundle extends AbstractBundle {
 		// Default metadata converter service
 		$services->set('persistent_preference.converter.object_vars', ObjectVarsConverter::class)
 			->alias(MetadataConverterInterface::class, 'persistent_preference.converter.object_vars');
+
+		// Optional Doctrine storage service from configuration
+		$doctrineCfg = $config['storage']['doctrine'] ?? null;
+		if (is_array($doctrineCfg) && ($doctrineCfg['enabled'] ?? false)) {
+			$serviceId = $doctrineCfg['id'] ?? 'persistent_preference.storage.doctrine';
+			$entityClass = $doctrineCfg['preference_class'] ?? null;
+			$emName = $doctrineCfg['entity_manager'] ?? 'default';
+			$emServiceId = sprintf('doctrine.orm.%s_entity_manager', $emName);
+
+			/** @var ServiceConfigurator $def */
+			$def = $services
+				->set($serviceId, DoctrineStorage::class)
+				->public()
+			;
+			$def->arg('$em', service($emServiceId));
+			$def->arg('$entityClass', $entityClass);
+		}
 
 
 		// 1) Register configured context providers as services

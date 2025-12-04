@@ -29,6 +29,10 @@ return static function (DefinitionConfigurator $definition): void {
 						->arrayNode('doctrine')
 							->canBeEnabled() // Creates an 'enabled' boolean key
 							->children()
+								->scalarNode('id')
+									->info('Service ID to register the Doctrine storage under')
+									->isRequired()
+								->end()
 								->scalarNode('preference_class')
 									->info('The Entity class that implements PreferenceEntityInterface')
 									->isRequired()
