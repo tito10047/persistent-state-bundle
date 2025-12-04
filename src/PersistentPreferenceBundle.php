@@ -12,6 +12,7 @@ use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagCon
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagIdentifierNormalizersPass;
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagIdentityLoadersPass;
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagValueTransformerPass;
+use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\TraceableManagersPass;
 use Tito10047\PersistentPreferenceBundle\Resolver\ObjectContextResolver;
 use Tito10047\PersistentPreferenceBundle\Service\PreferenceManager;
 use Tito10047\PersistentPreferenceBundle\Storage\DoctrineStorage;
@@ -87,9 +88,10 @@ class PersistentPreferenceBundle extends AbstractBundle {
 		}
 	}
 
-	public function build(ContainerBuilder $container): void {
-		parent::build($container);
-		$container->addCompilerPass(new AutoTagContextKeyResolverPass());
-		$container->addCompilerPass(new AutoTagValueTransformerPass());
-	}
+    public function build(ContainerBuilder $container): void {
+        parent::build($container);
+        $container->addCompilerPass(new AutoTagContextKeyResolverPass());
+        $container->addCompilerPass(new AutoTagValueTransformerPass());
+        $container->addCompilerPass(new TraceableManagersPass());
+    }
 }

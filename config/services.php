@@ -1,13 +1,16 @@
 <?php
 
+use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Tito10047\PersistentPreferenceBundle\DataCollector\PreferenceDataCollector;
 use Tito10047\PersistentPreferenceBundle\Converter\MetadataConverterInterface;
 use Tito10047\PersistentPreferenceBundle\Converter\ObjectVarsConverter;
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagContextKeyResolverPass;
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagValueTransformerPass;
 use Tito10047\PersistentPreferenceBundle\Service\PreferenceManager;
 use Tito10047\PersistentPreferenceBundle\Service\PreferenceManagerInterface;
+use Tito10047\PersistentPreferenceBundle\Service\TraceablePreferenceManager;
 use Tito10047\PersistentPreferenceBundle\Storage\SessionStorage;
 use Tito10047\PersistentPreferenceBundle\Storage\StorageInterface;
 use Tito10047\PersistentPreferenceBundle\Resolver\PersistentContextResolver;
@@ -32,7 +35,8 @@ return static function (ContainerConfigurator $container): void {
         ->set('persistent_preference.storage.session',SessionStorage::class)
             ->arg('$requestStack', service(RequestStack::class))
     ;
-    $services->alias(StorageInterface::class, SessionStorage::class);
+    // Alias the interface to our concrete storage service id
+    $services->alias(StorageInterface::class, 'persistent_preference.storage.session');
 
     // --- Built-in Resolvers ---
     $services
@@ -86,5 +90,24 @@ return static function (ContainerConfigurator $container): void {
             ->arg('$container', service('service_container'))
             ->tag('console.command')
     ;
+
+    // --- Data Collector ---
+    // Register only when WebProfiler is installed AND Symfony debug is enabled
+    if (class_exists(WebProfilerBundle::class)) {
+        $appDebug = in_array($container->env(),['dev','test']);
+        if ($appDebug) {
+            $services
+                ->set(PreferenceDataCollector::class)
+                    ->public()
+                    ->arg('$storage', service(StorageInterface::class))
+                    ->tag('data_collector', [
+                        'id' => 'app.preference_collector',
+                        'template' => 'data_collector/panel.html.twig',
+                    ])
+            ;
+
+            // Note: decoration of all managers is handled by a CompilerPass (TraceableManagersPass)
+        }
+    }
 
 };

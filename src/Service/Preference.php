@@ -24,6 +24,11 @@ final class Preference implements PreferenceInterface
 		private readonly EventDispatcherInterface $dispatcher,
     ) {}
 
+    public function getContext(): string
+    {
+        return $this->context;
+    }
+
     public function set(string $key, mixed $value): self
     {
 		$event = new PreferenceEvent($this->context, $key, $value);

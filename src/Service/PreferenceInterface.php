@@ -8,6 +8,10 @@ namespace Tito10047\PersistentPreferenceBundle\Service;
  */
 interface PreferenceInterface
 {
+    /**
+     * Returns the resolved persistent context identifier for this preference instance.
+     */
+    public function getContext(): string;
 	/**
 	 * Sets a preference value.
 	 * Use this for single key updates.

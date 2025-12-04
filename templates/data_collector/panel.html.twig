@@ -1,0 +1,69 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% set status_color = collector.enabled ? '' : 'red' %}
+    {% set icon %}
+        <span class="sf-toolbar-value">Pref</span>
+        <span class="sf-toolbar-label">{{ collector.preferencesCount }}</span>
+    {% endset %}
+    {% set text %}
+        <div class="sf-toolbar-info-piece">
+            <b>Persistent Preferences</b>
+            <span>{{ collector.preferencesCount }} položiek</span>
+        </div>
+    {% endset %}
+
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: profiler_url, status: status_color }) }}
+{% endblock %}
+
+{% block menu %}
+    <span class="label">
+        <span class="icon">⚙️</span>
+        <strong>Preferences</strong>
+    </span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Persistent Preferences</h2>
+    <div class="metrics">
+        <div class="metric">
+            <span class="value">{{ collector.preferencesCount }}</span>
+            <span class="label">Počet preferencií</span>
+        </div>
+    </div>
+
+    <h3>Kontext</h3>
+    <div>
+        <p><strong>Storage:</strong> {{ collector.context.storage }}</p>
+        <p><strong>Route:</strong> {{ collector.context.route ?: 'n/a' }}</p>
+        <p><strong>Distinct contexts this request:</strong> {{ collector.context.contexts|length }}</p>
+    </div>
+
+    {% if collector.context.managers is defined and collector.context.managers %}
+        <h3>Managers</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Manager</th>
+                    <th>Contexts</th>
+                    <th>Count</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for name, info in collector.context.managers %}
+                <tr>
+                    <td><code>{{ name }}</code></td>
+                    <td>
+                        {% if info.contexts is defined and info.contexts %}
+                            {{ info.contexts|join(', ') }}
+                        {% else %}
+                            <em>none</em>
+                        {% endif %}
+                    </td>
+                    <td>{{ info.count|default(0) }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}
