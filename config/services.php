@@ -12,6 +12,8 @@ use Tito10047\PersistentPreferenceBundle\Storage\SessionStorage;
 use Tito10047\PersistentPreferenceBundle\Storage\StorageInterface;
 use Tito10047\PersistentPreferenceBundle\Resolver\PersistentContextResolver;
 use Tito10047\PersistentPreferenceBundle\Transformer\ScalarValueTransformer;
+use Tito10047\PersistentPreferenceBundle\Twig\PreferenceExtension;
+use Tito10047\PersistentPreferenceBundle\Twig\PreferenceRuntime;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 
@@ -60,5 +62,20 @@ return static function (ContainerConfigurator $container): void {
             ->tag('persistent_preference.manager', ['name' => 'default'])
     ;
     $services->alias(PreferenceManagerInterface::class, 'persistent_preference.manager.default');
+
+    // --- Twig Extension ---
+    $services
+        ->set(PreferenceExtension::class)
+            ->public()
+            ->tag('twig.extension')
+    ;
+
+    // --- Twig Runtime ---
+    $services
+        ->set(PreferenceRuntime::class)
+            ->public()
+            ->arg('$preferenceManager', service(PreferenceManagerInterface::class))
+            ->tag('twig.runtime')
+    ;
 
 };
