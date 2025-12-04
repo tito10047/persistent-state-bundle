@@ -13,7 +13,7 @@ persistent_preference:
         doctrine:
             id: 'app.persistent_preference.storage.doctrine'
             enabled: true
-            preference_class: Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Entity\UserPreference
+            preference_class: App\Entity\UserPreference
             entity_manager: 'default'
 
     context_providers:
@@ -63,4 +63,11 @@ class Foo{
     }
 
 }
+```
+
+```twig
+<div>
+    User Foo: {{ preference(user, 'foo') }}<br>
+    Company pref: {{ company|pref('foo2') }}
+</div>
 ```
