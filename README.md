@@ -71,3 +71,33 @@ class Foo{
     Company pref: {{ company|pref('foo2') }}
 </div>
 ```
+
+## Console command: debug:preference
+
+Inspect stored preferences for a specific context directly from CLI.
+
+Usage:
+
+```
+php bin/console debug:preference "user_15" --manager=my_pref_manager
+```
+
+Output example:
+
+```
+Context: user_15
+Storage: doctrine
+
++-------+-------+
+| Key   | Value |
++-------+-------+
+| theme | dark  |
+| limit | 50    |
++-------+-------+
+```
+
+Notes:
+- The `context` argument accepts either a pre-resolved key like `user_15` or any object supported by your configured context resolvers.
+- The `--manager` option selects which preference manager to use. It maps to the service id `persistent_preference.manager.{name}` and defaults to `default` when omitted.
+- The Storage line reflects the underlying storage: `session`, `doctrine`, or the short class name for custom storages.
+- Non-scalar values are JSON-encoded for readability; `null` and booleans are rendered as `null`, `true`/`false`.

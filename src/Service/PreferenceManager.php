@@ -25,6 +25,11 @@ class PreferenceManager implements PreferenceManagerInterface
 		return new Preference($this->transformers, $contextKey, $this->storage);
 	}
 
+	public function getStorage(): StorageInterface
+	{
+		return $this->storage;
+	}
+
 	private function resolveContextKey(object|string $context): string
 	{
 		// 1. If it's already a string, just use it

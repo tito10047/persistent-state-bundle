@@ -14,6 +14,7 @@ use Tito10047\PersistentPreferenceBundle\Resolver\PersistentContextResolver;
 use Tito10047\PersistentPreferenceBundle\Transformer\ScalarValueTransformer;
 use Tito10047\PersistentPreferenceBundle\Twig\PreferenceExtension;
 use Tito10047\PersistentPreferenceBundle\Twig\PreferenceRuntime;
+use Tito10047\PersistentPreferenceBundle\Command\DebugPreferenceCommand;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 
@@ -76,6 +77,14 @@ return static function (ContainerConfigurator $container): void {
             ->public()
             ->arg('$preferenceManager', service(PreferenceManagerInterface::class))
             ->tag('twig.runtime')
+    ;
+
+    // --- Console Command ---
+    $services
+        ->set(DebugPreferenceCommand::class)
+            ->public()
+            ->arg('$container', service('service_container'))
+            ->tag('console.command')
     ;
 
 };
