@@ -10,6 +10,7 @@ use Exception;
 use InvalidArgumentException;
 use RuntimeException;
 use Tito10047\PersistentPreferenceBundle\Selection\Normalizer\IdentifierNormalizerInterface;
+use Tito10047\PersistentPreferenceBundle\Transformer\ValueTransformerInterface;
 
 /**
  * Loader responsible for extracting identifiers and counts from a Doctrine ORM Query object.
@@ -32,7 +33,7 @@ final class DoctrineQueryLoader implements IdentityLoaderInterface {
 	 *
 	 * @return array<int|string>
 	 */
-	public function loadAllIdentifiers(?IdentifierNormalizerInterface $resolver, mixed $source, ?string $identifierPath): array {
+	public function loadAllIdentifiers(?ValueTransformerInterface $transformer, mixed $source): array {
 		if (!$this->supports($source)) {
 			throw new InvalidArgumentException('Source must be a Doctrine Query instance.');
 		}
@@ -52,7 +53,7 @@ final class DoctrineQueryLoader implements IdentityLoaderInterface {
 		}
 
 		$defaultIdField  = $identifierFields[0];
-		$identifierField = ($identifierPath !== null && $identifierPath !== '') ? $identifierPath : $defaultIdField;
+		$identifierField =  $defaultIdField;
 
 		$dql     = $baseQuery->getDQL();
 		$posFrom = stripos($dql, ' from ');

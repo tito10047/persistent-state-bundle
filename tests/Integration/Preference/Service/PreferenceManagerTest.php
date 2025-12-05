@@ -50,26 +50,6 @@ class PreferenceManagerTest extends AssetMapperKernelTestCase
         $this->assertFalse($pref2->has('limit'));
     }
 
-    public function testResolvesObjectContextViaPersistentContextInterface(): void
-    {
-        static::bootKernel();
-        $this->ensureSession();
-        $pm = static::getContainer()->get(PreferenceManagerInterface::class);
-
-        $obj = new class implements PersistentContextInterface {
-            public function getPersistentContext(): string { return 'ctx_object_1'; }
-        };
-
-        $pref = $pm->getPreference($obj);
-        $pref->import(['enabled' => 'true', 'count' => '10']);
-
-        $this->assertTrue($pref->getBool('enabled'));
-        $this->assertSame(10, $pref->getInt('count'));
-        $this->assertSame(['enabled' => true, 'count' => 10], [
-            'enabled' => $pref->getBool('enabled'),
-            'count' => $pref->getInt('count'),
-        ]);
-    }
 
     public function testThrowsForUnsupportedObject(): void
     {

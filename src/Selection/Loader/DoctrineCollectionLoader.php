@@ -5,6 +5,7 @@ namespace Tito10047\PersistentPreferenceBundle\Selection\Loader;
 use Doctrine\Common\Collections\Collection;
 use InvalidArgumentException;
 use Tito10047\PersistentPreferenceBundle\Selection\Normalizer\IdentifierNormalizerInterface;
+use Tito10047\PersistentPreferenceBundle\Transformer\ValueTransformerInterface;
 
 /**
  * Loader responsible for extracting identifiers from Doctrine Collection objects.
@@ -35,11 +36,10 @@ final class DoctrineCollectionLoader implements IdentityLoaderInterface
 	}
 
 	/**
-	 * @param string $identifierPath *
 	 *
 	 * @inheritDoc
 	 */
-	public function loadAllIdentifiers(?IdentifierNormalizerInterface $resolver, mixed $source, ?string $identifierPath): array
+	public function loadAllIdentifiers(?ValueTransformerInterface $transformer, mixed $source): array
 	{
 		if (!$this->supports($source)) {
 			throw new InvalidArgumentException('Source must be a Doctrine Collection.');
@@ -49,7 +49,7 @@ final class DoctrineCollectionLoader implements IdentityLoaderInterface
 		$identifiers = [];
 
 		foreach ($source as $item) {
-			$identifiers[] = $resolver->normalize($item, $identifierPath);
+			$identifiers[] = $transformer->transform($item)->data;
 		}
 
 		return $identifiers;

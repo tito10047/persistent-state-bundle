@@ -9,8 +9,10 @@ use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 use Tito10047\PersistentPreferenceBundle\Converter\MetadataConverterInterface;
 use Tito10047\PersistentPreferenceBundle\Converter\ObjectVarsConverter;
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagContextKeyResolverPass;
+use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagIdentityLoadersPass;
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\TraceableManagersPass;
 use Tito10047\PersistentPreferenceBundle\Preference\Service\PreferenceManager;
+use Tito10047\PersistentPreferenceBundle\Selection\Service\SelectionManager;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 
@@ -47,11 +49,29 @@ class PersistentPreferenceBundle extends AbstractBundle {
 				->arg('$dispatcher', service('event_dispatcher'))
 				->tag('persistent_preference.manager', ['name' => $name]);
 		}
+
+		$configManagers = $config['selection']['managers'] ?? [];
+		foreach($configManagers as $name=>$subConfig){
+			$storage = service(ltrim($subConfig['storage'], '@'));
+			$transformer = service(ltrim($subConfig['transformer'], '@')??null);
+			$metadataTransformer = service(ltrim($subConfig['metadata_transformer'], '@')??null);
+			$ttl = $subConfig['ttl']??null;
+			$services
+				->set('persistent.selection.manager.'.$name,SelectionManager::class)
+				->public()
+				->arg('$storage', $storage)
+				->arg('$transformer', $transformer)
+				->arg('$metadataTransformer', $metadataTransformer)
+				->arg('$loaders', tagged_iterator(AutoTagIdentityLoadersPass::TAG))
+				->arg('$ttl', $ttl)
+			;
+		}
 	}
 
     public function build(ContainerBuilder $container): void {
         parent::build($container);
         $container->addCompilerPass(new AutoTagContextKeyResolverPass());
+        $container->addCompilerPass(new AutoTagIdentityLoadersPass());
         $container->addCompilerPass(new TraceableManagersPass());
     }
 }

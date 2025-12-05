@@ -9,7 +9,10 @@ use Doctrine\ORM\QueryBuilder;
 use Exception;
 use InvalidArgumentException;
 use RuntimeException;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use Tito10047\PersistentPreferenceBundle\Selection\Normalizer\IdentifierNormalizerInterface;
+use Tito10047\PersistentPreferenceBundle\Transformer\ObjectIdValueTransformer;
+use Tito10047\PersistentPreferenceBundle\Transformer\ValueTransformerInterface;
 
 /**
  * Loader pre Doctrine QueryBuilder.
@@ -17,9 +20,6 @@ use Tito10047\PersistentPreferenceBundle\Selection\Normalizer\IdentifierNormaliz
  */
 final class DoctrineQueryBuilderLoader implements IdentityLoaderInterface
 {
-	public function __construct(
-		private IdentifierNormalizerInterface $arrayNormalizer
-	) { }
 
 	public function supports(mixed $source): bool
     {
@@ -28,9 +28,10 @@ final class DoctrineQueryBuilderLoader implements IdentityLoaderInterface
 
     /**
      * @param QueryBuilder $source
+	 *
      * @return array<int|string>
      */
-    public function loadAllIdentifiers(?IdentifierNormalizerInterface $resolver, mixed $source, ?string $identifierPath): array
+    public function loadAllIdentifiers(?ValueTransformerInterface $transformer, mixed $source): array
     {
         if (!$this->supports($source)) {
             throw new InvalidArgumentException('Source must be a Doctrine QueryBuilder instance.');
@@ -58,7 +59,7 @@ final class DoctrineQueryBuilderLoader implements IdentityLoaderInterface
         }
 
         $defaultIdField = $identifierFields[0];
-        $identifierField = ($identifierPath !== null && $identifierPath !== '') ? $identifierPath : $defaultIdField;
+        $identifierField = $defaultIdField;
 
         // prepis SELECT, ostatné časti dotazu (WHERE, JOIN, GROUP BY, HAVING, ORDER BY) ponechaj
         $baseQb->resetDQLPart('select');
@@ -69,8 +70,10 @@ final class DoctrineQueryBuilderLoader implements IdentityLoaderInterface
         $baseQb->setMaxResults(null);
 
         $rows = $baseQb->getQuery()->getResult();
-        return array_map(function($item)use($identifierPath){
-			return $this->arrayNormalizer->normalize($item, $identifierPath);
+
+
+        return array_map(function($item) use($identifierField){
+			return $item[$identifierField];
 		}, $rows);
     }
 

@@ -33,7 +33,12 @@ persistent:
         managers:
             default:
                 storage: '@persistent.selection.storage.session'
-                resolver: '@app.transformer.id'
-            simple:
-                storage: '@persistent.selection.storage.doctrine'
-                resolver: '@app.transformer.id'
+                transformer: '@app.transformer.id'
+                metadata_transformer: '@app.transformer.id'
+                ttl: 3600
+            scalar:
+                transformer: '@persistent.transformer.scalar'
+                metadata_transformer: '@app.transformer.id'
+            array:
+                transformer: '@persistent.transformer.scalar'
+                metadata_transformer: '@app.transformer.id'

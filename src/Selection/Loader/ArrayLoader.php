@@ -4,7 +4,7 @@ namespace Tito10047\PersistentPreferenceBundle\Selection\Loader;
 
 
 use InvalidArgumentException;
-use Tito10047\PersistentPreferenceBundle\Selection\Normalizer\IdentifierNormalizerInterface;
+use Tito10047\PersistentPreferenceBundle\Transformer\ValueTransformerInterface;
 
 final class ArrayLoader implements IdentityLoaderInterface
 {
@@ -14,7 +14,7 @@ final class ArrayLoader implements IdentityLoaderInterface
 		return is_array($source);
 	}
 
-	public function loadAllIdentifiers(?IdentifierNormalizerInterface $resolver, mixed $source, ?string $identifierPath): array
+	public function loadAllIdentifiers(?ValueTransformerInterface $transformer, mixed $source): array
 	{
 		if (!is_array($source)) {
 			throw new InvalidArgumentException('Source must be an array.');
@@ -23,7 +23,7 @@ final class ArrayLoader implements IdentityLoaderInterface
 		$identifiers = [];
 
 		foreach ($source as $item) {
-			$identifiers[] = $resolver->normalize($item, $identifierPath);
+			$identifiers[] = $transformer->transform($item)->data;
 		}
 
 		return $identifiers;

@@ -30,7 +30,7 @@ class DoctrineQueryLoaderTest extends AssetMapperKernelTestCase {
 
 		$ids = array_map(fn(RecordInteger $record) => $record->getId(), $records);
 		sort($ids);
-		$foundIds = $loader->loadAllIdentifiers(null, $query, "id");
+		$foundIds = $loader->loadAllIdentifiers(null, $query);
 		sort($foundIds);
 
 		$this->assertEquals($ids, $foundIds);
@@ -68,7 +68,7 @@ class DoctrineQueryLoaderTest extends AssetMapperKernelTestCase {
 		$this->assertEquals(count($expectedIds), $loader->getTotalCount($query));
 		sort($expectedIds);
 
-		$foundIds = $loader->loadAllIdentifiers(null, $query, 'id');
+		$foundIds = $loader->loadAllIdentifiers(null, $query);
 		sort($foundIds);
 
 		$this->assertEquals($expectedIds, $foundIds);
@@ -106,7 +106,7 @@ class DoctrineQueryLoaderTest extends AssetMapperKernelTestCase {
         $this->assertTrue($loader->supports($query));
         $this->assertEquals(count($expectedIds), $loader->getTotalCount($query));
 
-        $foundIds = $loader->loadAllIdentifiers(null, $query, 'id');
+        $foundIds = $loader->loadAllIdentifiers(null, $query);
         sort($foundIds);
 
         $this->assertEquals($expectedIds, $foundIds);

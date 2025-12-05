@@ -3,12 +3,11 @@
 namespace Tito10047\PersistentPreferenceBundle\Selection\Loader;
 
 
-
-use Tito10047\PersistentPreferenceBundle\Selection\Normalizer\IdentifierNormalizerInterface;
+use Tito10047\PersistentPreferenceBundle\Transformer\ValueTransformerInterface;
 
 interface IdentityLoaderInterface {
 
-	public function loadAllIdentifiers(?IdentifierNormalizerInterface $resolver, mixed $source, ?string $identifierPath): array;
+	public function loadAllIdentifiers(?ValueTransformerInterface $transformer, mixed $source): array;
 
 
 	public function getTotalCount(mixed $source): int;

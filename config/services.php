@@ -8,15 +8,20 @@ use Tito10047\PersistentPreferenceBundle\Converter\MetadataConverterInterface;
 use Tito10047\PersistentPreferenceBundle\Converter\ObjectVarsConverter;
 use Tito10047\PersistentPreferenceBundle\DataCollector\PreferenceDataCollector;
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagContextKeyResolverPass;
+use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagIdentityLoadersPass;
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagValueTransformerPass;
 use Tito10047\PersistentPreferenceBundle\PersistentPreferenceBundle;
 use Tito10047\PersistentPreferenceBundle\Preference\Service\PreferenceManager;
 use Tito10047\PersistentPreferenceBundle\Preference\Service\PreferenceManagerInterface;
 use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceSessionStorage;
 use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceStorageInterface;
-use Tito10047\PersistentPreferenceBundle\Resolver\PersistentContextResolver;
+use Tito10047\PersistentPreferenceBundle\Selection\Loader\ArrayLoader;
+use Tito10047\PersistentPreferenceBundle\Selection\Loader\DoctrineCollectionLoader;
+use Tito10047\PersistentPreferenceBundle\Selection\Loader\DoctrineQueryBuilderLoader;
+use Tito10047\PersistentPreferenceBundle\Selection\Loader\DoctrineQueryLoader;
+use Tito10047\PersistentPreferenceBundle\Selection\Storage\SelectionSessionStorage;
+use Tito10047\PersistentPreferenceBundle\Selection\Storage\SelectionStorageInterface;
 use Tito10047\PersistentPreferenceBundle\Transformer\ArrayValueTransformer;
-use Tito10047\PersistentPreferenceBundle\Transformer\ObjectIdValueTransformer;
 use Tito10047\PersistentPreferenceBundle\Transformer\ScalarValueTransformer;
 use Tito10047\PersistentPreferenceBundle\Twig\PreferenceExtension;
 use Tito10047\PersistentPreferenceBundle\Twig\PreferenceRuntime;
@@ -41,11 +46,6 @@ return static function (ContainerConfigurator $container): void {
     // Alias the interface to our concrete storage service id
     $services->alias(PreferenceStorageInterface::class, 'persistent.preference.storage.session');
 
-    // --- Built-in Resolvers ---
-    $services
-        ->set(PersistentContextResolver::class)
-        ->public()
-    ;
 
     // --- Built-in Value Transformers ---
     $services
@@ -77,11 +77,13 @@ return static function (ContainerConfigurator $container): void {
             ->public()
             ->tag('twig.extension')
     ;
-	foreach([ArrayValueTransformer::class, ScalarValueTransformer::class] as $class){
-		$services->set($class)
-			->public()
-			->tag(PersistentPreferenceBundle::TRANSFORMER_TAG);
-	}
+
+	$services->set(ArrayValueTransformer::class)
+		->public()
+		->tag(PersistentPreferenceBundle::TRANSFORMER_TAG);
+	$services->set("persistent.transformer.scalar",ScalarValueTransformer::class)
+		->public()
+		->tag(PersistentPreferenceBundle::TRANSFORMER_TAG);
 
     // --- Twig Runtime ---
     $services
@@ -90,7 +92,26 @@ return static function (ContainerConfigurator $container): void {
             ->arg('$preferenceManager', service(PreferenceManagerInterface::class))
             ->tag('twig.runtime')
     ;
+// --- Loadery ---
+	$services
+		->set(ArrayLoader::class)
+		->tag(AutoTagIdentityLoadersPass::TAG)
+	;
 
+	$services
+		->set(DoctrineCollectionLoader::class)
+		->tag(AutoTagIdentityLoadersPass::TAG)
+	;
+
+	$services
+		->set(DoctrineQueryLoader::class)
+		->tag(AutoTagIdentityLoadersPass::TAG)
+	;
+
+	$services
+		->set(DoctrineQueryBuilderLoader::class)
+		->tag(AutoTagIdentityLoadersPass::TAG)
+	;
     // --- Console Command ---
     $services
         ->set(DebugPreferenceCommand::class)
@@ -98,6 +119,11 @@ return static function (ContainerConfigurator $container): void {
             ->arg('$container', service('service_container'))
             ->tag('console.command')
     ;
+	$services
+		->set('persistent.selection.storage.session', SelectionSessionStorage::class)
+		->arg('$requestStack', service(RequestStack::class))
+	;
+	$services->alias(SelectionStorageInterface::class, SelectionSessionStorage::class);
 
     // --- Data Collector ---
     // Register only when WebProfiler is installed AND Symfony debug is enabled

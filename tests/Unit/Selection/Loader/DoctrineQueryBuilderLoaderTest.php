@@ -4,7 +4,6 @@ namespace Tito10047\PersistentPreferenceBundle\Tests\Unit\Selection\Loader;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Tito10047\PersistentPreferenceBundle\Selection\Loader\DoctrineQueryBuilderLoader;
-use Tito10047\PersistentPreferenceBundle\Selection\Normalizer\ArrayNormalizer;
 use Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Entity\RecordInteger;
 use Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Factory\RecordIntegerFactory;
 use Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Factory\TestCategoryFactory;
@@ -16,7 +15,7 @@ class DoctrineQueryBuilderLoaderTest extends AssetMapperKernelTestCase
     {
         $records = RecordIntegerFactory::createMany(10);
 
-        $loader = new DoctrineQueryBuilderLoader(new ArrayNormalizer());
+        $loader = new DoctrineQueryBuilderLoader();
 
         /** @var EntityManagerInterface $em */
         $em = self::getContainer()->get('doctrine')->getManager();
@@ -32,7 +31,7 @@ class DoctrineQueryBuilderLoaderTest extends AssetMapperKernelTestCase
 
         $ids = array_map(fn(RecordInteger $record) => $record->getId(), $records);
         sort($ids);
-        $foundIds = $loader->loadAllIdentifiers(null, $qb, 'id');
+        $foundIds = $loader->loadAllIdentifiers(null, $qb);
         sort($foundIds);
 
         $this->assertEquals($ids, $foundIds);
@@ -42,7 +41,7 @@ class DoctrineQueryBuilderLoaderTest extends AssetMapperKernelTestCase
     {
         RecordIntegerFactory::createMany(3);
 
-        $loader = new DoctrineQueryBuilderLoader(new ArrayNormalizer());
+        $loader = new DoctrineQueryBuilderLoader();
 
         /** @var EntityManagerInterface $em */
         $em = self::getContainer()->get('doctrine')->getManager();
@@ -84,7 +83,7 @@ class DoctrineQueryBuilderLoaderTest extends AssetMapperKernelTestCase
 			array_filter($records, fn(RecordInteger $r) => $r->getName()=='keep', ARRAY_FILTER_USE_BOTH)
 		));
 
-        $loader = new DoctrineQueryBuilderLoader(new ArrayNormalizer());
+        $loader = new DoctrineQueryBuilderLoader();
 
         $qb = $em->createQueryBuilder()
             ->select('i')
@@ -101,7 +100,7 @@ class DoctrineQueryBuilderLoaderTest extends AssetMapperKernelTestCase
 
         sort($expectedIds);
 
-        $foundIds = $loader->loadAllIdentifiers(null, $qb, 'id');
+        $foundIds = $loader->loadAllIdentifiers(null, $qb);
         sort($foundIds);
 
         $this->assertEquals($expectedIds, $foundIds);
@@ -120,7 +119,7 @@ class DoctrineQueryBuilderLoaderTest extends AssetMapperKernelTestCase
 		]);
 
 		$records = RecordIntegerFactory::createMany(10);
-        $loader = new DoctrineQueryBuilderLoader(new ArrayNormalizer());
+        $loader = new DoctrineQueryBuilderLoader();
 
 		$expectedIds = array_values(array_map(
 			fn(RecordInteger $r) => $r->getId(),
@@ -140,7 +139,7 @@ class DoctrineQueryBuilderLoaderTest extends AssetMapperKernelTestCase
         $this->assertTrue($loader->supports($qb));
         $this->assertEquals(count($expectedIds), $loader->getTotalCount($qb));
 
-        $foundIds = $loader->loadAllIdentifiers(null, $qb, 'id');
+        $foundIds = $loader->loadAllIdentifiers(null, $qb);
         sort($foundIds);
 
         $this->assertEquals($expectedIds, $foundIds);
