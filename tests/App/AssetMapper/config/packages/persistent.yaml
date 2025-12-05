@@ -28,6 +28,7 @@ persistent:
                 storage: '@persistent.preference.storage.session'
             my_pref_manager:
                 storage: '@app.storage.doctrine'
+
     selection:
         managers:
             default:

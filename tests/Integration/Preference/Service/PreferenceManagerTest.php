@@ -10,7 +10,6 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Tito10047\PersistentPreferenceBundle\Preference\Service\PreferenceManagerInterface;
 use Tito10047\PersistentPreferenceBundle\Preference\Service\PreferenceInterface;
 use Tito10047\PersistentPreferenceBundle\Service\PersistentContextInterface;
-use Tito10047\PersistentPreferenceBundle\Service\PersistentManagerInterface;
 use Tito10047\PersistentPreferenceBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
 
 class PreferenceManagerTest extends AssetMapperKernelTestCase

@@ -9,6 +9,7 @@ use Tito10047\PersistentPreferenceBundle\Event\PreferenceEvents;
 use Tito10047\PersistentPreferenceBundle\Preference\Service\Preference;
 use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceStorageInterface;
 use Tito10047\PersistentPreferenceBundle\Storage\StorableEnvelope;
+use Tito10047\PersistentPreferenceBundle\Transformer\ScalarValueTransformer;
 use Tito10047\PersistentPreferenceBundle\Transformer\ValueTransformerInterface;
 
 class PreferenceTest extends TestCase
@@ -21,6 +22,16 @@ class PreferenceTest extends TestCase
         $tr->method('supportsReverse')->willReturnCallback($supportsReverse ?? static fn() => false);
         $tr->method('reverseTransform')->willReturnCallback($reverseTransform ?? static fn($v) => $v);
         return $tr;
+    }
+
+    public function testGetContextReturnsProvidedContext(): void
+    {
+        $context = 'user_42';
+        $storage = $this->createMock(PreferenceStorageInterface::class);
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        $service = new Preference([], $context, $storage, $dispatcher);
+        self::assertSame($context, $service->getContext());
     }
 
     public function testSetDispatchesPreThenStoresThenDispatchesPost(): void
@@ -140,5 +151,159 @@ class PreferenceTest extends TestCase
 
         $service = new Preference([], $context, $storage, $dispatcher);
         $service->import($values);
+    }
+
+    public function testGetReturnsDefaultWithoutReverseTransform(): void
+    {
+        $context = 'ctx5';
+        $key = 'missing';
+        $default = 'DEF';
+
+        $storage = $this->createMock(PreferenceStorageInterface::class);
+        // storage returns exactly the default value
+        $storage->expects(self::once())
+            ->method('get')
+            ->with($context, $key, $default)
+            ->willReturn($default);
+
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $service = new Preference([], $context, $storage, $dispatcher);
+
+        self::assertSame($default, $service->get($key, $default));
+    }
+
+    public function testGetAppliesReverseTransformWhenSupported(): void
+    {
+        $context = 'ctx6';
+        $key = 'obj';
+        $stored = (new StorableEnvelope('scalar', 'raw'))->toArray();
+
+        $storage = $this->createMock(PreferenceStorageInterface::class);
+        $storage->expects(self::once())
+            ->method('get')
+            ->with($context, $key, null)
+            ->willReturn($stored);
+
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $transformer = $this->makeTransformer(
+            supports: static fn($v) => false,
+            transform: static fn($v) => new StorableEnvelope('scalar', $v),
+            supportsReverse: static fn(StorableEnvelope $v) => $v->className=='scalar',
+            reverseTransform: static fn(StorableEnvelope $v) => $v->data.'_rt',
+        );
+
+        $service = new Preference([$transformer], $context, $storage, $dispatcher);
+        self::assertSame('raw_rt', $service->get($key));
+    }
+
+    public function testGetIntCastsValuesProperly(): void
+    {
+        $context = 'ctx7';
+        $storage = $this->createMock(PreferenceStorageInterface::class);
+
+		$transformer = new ScalarValueTransformer();
+		$map = [
+            // context, key, default => return
+            [$context, 'i1', 0, $transformer->transform(7)->toArray()],
+            [$context, 'i2', 0, $transformer->transform('15')->toArray()],
+            [$context, 'i3', 5, $transformer->transform('no-number')->toArray()],
+        ];
+		$storage->method('get')->willReturnMap($map);
+
+		$dispatcher             = $this->createMock(EventDispatcherInterface::class);
+		$service                = new Preference([$transformer], $context, $storage, $dispatcher);
+
+        self::assertSame(7, $service->getInt('i1'));
+        self::assertSame(15, $service->getInt('i2'));
+        self::assertSame(5, $service->getInt('i3', 5));
+    }
+
+    public function testHasDelegatesToStorage(): void
+    {
+        $context = 'ctx9';
+        $key = 'exists';
+        $storage = $this->createMock(PreferenceStorageInterface::class);
+        $storage->expects(self::once())
+            ->method('has')
+            ->with($context, $key)
+            ->willReturn(true);
+
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $service = new Preference([], $context, $storage, $dispatcher);
+        self::assertTrue($service->has($key));
+    }
+
+    public function testRemoveDelegatesToStorageAndIsFluent(): void
+    {
+        $context = 'ctx10';
+        $key = 'to_remove';
+        $storage = $this->createMock(PreferenceStorageInterface::class);
+        $storage->expects(self::once())
+            ->method('remove')
+            ->with($context, $key);
+
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $service = new Preference([], $context, $storage, $dispatcher);
+
+        self::assertSame($service, $service->remove($key));
+    }
+
+    public function testAllAppliesReverseTransformToEachValue(): void
+    {
+        $context = 'ctx11';
+        $raw = [
+            'a' => (new StorableEnvelope('scalar', '1'))->toArray(),
+            'b' => (new StorableEnvelope('scalar', '2'))->toArray(),
+        ];
+
+        $storage = $this->createMock(PreferenceStorageInterface::class);
+        $storage->expects(self::once())
+            ->method('all')
+            ->with($context)
+            ->willReturn($raw);
+
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $transformer = $this->makeTransformer(
+            supports: static fn($v) => false,
+            transform: static fn($v) => new StorableEnvelope('scalar', $v),
+            supportsReverse: static fn(StorableEnvelope $v) => $v->className === 'scalar',
+            reverseTransform: static fn(StorableEnvelope $v) => 'rt-'.$v->data,
+        );
+
+        $service = new Preference([$transformer], $context, $storage, $dispatcher);
+        self::assertSame(['a' => 'rt-1', 'b' => 'rt-2'], $service->all());
+    }
+
+    public function testSetThenGetRoundtripReturnsSameLogicalValue(): void
+    {
+        $context = 'ctx12';
+        $key = 'round';
+        $input = ['x' => 1];
+
+        $storedValue = null;
+        $storage = $this->createMock(PreferenceStorageInterface::class);
+        $storage->expects(self::once())
+            ->method('set')
+            ->with($context, $key, self::isType('array'))
+            ->willReturnCallback(function ($ctx, $k, $val) use (&$storedValue) { $storedValue = $val; });
+        $storage->expects(self::once())
+            ->method('get')
+            ->with($context, $key, null)
+            ->willReturnCallback(function () use (&$storedValue) { return $storedValue; });
+
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        // Identity forward transform into envelope and exact reverse
+        $transformer = $this->makeTransformer(
+            supports: static fn($v) => is_array($v),
+            transform: static fn($v) => new StorableEnvelope('json', json_encode($v)),
+            supportsReverse: static fn(StorableEnvelope $v) => $v->className=='json',
+            reverseTransform: static fn(StorableEnvelope $v) => json_decode($v->data, true),
+        );
+
+        $service = new Preference([$transformer], $context, $storage, $dispatcher);
+        $service->set($key, $input);
+        $out = $service->get($key);
+
+        self::assertSame($input, $out);
     }
 }

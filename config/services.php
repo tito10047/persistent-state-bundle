@@ -9,11 +9,14 @@ use Tito10047\PersistentPreferenceBundle\Converter\ObjectVarsConverter;
 use Tito10047\PersistentPreferenceBundle\DataCollector\PreferenceDataCollector;
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagContextKeyResolverPass;
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagValueTransformerPass;
+use Tito10047\PersistentPreferenceBundle\PersistentPreferenceBundle;
 use Tito10047\PersistentPreferenceBundle\Preference\Service\PreferenceManager;
 use Tito10047\PersistentPreferenceBundle\Preference\Service\PreferenceManagerInterface;
 use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceSessionStorage;
 use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceStorageInterface;
 use Tito10047\PersistentPreferenceBundle\Resolver\PersistentContextResolver;
+use Tito10047\PersistentPreferenceBundle\Transformer\ArrayValueTransformer;
+use Tito10047\PersistentPreferenceBundle\Transformer\ObjectIdValueTransformer;
 use Tito10047\PersistentPreferenceBundle\Transformer\ScalarValueTransformer;
 use Tito10047\PersistentPreferenceBundle\Twig\PreferenceExtension;
 use Tito10047\PersistentPreferenceBundle\Twig\PreferenceRuntime;
@@ -62,7 +65,7 @@ return static function (ContainerConfigurator $container): void {
         ->set('persistent.preference.manager.default', PreferenceManager::class)
             ->public()
             ->arg('$resolvers', tagged_iterator(AutoTagContextKeyResolverPass::TAG))
-            ->arg('$transformers', tagged_iterator(AutoTagValueTransformerPass::TAG))
+            ->arg('$transformers', tagged_iterator(PersistentPreferenceBundle::TRANSFORMER_TAG))
             ->arg('$storage', service('persistent.preference.storage.session'))
             ->tag('persistent.preference.manager', ['name' => 'default'])
     ;
@@ -74,6 +77,11 @@ return static function (ContainerConfigurator $container): void {
             ->public()
             ->tag('twig.extension')
     ;
+	foreach([ArrayValueTransformer::class, ScalarValueTransformer::class] as $class){
+		$services->set($class)
+			->public()
+			->tag(PersistentPreferenceBundle::TRANSFORMER_TAG);
+	}
 
     // --- Twig Runtime ---
     $services

@@ -6,6 +6,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Tito10047\PersistentPreferenceBundle\Event\PreferenceEvent;
 use Tito10047\PersistentPreferenceBundle\Event\PreferenceEvents;
 use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceStorageInterface;
+use Tito10047\PersistentPreferenceBundle\Storage\StorableEnvelope;
 use Tito10047\PersistentPreferenceBundle\Transformer\ValueTransformerInterface;
 
 /**
@@ -157,17 +158,18 @@ final class Preference implements PreferenceInterface
             }
         }
 
-        return $value; // fallback: store as-is
+		throw  new \RuntimeException("No transformer found for value of type " . gettype($value));
     }
 
-    private function applyReverseTransform(mixed $value): mixed
+    private function applyReverseTransform(array $value): mixed
     {
+		$value = StorableEnvelope::fromArray($value);
         foreach ($this->transformers as $transformer) {
             if ($transformer->supportsReverse($value)) {
                 return $transformer->reverseTransform($value);
             }
         }
 
-        return $value; // fallback: return as-is
+        throw new \RuntimeException("No reverse transformer found for value of type " . $value->className);
     }
 }
