@@ -4,30 +4,31 @@ namespace Tito10047\PersistentPreferenceBundle\Service;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Tito10047\PersistentPreferenceBundle\Resolver\ContextKeyResolverInterface;
-use Tito10047\PersistentPreferenceBundle\Storage\StorageInterface;
+use Tito10047\PersistentPreferenceBundle\Storage\PreferenceStorageInterface;
+use Tito10047\PersistentPreferenceBundle\Storage\SelectionStorageInterface;
 use Tito10047\PersistentPreferenceBundle\Transformer\ValueTransformerInterface;
 
-class PreferenceManager implements PreferenceManagerInterface
+class PersistentManager implements PersistentManagerInterface
 {
 	/**
 	 * @param iterable<ContextKeyResolverInterface> $resolvers
 	 * @param iterable<ValueTransformerInterface> $transformers
 	 */
 	public function __construct(
-		private readonly iterable $resolvers,
-		private readonly iterable $transformers,
-		private readonly StorageInterface $storage,
-		private readonly EventDispatcherInterface $dispatcher,
+		private readonly iterable                   $resolvers,
+		private readonly iterable                   $transformers,
+		private readonly PreferenceStorageInterface $storage,
+		private readonly EventDispatcherInterface   $dispatcher,
 	) {}
 
-	public function getPreference(object|string $context): PreferenceInterface
+	public function getPreference(object|string $owner): PreferenceInterface
 	{
-		$contextKey = $this->resolveContextKey($context);
+		$contextKey = $this->resolveContextKey($owner);
 
 		return new Preference($this->transformers, $contextKey, $this->storage, $this->dispatcher);
 	}
 
-	public function getStorage(): StorageInterface
+	public function getPreferenceStorage(): PreferenceStorageInterface
 	{
 		return $this->storage;
 	}
@@ -50,5 +51,9 @@ class PreferenceManager implements PreferenceManagerInterface
 			'Could not resolve persistent context for object of type "%s". Implement PersistentContextInterface or register a resolver.',
 			get_class($context)
 		));
+	}
+
+	public function getSelection(string $namespace, mixed $owner = null): SelectionInterface {
+		// TODO: Implement getSelection() method.
 	}
 }

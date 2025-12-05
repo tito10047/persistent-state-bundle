@@ -2,7 +2,7 @@
 
 namespace Tito10047\PersistentPreferenceBundle\Twig;
 
-use Tito10047\PersistentPreferenceBundle\Service\PreferenceManagerInterface;
+use Tito10047\PersistentPreferenceBundle\Service\PersistentManagerInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;

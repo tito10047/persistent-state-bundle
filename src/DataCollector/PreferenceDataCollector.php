@@ -7,11 +7,11 @@ namespace Tito10047\PersistentPreferenceBundle\DataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
-use Tito10047\PersistentPreferenceBundle\Storage\StorageInterface;
+use Tito10047\PersistentPreferenceBundle\Storage\PreferenceStorageInterface;
 
 final class PreferenceDataCollector extends DataCollector
 {
-    public function __construct(private readonly StorageInterface $storage)
+    public function __construct(private readonly PreferenceStorageInterface $storage)
     {
         $this->reset();
     }

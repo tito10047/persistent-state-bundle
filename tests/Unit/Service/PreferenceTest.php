@@ -7,7 +7,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Tito10047\PersistentPreferenceBundle\Event\PreferenceEvent;
 use Tito10047\PersistentPreferenceBundle\Event\PreferenceEvents;
 use Tito10047\PersistentPreferenceBundle\Service\Preference;
-use Tito10047\PersistentPreferenceBundle\Storage\StorageInterface;
+use Tito10047\PersistentPreferenceBundle\Storage\PreferenceStorageInterface;
 use Tito10047\PersistentPreferenceBundle\Transformer\ValueTransformerInterface;
 
 class PreferenceTest extends TestCase
@@ -29,7 +29,7 @@ class PreferenceTest extends TestCase
         $input = 'dark';
         $transformed = 'dark_trans';
 
-        $storage = $this->createMock(StorageInterface::class);
+        $storage = $this->createMock(PreferenceStorageInterface::class);
         $storage->expects(self::once())
             ->method('set')
             ->with($context, $key, $transformed);
@@ -71,7 +71,7 @@ class PreferenceTest extends TestCase
         $key = 'k';
         $value = 123;
 
-        $storage = $this->createMock(StorageInterface::class);
+        $storage = $this->createMock(PreferenceStorageInterface::class);
         $storage->expects(self::never())->method('set');
 
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
@@ -93,7 +93,7 @@ class PreferenceTest extends TestCase
         $values = ['a' => 1, 'b' => 2];
         $transformed = ['a' => '1t', 'b' => '2t'];
 
-        $storage = $this->createMock(StorageInterface::class);
+        $storage = $this->createMock(PreferenceStorageInterface::class);
         $storage->expects(self::once())
             ->method('setMultiple')
             ->with($context, $transformed);
@@ -119,7 +119,7 @@ class PreferenceTest extends TestCase
         $context = 'ctx4';
         $values = ['x' => 10, 'y' => 20];
 
-        $storage = $this->createMock(StorageInterface::class);
+        $storage = $this->createMock(PreferenceStorageInterface::class);
         $storage->expects(self::never())->method('setMultiple');
 
         $dispatcher = $this->createMock(EventDispatcherInterface::class);

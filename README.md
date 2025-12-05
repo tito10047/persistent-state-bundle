@@ -3,27 +3,35 @@
 # 🛒 Persistent Preference Bundle
 
 ```yaml
-persistent_preference:
-    managers:
-        default:
-            storage: 'persistent_preference.storage.session'
-        my_pref_manager:
-            storage: 'app.persistent_preference.storage.doctrine'
-    storage:
-        doctrine:
-            id: 'app.persistent_preference.storage.doctrine'
-            enabled: true
-            preference_class: App\Entity\UserPreference
-            entity_manager: 'default'
+services:
+    app.users_resolver:
+        class: Tito10047\PersistentPreferenceBundle\Resolver\ObjectContextResolver
+        arguments:
+            $targetClass: App\Entity\User
+            $identifierMethod: 'getName'
+    app.companies_resolver:
+        class: Tito10047\PersistentPreferenceBundle\Resolver\ObjectContextResolver
+        arguments:
+            $targetClass: App\Entity\Company
+    app.storage.doctrine:
+        class: Tito10047\PersistentPreferenceBundle\Storage\DoctrinePreferenceStorage
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Entity\UserPreference
 
-    context_providers:
-        users:
-            class: App\Entity\User
-            prefix: 'user'
-        companies:
-            class: App\Entity\Company
-            prefix: 'company'
-            identifier_method: 'getUuid'
+persistent:
+    preference:
+        managers:
+            default:
+                storage: '@persistent_preference.storage.session'
+            my_pref_manager:
+                storage: '@app.storage.doctrine'
+    selection:
+        managers:
+            default:
+                storage: 'persistent.selection.storage.session'
+            simple:
+                storage: 'persistent.selection.storage.doctrine'
 ```
 
 ```php
@@ -32,20 +40,34 @@ namespace ;
 use \Symfony\Component\DependencyInjection\Attribute\Autowire;
 use \App\Entity\User;
 use \App\Entity\Company;
+use \App\Entity\Product;
 
 class Foo{
 
     public function __construct(
-        private readonly PreferenceManagerInterface $sessionPrefManager
-        #[Autowire('persistent_preference.manager.my_pref_manager')]
-        private readonly PreferenceManagerInterface $doctrinePrefManager,
+        private readonly PreconfiguredPreferenceInterface $sessionPrefManager
+        #[Autowire('persistent.preference.my_pref_manager')]
+        private readonly PreconfiguredPreferenceInterface $doctrinePrefManager,
+        private readonly PreconfiguredSelectionInterface $sessionPrefManager,
+        #[Autowire('persistent.selection.my_sel_manager')]
+        private readonly PreconfiguredSelectionInterface $doctrinePrefManager,
         private readonly EntityManagerInterface $em
     ) {}
     
-    public function bar(User $user, Company $company){
+    public function bar(User $user, Company $company, Product $product){
         
         $userPref = $this->sessionPrefManager->getPreference($user);
         $companyPref = $this->doctrinePrefManager->getPreference($company);
+        
+        $cartSelection = $this->sessionPrefManager->getSelection($user,"cart");
+        $companySelection = $this->doctrinePrefManager->getSelection($company, "products");
+        
+        $cartSelection->select($product, [
+            'quantity' => $request->get('qty', 1),
+            'added_at' => new \DateTime()
+        ]);
+        
+        $companySelection->select($product);
     
         $userPref->set('foo', 'bar');
         $userPref->set('baz', [1,2,3]);
@@ -60,8 +82,13 @@ class Foo{
         
         $foo2 = $companyPref->get('foo2');
         $baz2 = $companyPref->get('baz2');
+        
+        $selectedItems = $cartSelection->getSelectedObjects(); 
+        $selectedProducts = $companySelection->getSelectedObjects(); 
+        
+        
+        $cart->destroy();
     }
-
 }
 ```
 

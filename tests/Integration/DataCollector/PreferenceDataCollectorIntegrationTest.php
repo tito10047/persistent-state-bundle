@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Tito10047\PersistentPreferenceBundle\DataCollector\PreferenceDataCollector;
-use Tito10047\PersistentPreferenceBundle\Service\PreferenceManagerInterface;
+use Tito10047\PersistentPreferenceBundle\Service\PersistentManagerInterface;
 use Tito10047\PersistentPreferenceBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
 
 final class PreferenceDataCollectorIntegrationTest extends AssetMapperKernelTestCase
@@ -22,8 +22,8 @@ final class PreferenceDataCollectorIntegrationTest extends AssetMapperKernelTest
         $container = self::getContainer();
 
         // Write some preferences using the real manager & session-backed storage
-        /** @var PreferenceManagerInterface $manager */
-        $manager = $container->get(PreferenceManagerInterface::class);
+        /** @var PersistentManagerInterface $manager */
+        $manager = $container->get(PersistentManagerInterface::class);
 
         $contextKey = 'integration_test_ctx';
 
@@ -42,7 +42,7 @@ final class PreferenceDataCollectorIntegrationTest extends AssetMapperKernelTest
         ]);
 
         // Create collector (service may not be registered when profiler is absent)
-        $storage = $container->get(\Tito10047\PersistentPreferenceBundle\Storage\StorageInterface::class);
+        $storage = $container->get(\Tito10047\PersistentPreferenceBundle\Storage\PreferenceStorageInterface::class);
         $collector = new PreferenceDataCollector($storage);
         self::assertInstanceOf(DataCollectorInterface::class, $collector);
 

@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Tito10047\PersistentPreferenceBundle\DataCollector\PreferenceDataCollector;
-use Tito10047\PersistentPreferenceBundle\Service\TraceablePreferenceManager;
+use Tito10047\PersistentPreferenceBundle\Service\TraceablePersistentManager;
 
 /**
  * Decorates all preference managers with TraceablePreferenceManager in debug mode
@@ -42,7 +42,7 @@ final class TraceableManagersPass implements CompilerPassInterface
                 continue; // already decorated
             }
 
-            $definition = new Definition(TraceablePreferenceManager::class);
+            $definition = new Definition(TraceablePersistentManager::class);
             $definition->setPublic(true);
             $definition->setDecoratedService($serviceId);
             $definition->setArguments([

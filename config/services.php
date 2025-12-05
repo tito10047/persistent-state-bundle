@@ -8,11 +8,11 @@ use Tito10047\PersistentPreferenceBundle\Converter\MetadataConverterInterface;
 use Tito10047\PersistentPreferenceBundle\Converter\ObjectVarsConverter;
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagContextKeyResolverPass;
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagValueTransformerPass;
-use Tito10047\PersistentPreferenceBundle\Service\PreferenceManager;
-use Tito10047\PersistentPreferenceBundle\Service\PreferenceManagerInterface;
-use Tito10047\PersistentPreferenceBundle\Service\TraceablePreferenceManager;
-use Tito10047\PersistentPreferenceBundle\Storage\SessionStorage;
-use Tito10047\PersistentPreferenceBundle\Storage\StorageInterface;
+use Tito10047\PersistentPreferenceBundle\Service\PersistentManager;
+use Tito10047\PersistentPreferenceBundle\Service\PersistentManagerInterface;
+use Tito10047\PersistentPreferenceBundle\Service\TraceablePersistentManager;
+use Tito10047\PersistentPreferenceBundle\Storage\PreferenceSessionStorage;
+use Tito10047\PersistentPreferenceBundle\Storage\PreferenceStorageInterface;
 use Tito10047\PersistentPreferenceBundle\Resolver\PersistentContextResolver;
 use Tito10047\PersistentPreferenceBundle\Transformer\ScalarValueTransformer;
 use Tito10047\PersistentPreferenceBundle\Twig\PreferenceExtension;
@@ -32,11 +32,12 @@ return static function (ContainerConfigurator $container): void {
 
 	// --- Storage ---
     $services
-        ->set('persistent_preference.storage.session',SessionStorage::class)
+        ->set('persistent_preference.storage.session',PreferenceSessionStorage::class)
             ->arg('$requestStack', service(RequestStack::class))
+		->public()
     ;
     // Alias the interface to our concrete storage service id
-    $services->alias(StorageInterface::class, 'persistent_preference.storage.session');
+    $services->alias(PreferenceStorageInterface::class, 'persistent_preference.storage.session');
 
     // --- Built-in Resolvers ---
     $services
@@ -59,14 +60,14 @@ return static function (ContainerConfigurator $container): void {
 
     // --- PreferenceManager ---
     $services
-        ->set('persistent_preference.manager.default', PreferenceManager::class)
+        ->set('persistent_preference.manager.default', PersistentManager::class)
             ->public()
             ->arg('$resolvers', tagged_iterator(AutoTagContextKeyResolverPass::TAG))
             ->arg('$transformers', tagged_iterator(AutoTagValueTransformerPass::TAG))
             ->arg('$storage', service('persistent_preference.storage.session'))
             ->tag('persistent_preference.manager', ['name' => 'default'])
     ;
-    $services->alias(PreferenceManagerInterface::class, 'persistent_preference.manager.default');
+    $services->alias(PersistentManagerInterface::class, 'persistent_preference.manager.default');
 
     // --- Twig Extension ---
     $services
@@ -79,7 +80,7 @@ return static function (ContainerConfigurator $container): void {
     $services
         ->set(PreferenceRuntime::class)
             ->public()
-            ->arg('$preferenceManager', service(PreferenceManagerInterface::class))
+            ->arg('$preferenceManager', service(PersistentManagerInterface::class))
             ->tag('twig.runtime')
     ;
 
@@ -99,7 +100,7 @@ return static function (ContainerConfigurator $container): void {
             $services
                 ->set(PreferenceDataCollector::class)
                     ->public()
-                    ->arg('$storage', service(StorageInterface::class))
+                    ->arg('$storage', service(PreferenceStorageInterface::class))
                     ->tag('data_collector', [
                         'id' => 'app.preference_collector',
                         'template' => 'data_collector/panel.html.twig',

@@ -7,11 +7,11 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Tito10047\PersistentPreferenceBundle\Storage\SessionStorage;
+use Tito10047\PersistentPreferenceBundle\Storage\PreferenceSessionStorage;
 
-class SessionStorageTest extends TestCase
+class PreferenceSessionStorageTest extends TestCase
 {
-    private function createStorageWithSession(?SessionInterface $session): SessionStorage
+    private function createStorageWithSession(?SessionInterface $session): PreferenceSessionStorage
     {
         $stack = $this->createMock(RequestStack::class);
 
@@ -23,7 +23,7 @@ class SessionStorageTest extends TestCase
             $stack->method('getCurrentRequest')->willReturn($request);
         }
 
-        return new SessionStorage($stack);
+        return new PreferenceSessionStorage($stack);
     }
 
     /** @return SessionInterface&MockObject */

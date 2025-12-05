@@ -5,7 +5,7 @@ namespace Tito10047\PersistentPreferenceBundle\Service;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Tito10047\PersistentPreferenceBundle\Event\PreferenceEvent;
 use Tito10047\PersistentPreferenceBundle\Event\PreferenceEvents;
-use Tito10047\PersistentPreferenceBundle\Storage\StorageInterface;
+use Tito10047\PersistentPreferenceBundle\Storage\PreferenceStorageInterface;
 use Tito10047\PersistentPreferenceBundle\Transformer\ValueTransformerInterface;
 
 /**
@@ -18,10 +18,10 @@ final class Preference implements PreferenceInterface
      * @param iterable<ValueTransformerInterface> $transformers
      */
     public function __construct(
-        private readonly iterable $transformers,
-        private readonly string $context,
-        private readonly StorageInterface $storage,
-		private readonly EventDispatcherInterface $dispatcher,
+        private readonly iterable                   $transformers,
+        private readonly string                     $context,
+        private readonly PreferenceStorageInterface $storage,
+		private readonly EventDispatcherInterface   $dispatcher,
     ) {}
 
     public function getContext(): string

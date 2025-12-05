@@ -5,7 +5,7 @@ namespace Tito10047\PersistentPreferenceBundle\Tests\Integration\Service;
 use PHPUnit\Framework\Attributes\TestWith;
 use stdClass;
 use Tito10047\PersistentPreferenceBundle\Service\PreferenceInterface;
-use Tito10047\PersistentPreferenceBundle\Service\PreferenceManagerInterface;
+use Tito10047\PersistentPreferenceBundle\Service\PersistentManagerInterface;
 use Tito10047\PersistentPreferenceBundle\Service\PersistentContextInterface;
 use Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\ServiceHelper;
 use Tito10047\PersistentPreferenceBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
@@ -38,7 +38,7 @@ class PreferenceManagerTest extends AssetMapperKernelTestCase
     {
         static::bootKernel();
         $this->ensureSession();
-        $pm = static::getContainer()->get(PreferenceManagerInterface::class);
+        $pm = static::getContainer()->get(PersistentManagerInterface::class);
 
         $pref = $pm->getPreference('user_1');
         $this->assertInstanceOf(PreferenceInterface::class, $pref);
@@ -59,7 +59,7 @@ class PreferenceManagerTest extends AssetMapperKernelTestCase
     {
         static::bootKernel();
         $this->ensureSession();
-        $pm = static::getContainer()->get(PreferenceManagerInterface::class);
+        $pm = static::getContainer()->get(PersistentManagerInterface::class);
 
         $obj = new class implements PersistentContextInterface {
             public function getPersistentContext(): string { return 'ctx_object_1'; }
@@ -80,7 +80,7 @@ class PreferenceManagerTest extends AssetMapperKernelTestCase
     {
         static::bootKernel();
         $this->ensureSession();
-        $pm = static::getContainer()->get(PreferenceManagerInterface::class);
+        $pm = static::getContainer()->get(PersistentManagerInterface::class);
 
         $this->expectException(\InvalidArgumentException::class);
         $pm->getPreference(new stdClass());

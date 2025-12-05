@@ -6,7 +6,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\QueryBuilder;
 
-final class DoctrineStorage implements StorageInterface
+final class DoctrinePreferenceStorage implements PreferenceStorageInterface
 {
     public function __construct(
         private readonly EntityManagerInterface $em,

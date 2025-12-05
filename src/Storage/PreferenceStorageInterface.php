@@ -9,7 +9,7 @@ namespace Tito10047\PersistentPreferenceBundle\Storage;
  * type casting. It simply stores and retrieves serialized data (scalars/arrays)
  * associated with a specific context string.
  */
-interface StorageInterface
+interface PreferenceStorageInterface
 {
 	/**
 	 * Retrieves a raw value from storage.

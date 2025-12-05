@@ -14,8 +14,8 @@ use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagIde
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagValueTransformerPass;
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\TraceableManagersPass;
 use Tito10047\PersistentPreferenceBundle\Resolver\ObjectContextResolver;
-use Tito10047\PersistentPreferenceBundle\Service\PreferenceManager;
-use Tito10047\PersistentPreferenceBundle\Storage\DoctrineStorage;
+use Tito10047\PersistentPreferenceBundle\Service\PersistentManager;
+use Tito10047\PersistentPreferenceBundle\Storage\DoctrinePreferenceStorage;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ServiceConfigurator;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
@@ -25,7 +25,7 @@ use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_it
  */
 class PersistentPreferenceBundle extends AbstractBundle {
 
-	protected string $extensionAlias = 'persistent_preference';
+	protected string $extensionAlias = 'persistent';
 
 	public function configure(DefinitionConfigurator $definition): void {
 		$definition->import('../config/definition.php');
@@ -38,51 +38,17 @@ class PersistentPreferenceBundle extends AbstractBundle {
 		$services->set('persistent_preference.converter.object_vars', ObjectVarsConverter::class)
 			->alias(MetadataConverterInterface::class, 'persistent_preference.converter.object_vars');
 
-		// Optional Doctrine storage service from configuration
-		$doctrineCfg = $config['storage']['doctrine'] ?? null;
-		if (is_array($doctrineCfg) && ($doctrineCfg['enabled'] ?? false)) {
-			$serviceId = $doctrineCfg['id'] ?? 'persistent_preference.storage.doctrine';
-			$entityClass = $doctrineCfg['preference_class'] ?? null;
-			$emName = $doctrineCfg['entity_manager'] ?? 'default';
-			$emServiceId = sprintf('doctrine.orm.%s_entity_manager', $emName);
 
-			/** @var ServiceConfigurator $def */
-			$def = $services
-				->set($serviceId, DoctrineStorage::class)
-				->public()
-			;
-			$def->arg('$em', service($emServiceId));
-			$def->arg('$entityClass', $entityClass);
-		}
-
-
-		// 1) Register configured context providers as services
-		$contextProviders = $config['context_providers'] ?? [];
-		foreach ($contextProviders as $name => $providerCfg) {
-			$serviceId = 'persistent_preference.context_resolver.' . $name;
-			/** @var ServiceConfigurator $def */
-			$def = $services
-				->set($serviceId, ObjectContextResolver::class)
-				->public()
-			;
-			$def->arg('$class', $providerCfg['class']);
-			$def->arg('$prefix', $providerCfg['prefix']);
-			$def->arg('$identifierMethod', $providerCfg['identifier_method'] ?? 'getId');
-
-			// Manually tag as a context key resolver so it's injected into managers
-			$def->tag(AutoTagContextKeyResolverPass::TAG);
-		}
-
-		// 2) Register managers
-		$configManagers = $config['managers'] ?? [];
+		$configManagers = $config['preference']['managers'] ?? [];
 		foreach ($configManagers as $name => $subConfig) {
-			$storage = service($subConfig['storage'] ?? 'persistent_preference.storage.session');
+			$storage = service($subConfig['storage'] ?? '@persistent_preference.storage.session');
+			$storage = ltrim($storage, '@');
 			$services
-				->set('persistent_preference.manager.' . $name, PreferenceManager::class)
+				->set('persistent_preference.manager.' . $name, PersistentManager::class)
 				->public()
 				->arg('$resolvers', tagged_iterator(AutoTagContextKeyResolverPass::TAG))
 				->arg('$transformers', tagged_iterator(AutoTagValueTransformerPass::TAG))
-				->arg('$storage', $storage)
+				->arg('$storage', service($storage))
 				->arg('$dispatcher', service('event_dispatcher'))
 				->tag('persistent_preference.manager', ['name' => $name]);
 		}

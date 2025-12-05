@@ -10,10 +10,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Tito10047\PersistentPreferenceBundle\Service\PreferenceManagerInterface;
-use Tito10047\PersistentPreferenceBundle\Storage\DoctrineStorage;
-use Tito10047\PersistentPreferenceBundle\Storage\SessionStorage;
-use Tito10047\PersistentPreferenceBundle\Storage\StorageInterface;
+use Tito10047\PersistentPreferenceBundle\Service\PersistentManagerInterface;
+use Tito10047\PersistentPreferenceBundle\Storage\DoctrinePreferenceStorage;
+use Tito10047\PersistentPreferenceBundle\Storage\PreferenceSessionStorage;
+use Tito10047\PersistentPreferenceBundle\Storage\PreferenceStorageInterface;
 
 #[AsCommand(name: 'debug:preference', description: 'Print preferences for a given context and manager')]
 final class DebugPreferenceCommand extends Command
@@ -44,12 +44,12 @@ final class DebugPreferenceCommand extends Command
         }
 
         $manager = $this->container->get($serviceId);
-        if (!$manager instanceof PreferenceManagerInterface) {
+        if (!$manager instanceof PersistentManagerInterface) {
             $io->error(sprintf('Service "%s" is not a PreferenceManagerInterface.', $serviceId));
             return Command::FAILURE;
         }
 
-        $storage = $manager->getStorage();
+        $storage = $manager->getPreferenceStorage();
         $storageName = $this->detectStorageName($storage);
 
         $preference = $manager->getPreference($context);
@@ -77,11 +77,11 @@ final class DebugPreferenceCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function detectStorageName(StorageInterface $storage): string
+    private function detectStorageName(PreferenceStorageInterface $storage): string
     {
         return match (true) {
-            $storage instanceof DoctrineStorage => 'doctrine',
-            $storage instanceof SessionStorage => 'session',
+            $storage instanceof DoctrinePreferenceStorage => 'doctrine',
+            $storage instanceof PreferenceSessionStorage => 'session',
             default => (new \ReflectionClass($storage))->getShortName(),
         };
     }

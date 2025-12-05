@@ -2,7 +2,7 @@
 
 namespace Tito10047\PersistentPreferenceBundle\Tests\Integration\Storage;
 
-use Tito10047\PersistentPreferenceBundle\Storage\DoctrineStorage;
+use Tito10047\PersistentPreferenceBundle\Storage\DoctrinePreferenceStorage;
 use Tito10047\PersistentPreferenceBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
 
 class DoctrineStorageTest extends AssetMapperKernelTestCase
@@ -12,12 +12,12 @@ class DoctrineStorageTest extends AssetMapperKernelTestCase
         static::bootKernel();
         $container = static::getContainer();
 
-        $serviceId = 'app.persistent_preference.storage.doctrine';
+        $serviceId = 'app.storage.doctrine';
         $this->assertTrue($container->has($serviceId), 'Doctrine storage service should be registered with configured id');
 
-        /** @var DoctrineStorage $storage */
+        /** @var DoctrinePreferenceStorage $storage */
         $storage = $container->get($serviceId);
-        $this->assertInstanceOf(DoctrineStorage::class, $storage);
+        $this->assertInstanceOf(DoctrinePreferenceStorage::class, $storage);
 
         // Basic CRUD
         $ctx = 'user_99';

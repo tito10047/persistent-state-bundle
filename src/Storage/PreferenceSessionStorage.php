@@ -5,7 +5,7 @@ namespace Tito10047\PersistentPreferenceBundle\Storage;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
-final class SessionStorage implements StorageInterface
+final class PreferenceSessionStorage implements PreferenceStorageInterface
 {
     private const SESSION_PREFIX = '_persistent_preference_';
 
