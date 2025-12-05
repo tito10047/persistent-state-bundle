@@ -1,6 +1,6 @@
 <?php
 
-namespace Integration\Preference\Storage;
+namespace Tito10047\PersistentPreferenceBundle\Tests\Integration\Preference\Storage;
 
 use Tito10047\PersistentPreferenceBundle\Storage\DoctrinePreferenceStorage;
 use Tito10047\PersistentPreferenceBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;

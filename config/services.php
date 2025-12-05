@@ -9,6 +9,7 @@ use Tito10047\PersistentPreferenceBundle\Converter\ObjectVarsConverter;
 use Tito10047\PersistentPreferenceBundle\DataCollector\PreferenceDataCollector;
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagContextKeyResolverPass;
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagValueTransformerPass;
+use Tito10047\PersistentPreferenceBundle\Preference\Service\PreconfiguredPreferenceInterface;
 use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceSessionStorage;
 use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceStorageInterface;
 use Tito10047\PersistentPreferenceBundle\Resolver\PersistentContextResolver;
@@ -66,7 +67,7 @@ return static function (ContainerConfigurator $container): void {
             ->arg('$storage', service('persistent_preference.storage.session'))
             ->tag('persistent_preference.manager', ['name' => 'default'])
     ;
-    $services->alias(PersistentManagerInterface::class, 'persistent_preference.manager.default');
+    $services->alias(PreconfiguredPreferenceInterface::class, 'persistent_preference.manager.default');
 
     // --- Twig Extension ---
     $services
@@ -79,7 +80,7 @@ return static function (ContainerConfigurator $container): void {
     $services
         ->set(PreferenceRuntime::class)
             ->public()
-            ->arg('$preferenceManager', service(PersistentManagerInterface::class))
+            ->arg('$preferenceManager', service(PreconfiguredPreferenceInterface::class))
             ->tag('twig.runtime')
     ;
 

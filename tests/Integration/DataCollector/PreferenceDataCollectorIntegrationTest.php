@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Tito10047\PersistentPreferenceBundle\DataCollector\PreferenceDataCollector;
+use Tito10047\PersistentPreferenceBundle\Preference\Service\PreconfiguredPreferenceInterface;
 use Tito10047\PersistentPreferenceBundle\Service\PersistentManagerInterface;
 use Tito10047\PersistentPreferenceBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
 
@@ -23,7 +24,7 @@ final class PreferenceDataCollectorIntegrationTest extends AssetMapperKernelTest
 
         // Write some preferences using the real manager & session-backed storage
         /** @var PersistentManagerInterface $manager */
-        $manager = $container->get(PersistentManagerInterface::class);
+        $manager = $container->get(PreconfiguredPreferenceInterface::class);
 
         $contextKey = 'integration_test_ctx';
 

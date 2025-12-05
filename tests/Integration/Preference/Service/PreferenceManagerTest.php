@@ -1,17 +1,16 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Tests\Integration\Service;
+namespace Tito10047\PersistentPreferenceBundle\Tests\Integration\Preference\Service;
 
 use stdClass;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Tito10047\PersistentPreferenceBundle\Enum\PreferenceMode;
+use Tito10047\PersistentPreferenceBundle\Preference\Service\PreconfiguredPreferenceInterface;
 use Tito10047\PersistentPreferenceBundle\Preference\Service\PreferenceInterface;
 use Tito10047\PersistentPreferenceBundle\Service\PersistentContextInterface;
 use Tito10047\PersistentPreferenceBundle\Service\PersistentManagerInterface;
-use Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Support\TestList;
 use Tito10047\PersistentPreferenceBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
 
 class PreferenceManagerTest extends AssetMapperKernelTestCase
@@ -35,7 +34,7 @@ class PreferenceManagerTest extends AssetMapperKernelTestCase
     {
         static::bootKernel();
         $this->ensureSession();
-        $pm = static::getContainer()->get(PersistentManagerInterface::class);
+        $pm = static::getContainer()->get(PreconfiguredPreferenceInterface::class);
 
         $pref = $pm->getPreference('user_1');
         $this->assertInstanceOf(PreferenceInterface::class, $pref);
@@ -56,7 +55,7 @@ class PreferenceManagerTest extends AssetMapperKernelTestCase
     {
         static::bootKernel();
         $this->ensureSession();
-        $pm = static::getContainer()->get(PersistentManagerInterface::class);
+        $pm = static::getContainer()->get(PreconfiguredPreferenceInterface::class);
 
         $obj = new class implements PersistentContextInterface {
             public function getPersistentContext(): string { return 'ctx_object_1'; }
@@ -77,7 +76,7 @@ class PreferenceManagerTest extends AssetMapperKernelTestCase
     {
         static::bootKernel();
         $this->ensureSession();
-        $pm = static::getContainer()->get(PersistentManagerInterface::class);
+        $pm = static::getContainer()->get(PreconfiguredPreferenceInterface::class);
 
         $this->expectException(\InvalidArgumentException::class);
         $pm->getPreference(new stdClass());
