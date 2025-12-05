@@ -2,12 +2,12 @@
 
 namespace Tito10047\PersistentPreferenceBundle\Twig;
 
-use Tito10047\PersistentPreferenceBundle\Service\PersistentManagerInterface;
+use Tito10047\PersistentPreferenceBundle\Preference\Service\PreferenceManagerInterface;
 use Twig\Extension\RuntimeExtensionInterface;
 
 final class PreferenceRuntime implements RuntimeExtensionInterface
 {
-    public function __construct(private readonly PersistentManagerInterface $preferenceManager)
+    public function __construct(private readonly PreferenceManagerInterface $preferenceManager)
     {
     }
 

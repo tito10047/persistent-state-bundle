@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Tito10047\PersistentPreferenceBundle\Preference\Service\PreconfiguredPreferenceInterface;
+use Tito10047\PersistentPreferenceBundle\Preference\Service\PreferenceManagerInterface;
 use Tito10047\PersistentPreferenceBundle\Preference\Service\PreferenceInterface;
 use Tito10047\PersistentPreferenceBundle\Service\PersistentContextInterface;
 use Tito10047\PersistentPreferenceBundle\Service\PersistentManagerInterface;
@@ -34,7 +34,7 @@ class PreferenceManagerTest extends AssetMapperKernelTestCase
     {
         static::bootKernel();
         $this->ensureSession();
-        $pm = static::getContainer()->get(PreconfiguredPreferenceInterface::class);
+        $pm = static::getContainer()->get(PreferenceManagerInterface::class);
 
         $pref = $pm->getPreference('user_1');
         $this->assertInstanceOf(PreferenceInterface::class, $pref);
@@ -55,7 +55,7 @@ class PreferenceManagerTest extends AssetMapperKernelTestCase
     {
         static::bootKernel();
         $this->ensureSession();
-        $pm = static::getContainer()->get(PreconfiguredPreferenceInterface::class);
+        $pm = static::getContainer()->get(PreferenceManagerInterface::class);
 
         $obj = new class implements PersistentContextInterface {
             public function getPersistentContext(): string { return 'ctx_object_1'; }
@@ -76,7 +76,7 @@ class PreferenceManagerTest extends AssetMapperKernelTestCase
     {
         static::bootKernel();
         $this->ensureSession();
-        $pm = static::getContainer()->get(PreconfiguredPreferenceInterface::class);
+        $pm = static::getContainer()->get(PreferenceManagerInterface::class);
 
         $this->expectException(\InvalidArgumentException::class);
         $pm->getPreference(new stdClass());

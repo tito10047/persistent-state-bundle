@@ -6,10 +6,10 @@ use Tito10047\PersistentPreferenceBundle\DataCollector\PreferenceDataCollector;
 use Tito10047\PersistentPreferenceBundle\Selection\Service\SelectionInterface;
 use Tito10047\PersistentPreferenceBundle\Service\PersistentManagerInterface;
 
-final class TraceablePersistentManager implements PersistentManagerInterface
+final class TraceablePersistentManager implements PreferenceManagerInterface
 {
     public function __construct(
-        private readonly PersistentManagerInterface $inner,
+        private readonly PreferenceManagerInterface $inner,
         private readonly PreferenceDataCollector    $collector,
         private readonly string                     $managerName,
     ) {}

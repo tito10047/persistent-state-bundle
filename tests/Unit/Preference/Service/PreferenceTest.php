@@ -8,6 +8,7 @@ use Tito10047\PersistentPreferenceBundle\Event\PreferenceEvent;
 use Tito10047\PersistentPreferenceBundle\Event\PreferenceEvents;
 use Tito10047\PersistentPreferenceBundle\Preference\Service\Preference;
 use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceStorageInterface;
+use Tito10047\PersistentPreferenceBundle\Storage\StorableEnvelope;
 use Tito10047\PersistentPreferenceBundle\Transformer\ValueTransformerInterface;
 
 class PreferenceTest extends TestCase
@@ -27,12 +28,12 @@ class PreferenceTest extends TestCase
         $context = 'ctx1';
         $key = 'theme';
         $input = 'dark';
-        $transformed = 'dark_trans';
+        $transformed = new StorableEnvelope("scalar",'dark_trans');
 
         $storage = $this->createMock(PreferenceStorageInterface::class);
         $storage->expects(self::once())
             ->method('set')
-            ->with($context, $key, $transformed);
+            ->with($context, $key, $transformed->toArray());
 
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $order = 0;
@@ -91,7 +92,10 @@ class PreferenceTest extends TestCase
     {
         $context = 'ctx3';
         $values = ['a' => 1, 'b' => 2];
-        $transformed = ['a' => '1t', 'b' => '2t'];
+        $transformed = [
+			'a' => (new StorableEnvelope("scalar",'1t'))->toArray(),
+			'b' =>  (new StorableEnvelope("scalar",'2t'))->toArray()
+		];
 
         $storage = $this->createMock(PreferenceStorageInterface::class);
         $storage->expects(self::once())
@@ -107,7 +111,7 @@ class PreferenceTest extends TestCase
 
         $transformer = $this->makeTransformer(
             supports: static fn($v) => true,
-            transform: static function ($v) { return $v . 't'; }
+            transform: static function ($v) { return new StorableEnvelope('scalar',  $v . 't'); }
         );
 
         $service = new Preference([$transformer], $context, $storage, $dispatcher);

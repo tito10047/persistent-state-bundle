@@ -7,21 +7,21 @@ use Tito10047\PersistentPreferenceBundle\Storage\StorableEnvelope;
 /**
  * Support all basic types. Int, String, Bool, Float, Null
  */
-class ScalarValueTransformer implements ValueTransformerInterface{
+class SerializableObjectTransformer implements ValueTransformerInterface{
 
     public function supports(mixed $value): bool {
-        return is_scalar($value) || $value === null;
+        return is_object($value);
     }
 
     public function transform(mixed $value): StorableEnvelope {
-        return new StorableEnvelope("scalar",$value);
+        return new StorableEnvelope("serializable",serialize($value));
     }
 
     public function supportsReverse(StorableEnvelope $value): bool {
-        return $value->className === "scalar";
+        return $value->className === "serializable";
     }
 
     public function reverseTransform(StorableEnvelope $value): mixed {
-        return $value->data;
+        return unserialize($value->data);
     }
 }

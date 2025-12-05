@@ -153,7 +153,7 @@ final class Preference implements PreferenceInterface
     {
         foreach ($this->transformers as $transformer) {
             if ($transformer->supports($value)) {
-                return $transformer->transform($value);
+                return $transformer->transform($value)->toArray();
             }
         }
 

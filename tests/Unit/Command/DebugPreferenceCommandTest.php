@@ -8,6 +8,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Tito10047\PersistentPreferenceBundle\Command\DebugPreferenceCommand;
 use Tito10047\PersistentPreferenceBundle\Preference\Service\PreferenceInterface;
+use Tito10047\PersistentPreferenceBundle\Preference\Service\PreferenceManagerInterface;
 use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceSessionStorage;
 use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceStorageInterface;
 use Tito10047\PersistentPreferenceBundle\Service\PersistentManagerInterface;
@@ -40,7 +41,7 @@ class DebugPreferenceCommandTest extends TestCase
     public function testSuccessWithRowsAndSessionStorageLabel(): void
     {
         $context = 'user_15';
-        $serviceId = 'persistent_preference.manager.default';
+        $serviceId = 'persistent.preference.manager.default';
 
         $preference = $this->createMock(PreferenceInterface::class);
         $preference->method('all')->willReturn([
@@ -53,7 +54,7 @@ class DebugPreferenceCommandTest extends TestCase
 
         $storage = new PreferenceSessionStorage(new RequestStack());
 
-        $manager = $this->createMock(PersistentManagerInterface::class);
+        $manager = $this->createMock(PreferenceManagerInterface::class);
         $manager->method('getPreference')->with($context)->willReturn($preference);
         $manager->method('getPreferenceStorage')->willReturn($storage);
 
@@ -86,14 +87,14 @@ class DebugPreferenceCommandTest extends TestCase
     public function testEmptyPreferencesShowsMessage(): void
     {
         $context = 'ctx';
-        $serviceId = 'persistent_preference.manager.default';
+        $serviceId = 'persistent.preference.manager.default';
 
         $preference = $this->createMock(PreferenceInterface::class);
         $preference->method('all')->willReturn([]);
 
         $storage = $this->createMock(PreferenceStorageInterface::class);
 
-        $manager = $this->createMock(PersistentManagerInterface::class);
+        $manager = $this->createMock(PreferenceManagerInterface::class);
         $manager->method('getPreference')->with($context)->willReturn($preference);
         $manager->method('getPreferenceStorage')->willReturn($storage);
 
@@ -115,7 +116,7 @@ class DebugPreferenceCommandTest extends TestCase
     public function testMissingManagerServiceFails(): void
     {
         $container = $this->makeContainerMock([], [
-            'persistent_preference.manager.missing' => false,
+            'persistent.preference.manager.missing' => false,
         ]);
 
         $command = new DebugPreferenceCommand($container);
@@ -132,7 +133,7 @@ class DebugPreferenceCommandTest extends TestCase
 
     public function testWrongServiceTypeFails(): void
     {
-        $serviceId = 'persistent_preference.manager.weird';
+        $serviceId = 'persistent.preference.manager.weird';
         $container = $this->makeContainerMock([
             $serviceId => new \stdClass(),
         ]);
@@ -153,7 +154,7 @@ class DebugPreferenceCommandTest extends TestCase
     public function testFallbackStorageNameUsesShortClassName(): void
     {
         $context = 'c';
-        $serviceId = 'persistent_preference.manager.default';
+        $serviceId = 'persistent.preference.manager.default';
 
         $preference = $this->createMock(PreferenceInterface::class);
         $preference->method('all')->willReturn(['a' => 1]);
@@ -168,7 +169,7 @@ class DebugPreferenceCommandTest extends TestCase
             public function all(string $context): array { return []; }
         };
 
-        $manager = $this->createMock(PersistentManagerInterface::class);
+        $manager = $this->createMock(PreferenceManagerInterface::class);
         $manager->method('getPreference')->with($context)->willReturn($preference);
         $manager->method('getPreferenceStorage')->willReturn($customStorage);
 

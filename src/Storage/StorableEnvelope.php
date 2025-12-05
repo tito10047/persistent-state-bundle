@@ -18,7 +18,7 @@ final class StorableEnvelope
 		/**
 		 * Surové dáta objektu pripravené na serializáciu (napr. ['theme' => 'dark'])
 		 */
-		public readonly array $data
+		public readonly array|string|null|int|float $data
 	) {}
 
 	/**

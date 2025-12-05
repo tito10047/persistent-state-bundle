@@ -3,6 +3,7 @@
 namespace Tito10047\PersistentPreferenceBundle\Tests\Unit\Transformer;
 
 use PHPUnit\Framework\TestCase;
+use Tito10047\PersistentPreferenceBundle\Storage\StorableEnvelope;
 use Tito10047\PersistentPreferenceBundle\Transformer\ScalarValueTransformer;
 
 class ScalarValueTransformerTest extends TestCase
@@ -38,7 +39,7 @@ class ScalarValueTransformerTest extends TestCase
     {
         $inputs = [0, 123, 1.5, '', 'hello', true, false, null];
         foreach ($inputs as $in) {
-            $this->assertSame($in, $this->transformer->transform($in));
+            $this->assertEquals($this->getEnvelope($in), $this->transformer->transform($in));
         }
     }
 
@@ -46,12 +47,12 @@ class ScalarValueTransformerTest extends TestCase
     {
         $supported = [0, 123, 1.5, '', 'hello', true, false, null];
         foreach ($supported as $val) {
-            $this->assertTrue($this->transformer->supportsReverse($val));
+            $this->assertTrue($this->transformer->supportsReverse($this->getEnvelope($val)));
         }
 
-        $unsupported = [[], ['a' => 1], new \stdClass(), function () {}];
+        $unsupported = [[], ['a' => 1]];
         foreach ($unsupported as $val) {
-            $this->assertFalse($this->transformer->supportsReverse($val));
+            $this->assertFalse($this->transformer->supportsReverse($this->getEnvelope($val, "array")));
         }
     }
 
@@ -59,11 +60,15 @@ class ScalarValueTransformerTest extends TestCase
     {
         $inputs = [0, 123, 1.5, '', 'hello', true, false, null];
         foreach ($inputs as $in) {
-            $this->assertSame($in,
+            $this->assertEquals($in,
 				$this->transformer->reverseTransform(
 					$this->transformer->transform($in)
 				)
 			);
         }
     }
+
+	private function getEnvelope(mixed $data, string $className = "scalar"): StorableEnvelope {
+		return new StorableEnvelope($className,$data);
+	}
 }

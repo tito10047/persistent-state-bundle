@@ -13,10 +13,7 @@ use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagIde
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagIdentityLoadersPass;
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagValueTransformerPass;
 use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\TraceableManagersPass;
-use Tito10047\PersistentPreferenceBundle\Resolver\ObjectContextResolver;
-use Tito10047\PersistentPreferenceBundle\Service\PersistentManager;
-use Tito10047\PersistentPreferenceBundle\Storage\DoctrinePreferenceStorage;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ServiceConfigurator;
+use Tito10047\PersistentPreferenceBundle\Preference\Service\PreferenceManager;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 
@@ -44,7 +41,7 @@ class PersistentPreferenceBundle extends AbstractBundle {
 			$storage = service($subConfig['storage'] ?? '@persistent_preference.storage.session');
 			$storage = ltrim($storage, '@');
 			$services
-				->set('persistent_preference.manager.' . $name, PersistentManager::class)
+				->set('persistent.preference.manager.' . $name, PreferenceManager::class)
 				->public()
 				->arg('$resolvers', tagged_iterator(AutoTagContextKeyResolverPass::TAG))
 				->arg('$transformers', tagged_iterator(AutoTagValueTransformerPass::TAG))
@@ -57,7 +54,6 @@ class PersistentPreferenceBundle extends AbstractBundle {
     public function build(ContainerBuilder $container): void {
         parent::build($container);
         $container->addCompilerPass(new AutoTagContextKeyResolverPass());
-        $container->addCompilerPass(new AutoTagValueTransformerPass());
         $container->addCompilerPass(new TraceableManagersPass());
     }
 }

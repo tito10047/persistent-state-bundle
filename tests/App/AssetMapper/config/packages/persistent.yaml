@@ -15,11 +15,24 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
             - Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Entity\UserPreference
+    app.transformer.id:
+        class: Tito10047\PersistentPreferenceBundle\Transformer\ObjectIdValueTransformer
+        arguments:
+            $class: Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Entity\User
+            $identifierMethod: 'getId'
 
 persistent:
     preference:
         managers:
             default:
-                storage: '@persistent_preference.storage.session'
+                storage: '@persistent.preference.storage.session'
             my_pref_manager:
                 storage: '@app.storage.doctrine'
+    selection:
+        managers:
+            default:
+                storage: '@persistent.selection.storage.session'
+                resolver: '@app.transformer.id'
+            simple:
+                storage: '@persistent.selection.storage.doctrine'
+                resolver: '@app.transformer.id'

@@ -42,7 +42,7 @@ class DoctrineStorageTest extends AssetMapperKernelTestCase
         static::bootKernel();
         $container = static::getContainer();
 
-        $manager = $container->get('persistent_preference.manager.my_pref_manager');
+        $manager = $container->get('persistent.preference.manager.my_pref_manager');
         $pref = $manager->getPreference('user_5');
         $pref->set('x', 1);
         $this->assertSame(1, $pref->getInt('x'));

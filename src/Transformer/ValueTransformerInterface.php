@@ -2,6 +2,8 @@
 
 namespace Tito10047\PersistentPreferenceBundle\Transformer;
 
+use Tito10047\PersistentPreferenceBundle\Storage\StorableEnvelope;
+
 /**
  * Responsibility: Handles two-way conversion between PHP Objects and Storage Data.
  *
@@ -20,7 +22,7 @@ interface ValueTransformerInterface
 	 * Converts PHP value to a storage-friendly format (scalar/array).
 	 * Example: Object -> ['__type' => 'MyClass', 'data' => {...}]
 	 */
-	public function transform(mixed $value): mixed;
+	public function transform(mixed $value): StorableEnvelope;
 
 	/**
 	 * Checks if the raw value from storage looks like something this transformer created.
@@ -28,11 +30,11 @@ interface ValueTransformerInterface
 	 *
 	 * Example: Checks if array has '__type' key.
 	 */
-	public function supportsReverse(mixed $value): bool;
+	public function supportsReverse(StorableEnvelope $value): bool;
 
 	/**
 	 * Converts storage format back to PHP value.
 	 * Example: ['__type' => 'MyClass', ...] -> Object
 	 */
-	public function reverseTransform(mixed $value): mixed;
+	public function reverseTransform(StorableEnvelope $value): mixed;
 }

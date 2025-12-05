@@ -6,8 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Tito10047\PersistentPreferenceBundle\Preference\Service\PreconfiguredPreferenceInterface;
-use Tito10047\PersistentPreferenceBundle\Service\PersistentManagerInterface;
+use Tito10047\PersistentPreferenceBundle\Preference\Service\PreferenceManagerInterface;
 use Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Entity\Company;
 use Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Entity\User;
 use Tito10047\PersistentPreferenceBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
@@ -34,7 +33,7 @@ class PreferenceExtensionTest extends AssetMapperKernelTestCase
         static::bootKernel();
         $this->ensureSession();
 
-        $pm = static::getContainer()->get(PreconfiguredPreferenceInterface::class);
+        $pm = static::getContainer()->get(PreferenceManagerInterface::class);
 
         $user = (new User())->setId(5)->setName('Alice');
         $company = (new Company())->setUuid(10)->setName('ACME');

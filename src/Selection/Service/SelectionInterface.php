@@ -50,24 +50,22 @@ interface SelectionInterface {
 	/**
 	 * Vráti mapu vybraných položiek. Ak je zadaná $metadataClass, metadáta sa hydratujú.
 	 *
-	 * @param class-string $metadataClass FQCN pre hydratáciu metadát (napr. MyDomainConfig::class).
 	 * @return array<string|int, array|object>
 	 * @template T of object
 	 * @phpstan-param class-string<T>|null $metadataClass
 	 * @phpstan-return array<string|int, T>|array<string|int, array|object>
 	 */
-	public function getSelected(?string $metadataClass = null): array;
+	public function getSelected(): array;
 
 	/**
 	 * Vráti mapu vybraných položiek. Ak je zadaná $metadataClass, metadáta sa hydratujú.
 	 *
-	 * @param class-string<T>|null $metadataClass FQCN pre hydratáciu metadát (napr. MyDomainConfig::class).
 	 * @return T|array|null
 	 * @template T of object
 	 * @phpstan-param class-string<T>|null $metadataClass
 	 * @phpstan-return T|array
 	 */
-	public function getMetadata(mixed $item, ?string $metadataClass = null): null|array|object;
+	public function getMetadata(mixed $item): null|array|object;
 
 	public function getTotal():int;
 

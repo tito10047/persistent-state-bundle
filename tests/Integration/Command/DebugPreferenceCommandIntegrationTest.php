@@ -15,7 +15,7 @@ class DebugPreferenceCommandIntegrationTest extends AssetMapperKernelTestCase
 
         // Seed some preferences into doctrine-backed manager
         /** @var PersistentManagerInterface $pmDoctrine */
-        $pmDoctrine = static::getContainer()->get('persistent_preference.manager.my_pref_manager');
+        $pmDoctrine = static::getContainer()->get('persistent.preference.manager.my_pref_manager');
         $pmDoctrine->getPreference('user_15')->import([
             'theme' => 'dark',
             'limit' => 50,

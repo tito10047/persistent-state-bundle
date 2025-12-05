@@ -21,7 +21,7 @@ services:
 
     Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\ServiceHelper:
         arguments:
-            $resolvers: !tagged_iterator persistent_preference.context_key_resolver
-            $transformers: !tagged_iterator persistent_preference.value_transformer
+            $resolvers: !tagged_iterator persistent.preference.context_key_resolver
+            $transformers: !tagged_iterator persistent.preference.value_transformer
         public: true
 

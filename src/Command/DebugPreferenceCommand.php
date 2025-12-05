@@ -10,9 +10,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Tito10047\PersistentPreferenceBundle\Preference\Service\PreferenceManagerInterface;
 use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceSessionStorage;
 use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceStorageInterface;
-use Tito10047\PersistentPreferenceBundle\Service\PersistentManagerInterface;
 use Tito10047\PersistentPreferenceBundle\Storage\DoctrinePreferenceStorage;
 
 #[AsCommand(name: 'debug:preference', description: 'Print preferences for a given context and manager')]
@@ -37,14 +37,14 @@ final class DebugPreferenceCommand extends Command
         $context = (string) $input->getArgument('context');
         $managerName = (string) $input->getOption('manager');
 
-        $serviceId = 'persistent_preference.manager.' . $managerName;
+        $serviceId = 'persistent.preference.manager.' . $managerName;
         if (!$this->container->has($serviceId)) {
             $io->error(sprintf('Preference manager "%s" not found (service id "%s").', $managerName, $serviceId));
             return Command::FAILURE;
         }
 
         $manager = $this->container->get($serviceId);
-        if (!$manager instanceof PersistentManagerInterface) {
+        if (!$manager instanceof PreferenceManagerInterface) {
             $io->error(sprintf('Service "%s" is not a PreferenceManagerInterface.', $serviceId));
             return Command::FAILURE;
         }
