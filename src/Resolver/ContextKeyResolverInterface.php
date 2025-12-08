@@ -3,11 +3,23 @@
 namespace Tito10047\PersistentPreferenceBundle\Resolver;
 
 /**
- * Strategy interface to resolve a context string from an arbitrary object.
+ * Strategy interface to resolve a persistent context string from an arbitrary object.
+ *
+ * Implementations are used by the PreferenceManager to turn domain objects
+ * (e.g. User, Tenant) into a unique context identifier string like
+ * "user_123" or "tenant:acme".
  */
 interface ContextKeyResolverInterface
 {
-	public function supports(object $context): bool;
+    /**
+     * Whether this resolver can handle the given context object.
+     */
+    public function supports(object $context): bool;
 
-	public function resolve(object $context): string;
+    /**
+     * Resolves a unique, stable context identifier for the given object.
+     *
+     * Should only be called if {@see supports()} returned true.
+     */
+    public function resolve(object $context): string;
 }

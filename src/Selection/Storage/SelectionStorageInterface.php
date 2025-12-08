@@ -16,20 +16,20 @@ use Tito10047\PersistentPreferenceBundle\Enum\SelectionMode;
  */
 interface SelectionStorageInterface {
 
-	/**
-	 * Pridá alebo aktualizuje identifikátor a ich pridružené dáta.
-	 *
-	 * @param int|string|array $identifier
-	 * @param array|null $metadata
-	 */
-	public function set(string $context, int|string|array $identifier, ?array $metadata): void;
+    /**
+     * Adds or updates a single identifier and its associated metadata.
+     *
+     * @param int|string|array $identifier Normalized identifier
+     * @param array|null       $metadata   Optional metadata to persist
+     */
+    public function set(string $context, int|string|array $identifier, ?array $metadata): void;
 
-	/**
-	 * Pridá alebo aktualizuje identifikátory a ich pridružené dáta.
-	 *
-	 * @param array<int|string|array> $identifiers
-	 */
-	public function setMultiple(string $context, array $identifiers): void;
+    /**
+     * Adds or updates multiple identifiers (without metadata).
+     *
+     * @param array<int|string|array> $identifiers List of normalized identifiers
+     */
+    public function setMultiple(string $context, array $identifiers): void;
 
 	/**
 	 * Removes identifiers from the storage for a specific context.
@@ -67,16 +67,23 @@ interface SelectionStorageInterface {
 	 */
 	public function getStored(string $context): array;
 
-	public function getMetadata(string $context, string|int|array $identifiers): array;
+ /**
+  * Returns metadata stored for the given identifier(s).
+  *
+  * @param string                 $context     The unique context key
+  * @param string|int|array       $identifiers Single id or list of ids
+  * @return array<string|int, array|null>     Map of id => metadata (or null)
+  */
+ public function getMetadata(string $context, string|int|array $identifiers): array;
 
 	/**
 	 * Checks if a specific identifier is present in the storage.
 	 * This checks the raw storage, ignoring the current Mode logic.
 	 *
-	 * @param string     $context The unique context key
-	 * @param string|int $id      The identifier to check
-	 */
-	public function hasIdentifier(string $context, string|int|array $identifiers): bool;
+  * @param string           $context    The unique context key
+  * @param string|int|array $identifiers The identifier to check
+  */
+ public function hasIdentifier(string $context, string|int|array $identifiers): bool;
 
 	/**
 	 * Sets the selection mode (Include vs Exclude).

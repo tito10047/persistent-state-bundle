@@ -3,26 +3,31 @@
 namespace Tito10047\PersistentPreferenceBundle\Converter;
 
 /**
- * Definuje kontrakt pre extrahovanie a hydratáciu komplexných metadát (payload)
- * na uložiteľné a čitateľné dáta.
+ * Defines the contract for extracting and hydrating complex metadata (payload)
+ * into a storable/readable representation and back.
  */
 interface MetadataConverterInterface
 {
 	/**
-	 * Konvertuje objekt metadát na bezpečne uložiteľné pole.
+	 * Converts a metadata object into a safely storable array representation.
 	 *
-	 * @param object $metadataObject Objekt (napr. DomainConfig).
-	 * @return array The resulting serializable array.
+	 * The result should contain only scalar/array values suitable for storage
+	 * (e.g. JSON column). Any nested objects must be normalized here.
+	 *
+	 * @param object $metadataObject Arbitrary metadata object (e.g. DomainConfig).
+	 * @return array<string, mixed> Serializable array to be persisted.
 	 */
 	public function convertToStorable(object $metadataObject): array;
 
 	/**
-	 * Konvertuje uložené pole späť na pôvodný objekt metadát.
+	 * Converts previously stored array data back into the original metadata object.
 	 *
-	 * @param array $storedData Pole s metadátami.
-	 * @param string $targetClass FQCN cieľovej triedy.
+	 * If the data cannot be hydrated to the target class, implementors may return
+	 * null to indicate absence/invalid payload.
 	 *
-	 * @return object|null
+	 * @param array<string, mixed> $storedData Raw metadata as read from storage.
+	 * @param string               $targetClass Fully-qualified class name to hydrate.
+	 * @return object|null The hydrated metadata instance or null if not possible.
 	 */
 	public function convertFromStorable(array $storedData, string $targetClass): ?object;
 }
