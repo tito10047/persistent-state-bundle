@@ -21,7 +21,10 @@ final class StorableEnvelope
 		public readonly array|string|null|int|float $data
 	) {}
 
-	public static function tryFromArray(mixed $meta): ?StorableEnvelope {
+	public static function tryFrom(mixed $meta): ?StorableEnvelope {
+		if (!is_array($meta)) {
+			return null;
+		}
 		try{
 			return self::fromArray($meta);
 		}catch (\InvalidArgumentException){

@@ -1,0 +1,2 @@
+persistent_selection:
+    resource: '@PersistentPreferenceBundle/config/routes.php'

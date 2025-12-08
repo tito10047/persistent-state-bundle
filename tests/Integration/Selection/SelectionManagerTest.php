@@ -4,20 +4,28 @@ namespace Tito10047\PersistentPreferenceBundle\Tests\Integration\Selection;
 
 use PHPUnit\Framework\Attributes\TestWith;
 use stdClass;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Tito10047\PersistentPreferenceBundle\Enum\SelectionMode;
 use Tito10047\PersistentPreferenceBundle\Selection\Service\SelectionManagerInterface;
 use Tito10047\PersistentPreferenceBundle\Selection\Service\SelectionInterface;
 use Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\ServiceHelper;
 use Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Support\TestList;
 use Tito10047\PersistentPreferenceBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
+use Tito10047\PersistentPreferenceBundle\Tests\Trait\SessionInterfaceTrait;
 
 class SelectionManagerTest extends AssetMapperKernelTestCase
 {
+	use SessionInterfaceTrait;
+
     public function testGetSelectionAndSelectFlow(): void
     {
-        $container = self::getContainer();
+		$this->initSession();
+		$container = self::getContainer();
 
-        /** @var SelectionInterface $manager */
+		/** @var SelectionInterface $manager */
         $manager = $container->get('persistent.selection.manager.scalar');
         $this->assertInstanceOf(SelectionManagerInterface::class, $manager);
 

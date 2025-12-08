@@ -2,7 +2,11 @@
 
 namespace Tito10047\PersistentPreferenceBundle\Tests\Trait;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 trait SessionInterfaceTrait {
 
@@ -26,5 +30,15 @@ trait SessionInterfaceTrait {
 				unset($sessionStore[$key]);
 			});
 		return $session;
+	}
+
+	public function initSession(): void {
+		$container = self::getContainer();
+		/** @var RequestStack $requestStack */
+		$requestStack = $container->get('request_stack');
+		$session = new Session(new MockArraySessionStorage());
+		$request = new Request();
+		$request->setSession($session);
+		$requestStack->push($request);
 	}
 }

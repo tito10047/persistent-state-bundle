@@ -8,10 +8,12 @@ use Tito10047\PersistentPreferenceBundle\Selection\Service\SelectionInterface;
 use Tito10047\PersistentPreferenceBundle\Selection\Service\SelectionManagerInterface;
 use Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Entity\User;
 use Tito10047\PersistentPreferenceBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
+use Tito10047\PersistentPreferenceBundle\Tests\Trait\SessionInterfaceTrait;
 use Twig\Environment;
 
 class SelectionExtensionTest extends AssetMapperKernelTestCase
 {
+	use SessionInterfaceTrait;
     public function testTwigFunctionsAreRegistered(): void
     {
         $container = self::getContainer();
@@ -36,7 +38,7 @@ class SelectionExtensionTest extends AssetMapperKernelTestCase
 
     public function testTwigFunctionsBehavior(): void
     {
-		$this->markTestSkipped("TODO: fix this test");
+		$this->initSession();
 		$controllerName = PersistentPreferenceBundle::STIMULUS_CONTROLLER;
         $container = self::getContainer();
 
@@ -118,7 +120,7 @@ class SelectionExtensionTest extends AssetMapperKernelTestCase
 
     public function testRowSelectorCustomAttributesAreMergedAndEscaped(): void
     {
-		$this->markTestSkipped("TODO: fix this test");
+		$this->initSession();
         $container = self::getContainer();
 
         /** @var SelectionManagerInterface $manager */
@@ -127,9 +129,10 @@ class SelectionExtensionTest extends AssetMapperKernelTestCase
         // Items
         $items = [];
         for ($i = 1; $i <= 1; $i++) {
-            $o = new \stdClass();
-            $o->id = $i;
-            $items[] = $o;
+			$o = new User();
+			$o->setId($i);
+			$o->setName('Item '.$i);
+			$items[] = $o;
         }
 
         // Register & select item to ensure 'checked' attribute appears
@@ -168,7 +171,7 @@ class SelectionExtensionTest extends AssetMapperKernelTestCase
 
     public function testStimulusControllerMergesDataController(): void
     {
-		$this->markTestSkipped("TODO: fix this test");
+		$this->initSession();
         $container = self::getContainer();
         /** @var Environment $twig */
         $twig = $container->get('twig');

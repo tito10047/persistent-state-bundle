@@ -73,8 +73,7 @@ final class SelectionRuntime implements RuntimeExtensionInterface {
 			"class" => "row-selector"
 		];
 
-		$id = $selection->normalize($item);
-		if ($selection->isSelected($id)) {
+		if ($selection->isSelected($item)) {
 			$myAttributes["checked"] = 'checked';
 		}
 

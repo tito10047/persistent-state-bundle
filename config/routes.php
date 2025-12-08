@@ -1,7 +1,6 @@
 <?php
 
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
-use Tito10047\PersistentPreferenceBundle\Controller\SelectController;
 
 /**
  * Definícia rout pre PersistentSelectionBundle.

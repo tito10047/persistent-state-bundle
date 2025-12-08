@@ -18,21 +18,20 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
 	}
 
 	public function isSelected(mixed $item): bool {
-		$item = is_scalar($item) ? $item : $this->transformer->transform($item);
-		$has = $this->storage->hasIdentifier($this->key, $item);
+		$id = $this->normalizeIdentifier($item);
+		$has = $this->storage->hasIdentifier($this->key, $id);
 		return $this->storage->getMode($this->key) === SelectionMode::INCLUDE ? $has : !$has;
 	}
 
 	public function select(mixed $item, null|array|object $metadata = null): static {
-		$id        = is_scalar($item) ? $item : $this->transformer->transform($item)->toArray();
+		$id        = $this->normalizeIdentifier($item);
 		$mode      = $this->storage->getMode($this->key);
 		$metaArray = null;
 		if ($metadata !== null) {
 			$metaArray = $this->metadataTransformer->transform($metadata)->toArray();
 		}
 		if ($mode === SelectionMode::INCLUDE) {
-			// SessionStorage::add now expects a map [id => metadata]
-			$this->storage->add($this->key, [$id], $metaArray !== null ? [$id => $metaArray] : null);
+			$this->storage->set($this->key, $id, $metaArray);
 		} else {
 			// In EXCLUDE mode, selecting means removing the id from the exclusion list
 			$this->storage->remove($this->key, [$id]);
@@ -41,11 +40,11 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
 	}
 
 	public function unselect(mixed $item): static {
-		$id = is_scalar($item) ? $item : $this->transformer->transform($item);
+		$id = $this->normalizeIdentifier($item);
 		if ($this->storage->getMode($this->key) === SelectionMode::INCLUDE) {
 			$this->storage->remove($this->key, [$id]);
 		} else {
-			$this->storage->add($this->key, [$id], null);
+			$this->storage->set($this->key, $id, null);
 		}
 		return $this;
 	}
@@ -60,13 +59,13 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
 		if ($metadata === null) {
 			$ids = [];
 			foreach ($items as $item) {
-				$ids[] = is_scalar($item) ? $item : $this->transformer->transform($item);
+				$ids[] = $this->normalizeIdentifier($item);
 			}
-			$this->storage->add($this->key, $ids, null);
+			$this->storage->setMultiple($this->key, $ids);
 			return $this;
 		}
 		foreach ($items as $item) {
-			$id = is_scalar($item) ? $item : $this->transformer->transform($item);
+			$id = $this->normalizeIdentifier($item);
 
 			$metaForId = null;
 			if (array_key_exists($id, $metadata) || array_key_exists((string) $id, $metadata)) {
@@ -75,9 +74,8 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
 				throw new \LogicException("No metadata found for id $id");
 			}
 
-			// Convert object metadata and pass as [id => meta]
 			$metaForId = $this->metadataTransformer->transform($metaForId)->toArray();
-			$this->storage->add($this->key, [$id], [$id => $metaForId]);
+			$this->storage->set($this->key, $id, $metaForId);
 		}
 		return $this;
 	}
@@ -85,7 +83,7 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
 	public function unselectMultiple(array $items): static {
 		$ids = [];
 		foreach ($items as $item) {
-			$ids[] = is_scalar($item) ? $item : $this->transformer->transform($item);
+			$ids[] = $this->normalizeIdentifier($item);
 		}
 		$this->storage->remove($this->key, $ids);
 		return $this;
@@ -125,7 +123,7 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
 		}
 		foreach ($data as $key => $value) {
 			if (is_array($value) &&
-				($envelope = StorableEnvelope::tryFromArray($value)) &&
+				($envelope = StorableEnvelope::tryFrom($value)) &&
 				$this->transformer->supportsReverse($envelope)) {
 				$data[$key] = $this->transformer->reverseTransform($envelope);
 			}
@@ -134,7 +132,7 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
 	}
 
 	public function update(mixed $item, object|array|null $metadata = null): static {
-		$id = is_scalar($item) ? $item : $this->transformer->transform($item);
+		$id = $this->normalizeIdentifier($item);
 		if ($metadata === null) {
 			return $this; // nothing to update
 		}
@@ -143,12 +141,12 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
 		$mode = $this->storage->getMode($this->key);
 		if ($mode === SelectionMode::INCLUDE) {
 			// Ensure metadata is persisted for this id (and id is included)
-			$this->storage->add($this->key, [$id], [$id => $metaArray]);
+			$this->storage->set($this->key, $id, $metaArray);
 			return $this;
 		}
 		// In EXCLUDE mode, metadata can only be stored for explicitly excluded ids
 		if ($this->storage->hasIdentifier($this->key, $id)) {
-			$this->storage->add($this->key, [$id], [$id => $metaArray]);
+			$this->storage->set($this->key, $id, $metaArray);
 		}
 		return $this;
 	}
@@ -156,10 +154,11 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
 	public function getSelected(): array {
 		$mode = $this->storage->getMode($this->key);
 		if ($mode === SelectionMode::INCLUDE) {
-			$map      = $this->storage->getStoredWithMetadata($this->key);
+			$ids      = $this->storage->getStored($this->key);
 			$hydrated = [];
-			foreach ($map as $id => $meta) {
-				if ($meta = StorableEnvelope::tryFromArray($meta)) {
+			foreach ($ids as $id) {
+				$meta = $this->storage->getMetadata($this->key, $id);
+				if ($meta = StorableEnvelope::tryFrom($meta)) {
 					$hydrated[$id] = $this->metadataTransformer->reverseTransform($meta);
 				} else {
 					$hydrated[$id] = [];
@@ -174,8 +173,9 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
 		$result   = [];
 		foreach ($selected as $id) {
 			$meta = $this->storage->getMetadata($this->key, $id);
-			if ($meta = StorableEnvelope::tryFromArray($meta) !== null) {
-				$result[$id] = $this->metadataTransformer->reverseTransform($meta);
+			$envelope = StorableEnvelope::tryFrom($meta);
+			if ($envelope !== null) {
+				$result[$id] = $this->metadataTransformer->reverseTransform($envelope);
 			} else {
 				$result[$id] = [];
 			}
@@ -184,7 +184,7 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
 	}
 
 	public function getMetadata(mixed $item): null|array|object {
-		$id   = is_scalar($item) ? $item : $this->transformer->transform($item);
+		$id   = $this->normalizeIdentifier($item);
 		$meta = $this->storage->getMetadata($this->key, $id);
 		if ($meta === [] || $meta === null) {
 			return null;
@@ -197,7 +197,7 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
 	}
 
 	public function rememberAll(array $ids): static {
-		$this->storage->add($this->getAllContext(), $ids, null);
+		$this->storage->setMultiple($this->getAllContext(), $ids);
 		return $this;
 	}
 
@@ -215,6 +215,28 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
 
 	private function getAllMetaContext(): string {
 		return $this->key . '__ALL_META__';
+	}
+
+	/**
+	 * Normalize an item into a storage identifier (int|string|array).
+	 */
+	private function normalizeIdentifier(mixed $item): int|string|array {
+		if (is_scalar($item)) {
+			return $item;
+		}
+		$transformed = $this->transformer->transform($item);
+		if ($transformed instanceof StorableEnvelope) {
+			// If transformer can reverse, prefer scalar identifier (e.g., ObjectId -> int)
+			if ($this->transformer->supportsReverse($transformed)) {
+				$reversed = $this->transformer->reverseTransform($transformed);
+				if (is_scalar($reversed)) {
+					return $reversed;
+				}
+			}
+			// Fallback to serializable array form
+			return $transformed->toArray();
+		}
+		return $transformed; // assume transformer returns scalar or array
 	}
 
 	public function destroy(): static {
@@ -282,7 +304,7 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
 			$meta = ['expiresAt' => $expiresAt];
 		}
 
-		$this->storage->add($this->getAllMetaContext(), [$cacheKey], $meta !== null ? [$cacheKey => $meta] : null);
+		$this->storage->set($this->getAllMetaContext(), $cacheKey, $meta);
 
 		return $this;
 	}

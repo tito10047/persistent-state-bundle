@@ -320,8 +320,8 @@ class SelectionInterfaceTest  extends TestCase{
         $this->assertSame([77], $selected);
 
 		$selected=$selection->getSelected();
-		$this->assertSame($fooClass, $selected[77]);
+		$this->assertSame([77=>[]], $selected);
 
-		$this->assertTrue($selection->isSelected($fooClass));;
+		$this->assertTrue($selection->isSelected(77));;
     }
 }

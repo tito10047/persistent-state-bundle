@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tito10047\PersistentPreferenceBundle\Selection\Storage;
 
 
-
 use Tito10047\PersistentPreferenceBundle\Enum\SelectionMode;
 
 /**
@@ -15,23 +14,38 @@ use Tito10047\PersistentPreferenceBundle\Enum\SelectionMode;
  * or if they exist in the database. It only persists scalar values (int/string).
  * Complex logic regarding objects/UUIDs must be handled by the Manager layer.
  */
-interface SelectionStorageInterface
-{
+interface SelectionStorageInterface {
+
+	/**
+	 * Pridá alebo aktualizuje identifikátor a ich pridružené dáta.
+	 *
+	 * @param int|string|array $identifier
+	 * @param array|null $metadata
+	 */
+	public function set(string $context, int|string|array $identifier, ?array $metadata): void;
+
 	/**
 	 * Pridá alebo aktualizuje identifikátory a ich pridružené dáta.
 	 *
-	 * @param array<int|string> $ids
-	 * @param array<string|int, array> $idMetadataMap Mapa: ID => Konvertované pole metadát
+	 * @param array<int|string|array> $identifiers
 	 */
-	public function add(string $context, array $ids, ?array $idMetadataMap): void;
+	public function setMultiple(string $context, array $identifiers): void;
 
 	/**
 	 * Removes identifiers from the storage for a specific context.
 	 *
-	 * @param string $context The unique context key
-	 * @param array<string|int> $ids List of identifiers to remove
+	 * @param string           $context    The unique context key
+	 * @param string|int|array $identifier List of identifiers to remove
 	 */
-	public function remove(string $context, array $ids): void;
+	public function remove(string $context, array $identifier): void;
+
+	/**
+	 * Removes identifiers from the storage for a specific context.
+	 *
+	 * @param string                  $context     The unique context key
+	 * @param array<string|int|array> $identifiers List of identifiers to remove
+	 */
+	public function removeMultiple(string $context, array $identifiers): void;
 
 	/**
 	 * Clears all data for the given context and resets the mode to INCLUDE.
@@ -48,28 +62,27 @@ interface SelectionStorageInterface
 	 * - If Mode is EXCLUDE: These are the unselected items (exceptions).
 	 *
 	 * @param string $context The unique context key
+	 *
 	 * @return array<string|int>
 	 */
 	public function getStored(string $context): array;
 
-	public function getStoredWithMetadata(string $context):array;
-
-	public function getMetadata(string $context, string|int $id):array;
+	public function getMetadata(string $context, string|int|array $identifiers): array;
 
 	/**
 	 * Checks if a specific identifier is present in the storage.
 	 * This checks the raw storage, ignoring the current Mode logic.
 	 *
-	 * @param string $context The unique context key
-	 * @param string|int $id The identifier to check
+	 * @param string     $context The unique context key
+	 * @param string|int $id      The identifier to check
 	 */
-	public function hasIdentifier(string $context, string|int $id): bool;
+	public function hasIdentifier(string $context, string|int|array $identifiers): bool;
 
 	/**
 	 * Sets the selection mode (Include vs Exclude).
 	 *
-	 * @param string $context The unique context key
-	 * @param SelectionMode $mode The target mode
+	 * @param string        $context The unique context key
+	 * @param SelectionMode $mode    The target mode
 	 */
 	public function setMode(string $context, SelectionMode $mode): void;
 
