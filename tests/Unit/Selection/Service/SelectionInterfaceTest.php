@@ -318,5 +318,10 @@ class SelectionInterfaceTest  extends TestCase{
         // getSelected returns map id => metadata (reverse transformed)
         $selected = $selection->getSelectedIdentifiers();
         $this->assertSame([77], $selected);
+
+		$selected=$selection->getSelected();
+		$this->assertSame($fooClass, $selected[77]);
+
+		$this->assertTrue($selection->isSelected($fooClass));;
     }
 }

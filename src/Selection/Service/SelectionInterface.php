@@ -69,5 +69,4 @@ interface SelectionInterface {
 
 	public function getTotal():int;
 
-	public function normalize(mixed $item):int|string;
 }

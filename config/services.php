@@ -3,7 +3,9 @@
 use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Tito10047\PersistentPreferenceBundle\Command\DebugPreferenceCommand;
+use Tito10047\PersistentPreferenceBundle\Controller\SelectController;
 use Tito10047\PersistentPreferenceBundle\Converter\MetadataConverterInterface;
 use Tito10047\PersistentPreferenceBundle\Converter\ObjectVarsConverter;
 use Tito10047\PersistentPreferenceBundle\DataCollector\PreferenceDataCollector;
@@ -19,12 +21,16 @@ use Tito10047\PersistentPreferenceBundle\Selection\Loader\ArrayLoader;
 use Tito10047\PersistentPreferenceBundle\Selection\Loader\DoctrineCollectionLoader;
 use Tito10047\PersistentPreferenceBundle\Selection\Loader\DoctrineQueryBuilderLoader;
 use Tito10047\PersistentPreferenceBundle\Selection\Loader\DoctrineQueryLoader;
+use Tito10047\PersistentPreferenceBundle\Selection\Service\SelectionManager;
+use Tito10047\PersistentPreferenceBundle\Selection\Service\SelectionManagerInterface;
 use Tito10047\PersistentPreferenceBundle\Selection\Storage\SelectionSessionStorage;
 use Tito10047\PersistentPreferenceBundle\Selection\Storage\SelectionStorageInterface;
 use Tito10047\PersistentPreferenceBundle\Transformer\ArrayValueTransformer;
 use Tito10047\PersistentPreferenceBundle\Transformer\ScalarValueTransformer;
 use Tito10047\PersistentPreferenceBundle\Twig\PreferenceExtension;
 use Tito10047\PersistentPreferenceBundle\Twig\PreferenceRuntime;
+use Tito10047\PersistentPreferenceBundle\Twig\SelectionExtension;
+use Tito10047\PersistentPreferenceBundle\Twig\SelectionRuntime;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 
@@ -46,13 +52,6 @@ return static function (ContainerConfigurator $container): void {
     // Alias the interface to our concrete storage service id
     $services->alias(PreferenceStorageInterface::class, 'persistent.preference.storage.session');
 
-
-    // --- Built-in Value Transformers ---
-    $services
-        ->set(ScalarValueTransformer::class)
-        ->public()
-    ;
-
     // --- Metadata Converters ---
     $services
         ->set('persistent.preference.converter.object_vars', ObjectVarsConverter::class)
@@ -71,14 +70,28 @@ return static function (ContainerConfigurator $container): void {
     ;
     $services->alias(PreferenceManagerInterface::class, 'persistent.preference.manager.default');
 
-    // --- Twig Extension ---
+	// --- SelectionManager ---
+	$services
+		->set('persistent.selection.manager.default', SelectionManager::class)
+		->public()
+		->arg('$storage', service('persistent.selection.storage.session'))
+		->arg('$transformer',  service('persistent.transformer.scalar'))
+		->arg('$metadataTransformer', service('persistent.transformer.array'))
+		->arg('$loaders', tagged_iterator(AutoTagIdentityLoadersPass::TAG))
+		->arg('$ttl', null)
+		->tag('persistent.selection.manager', ['name' => 'default']);
+	$services->alias(SelectionManagerInterface::class, 'persistent.selection.manager.default');
+
+
+	// --- Twig Extension ---
     $services
         ->set(PreferenceExtension::class)
             ->public()
             ->tag('twig.extension')
     ;
 
-	$services->set(ArrayValueTransformer::class)
+	// --- Built-in Value Transformers ---
+	$services->set("persistent.transformer.array",ArrayValueTransformer::class)
 		->public()
 		->tag(PersistentPreferenceBundle::TRANSFORMER_TAG);
 	$services->set("persistent.transformer.scalar",ScalarValueTransformer::class)
@@ -143,5 +156,22 @@ return static function (ContainerConfigurator $container): void {
             // Note: decoration of all managers is handled by a CompilerPass (TraceableManagersPass)
         }
     }
+	// --- Controllers ---
+	$services
+		->set(SelectController::class)
+		->public()
+		->arg('$selectionManagers', tagged_iterator('persistent.selection.manager', 'name'));
 
+	// --- Twig integration ---
+	$services
+		->set(SelectionExtension::class)
+		->tag('twig.extension')
+	;
+
+	$services
+		->set(SelectionRuntime::class)
+		->arg('$selectionManagers', tagged_iterator('persistent.selection.manager', 'name'))
+		->arg('$router', service(UrlGeneratorInterface::class))
+		->tag('twig.runtime')
+	;
 };

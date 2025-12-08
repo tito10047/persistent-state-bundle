@@ -20,6 +20,7 @@ use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_it
  * @link https://symfony.com/doc/current/bundles/best_practices.html
  */
 class PersistentPreferenceBundle extends AbstractBundle {
+	public const STIMULUS_CONTROLLER='tito10047--persistent-preference-bundle--persistent-selection';
 
 	protected string $extensionAlias = 'persistent';
 	const TRANSFORMER_TAG = 'persistent_preference.value_transformer';
@@ -53,8 +54,8 @@ class PersistentPreferenceBundle extends AbstractBundle {
 		$configManagers = $config['selection']['managers'] ?? [];
 		foreach($configManagers as $name=>$subConfig){
 			$storage = service(ltrim($subConfig['storage'], '@'));
-			$transformer = service(ltrim($subConfig['transformer'], '@')??null);
-			$metadataTransformer = service(ltrim($subConfig['metadata_transformer'], '@')??null);
+			$transformer = service(ltrim($subConfig['transformer'], '@'));
+			$metadataTransformer = service(ltrim($subConfig['metadata_transformer'], '@'));
 			$ttl = $subConfig['ttl']??null;
 			$services
 				->set('persistent.selection.manager.'.$name,SelectionManager::class)
@@ -64,6 +65,7 @@ class PersistentPreferenceBundle extends AbstractBundle {
 				->arg('$metadataTransformer', $metadataTransformer)
 				->arg('$loaders', tagged_iterator(AutoTagIdentityLoadersPass::TAG))
 				->arg('$ttl', $ttl)
+				->tag('persistent.selection.manager', ['name' => $name])
 			;
 		}
 	}

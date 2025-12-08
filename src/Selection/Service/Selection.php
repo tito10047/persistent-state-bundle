@@ -18,6 +18,7 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
 	}
 
 	public function isSelected(mixed $item): bool {
+		$item = is_scalar($item) ? $item : $this->transformer->transform($item);
 		$has = $this->storage->hasIdentifier($this->key, $item);
 		return $this->storage->getMode($this->key) === SelectionMode::INCLUDE ? $has : !$has;
 	}
@@ -229,10 +230,6 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
 
 	public function getTotal(): int {
 		return count($this->storage->getStored($this->getAllContext()));
-	}
-
-	public function normalize(mixed $item): int|string {
-		return $this->transformer->transform($item);
 	}
 
 
