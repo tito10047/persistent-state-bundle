@@ -12,6 +12,7 @@ use Tito10047\PersistentPreferenceBundle\Tests\Trait\SessionInterfaceTrait;
 use Tito10047\PersistentPreferenceBundle\Transformer\ArrayValueTransformer;
 use Tito10047\PersistentPreferenceBundle\Transformer\ScalarValueTransformer;
 use Tito10047\PersistentPreferenceBundle\Transformer\SerializableObjectTransformer;
+use Tito10047\PersistentPreferenceBundle\Transformer\ObjectIdValueTransformer;
 use Tito10047\PersistentPreferenceBundle\Transformer\ValueTransformerInterface;
 
 class SelectionInterfaceTest  extends TestCase{
@@ -260,5 +261,62 @@ class SelectionInterfaceTest  extends TestCase{
         $state = $selection->toggle(1);
         $this->assertTrue($state);
         $this->assertTrue($selection->isSelected(1));
+    }
+
+    public function testCustomMetadataTransformerIsApplied(): void
+    {
+        $selection = new Selection('ctx_custom_meta', $this->storage, $this->normalizer, $this->converter);
+
+        // Create a custom metadata transformer mock
+        $custom = $this->createMock(ValueTransformerInterface::class);
+        $custom->method('supports')->willReturnCallback(static fn($v) => is_array($v));
+        $custom->method('transform')->willReturnCallback(static fn($v) => new \Tito10047\PersistentPreferenceBundle\Storage\StorableEnvelope('custom', $v));
+        $custom->method('supportsReverse')->willReturnCallback(static fn($env) => $env->className === 'custom');
+        $custom->method('reverseTransform')->willReturnCallback(static function ($env) {
+            $o = new \stdClass();
+            foreach ((array)$env->data as $k => $v) { $o->{$k} = $v; }
+            return $o;
+        });
+
+        // Re-create selection with the custom metadata transformer
+        $selection = new Selection('ctx_custom_meta', $this->storage, $this->normalizer, $custom);
+
+        $meta = ['foo' => 'bar', 'n' => 9];
+        $selection->select(123, $meta);
+
+        // getSelected should hydrate metadata through reverseTransform
+        $selected = $selection->getSelected();
+        $this->assertArrayHasKey(123, $selected);
+        $this->assertInstanceOf(\stdClass::class, $selected[123]);
+        $this->assertSame('bar', $selected[123]->foo);
+        $this->assertSame(9, $selected[123]->n);
+
+        // getMetadata() should return hydrated object as well
+        $m = $selection->getMetadata(123);
+        $this->assertInstanceOf(\stdClass::class, $m);
+        $this->assertSame('bar', $m->foo);
+        $this->assertSame(9, $m->n);
+    }
+
+    public function testObjectIdValueTransformerAsMetadata(): void
+    {
+        // Dummy object with getId()
+        $fooClass = new class(77) {
+            public function __construct(private int $id) {}
+            public function getId(): int { return $this->id; }
+        };
+
+        $transformer = new ObjectIdValueTransformer($fooClass::class);
+        // Sanity on transformer itself
+        $this->assertTrue($transformer->supports($fooClass));
+
+        $selection = new Selection('ctx_obj_id_meta', $this->storage, $transformer, $this->normalizer);
+
+        // Select scalar id with object metadata -> should store envelope and read back id (77)
+        $selection->select($fooClass);
+
+        // getSelected returns map id => metadata (reverse transformed)
+        $selected = $selection->getSelectedIdentifiers();
+        $this->assertSame([77], $selected);
     }
 }

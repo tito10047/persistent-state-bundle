@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Tito10047\PersistentPreferenceBundle\Enum\SelectionMode;
+use Tito10047\PersistentPreferenceBundle\Storage\StorableEnvelope;
 
 /**
  * Default storage implementation using Symfony Session.
@@ -175,6 +176,9 @@ final class SelectionSessionStorage implements SelectionStorageInterface
 		$data = $this->loadData($context);
 		$result = [];
 		foreach ($data['ids'] as $id) {
+			if ($id instanceof StorableEnvelope){
+				$id = $id->data;
+			}
 			$key = (string)$id;
 			$result[$id] = $data['meta'][$key] ?? [];
 		}

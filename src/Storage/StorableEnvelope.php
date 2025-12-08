@@ -21,6 +21,14 @@ final class StorableEnvelope
 		public readonly array|string|null|int|float $data
 	) {}
 
+	public static function tryFromArray(mixed $meta): ?StorableEnvelope {
+		try{
+			return self::fromArray($meta);
+		}catch (\InvalidArgumentException){
+			return null;
+		}
+	}
+
 	/**
 	 * Pomocná metóda pre konverziu na pole (pre finálne úložisko)
 	 */

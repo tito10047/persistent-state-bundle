@@ -23,7 +23,7 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
 	}
 
 	public function select(mixed $item, null|array|object $metadata = null): static {
-		$id        = is_scalar($item) ? $item : $this->transformer->transform($item);
+		$id        = is_scalar($item) ? $item : $this->transformer->transform($item)->toArray();
 		$mode      = $this->storage->getMode($this->key);
 		$metaArray = null;
 		if ($metadata !== null) {
@@ -116,12 +116,20 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
 
 	public function getSelectedIdentifiers(): array {
 		if ($this->storage->getMode($this->key) === SelectionMode::INCLUDE) {
-			return $this->storage->getStored($this->key);
+			$data = $this->storage->getStored($this->key);
 		} else {
 			$excluded = $this->storage->getStored($this->key);
 			$all      = $this->storage->getStored($this->getAllContext());
-			return array_diff($all, $excluded);
+			$data     = array_diff($all, $excluded);
 		}
+		foreach ($data as $key => $value) {
+			if (is_array($value) &&
+				($envelope = StorableEnvelope::tryFromArray($value)) &&
+				$this->transformer->supportsReverse($envelope)) {
+				$data[$key] = $this->transformer->reverseTransform($envelope);
+			}
+		}
+		return $data;
 	}
 
 	public function update(mixed $item, object|array|null $metadata = null): static {
@@ -147,10 +155,14 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
 	public function getSelected(): array {
 		$mode = $this->storage->getMode($this->key);
 		if ($mode === SelectionMode::INCLUDE) {
-			$map = $this->storage->getStoredWithMetadata($this->key);
+			$map      = $this->storage->getStoredWithMetadata($this->key);
 			$hydrated = [];
 			foreach ($map as $id => $meta) {
-				$hydrated[$id] = $this->metadataTransformer->reverseTransform(StorableEnvelope::fromArray($meta));
+				if ($meta = StorableEnvelope::tryFromArray($meta)) {
+					$hydrated[$id] = $this->metadataTransformer->reverseTransform($meta);
+				} else {
+					$hydrated[$id] = [];
+				}
 			}
 			return $hydrated;
 		}
@@ -161,10 +173,10 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
 		$result   = [];
 		foreach ($selected as $id) {
 			$meta = $this->storage->getMetadata($this->key, $id);
-			if ($metadataClass !== null) {
+			if ($meta = StorableEnvelope::tryFromArray($meta) !== null) {
 				$result[$id] = $this->metadataTransformer->reverseTransform($meta);
 			} else {
-				$result[$id] = $meta;
+				$result[$id] = [];
 			}
 		}
 		return $result;
