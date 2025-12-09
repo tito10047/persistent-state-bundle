@@ -3,7 +3,7 @@
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
-use Tito10047\PersistentPreferenceBundle\Tests\App\Kernel;
+use Tito10047\PersistentStateBundle\Tests\App\Kernel;
 
 // needed to avoid encoding issues when running tests on different platforms
 setlocale(LC_ALL, 'en_US.UTF-8');

@@ -2,10 +2,10 @@
 declare(strict_types=1);
 
 
-namespace Tito10047\PersistentPreferenceBundle\Selection\Storage;
+namespace Tito10047\PersistentStateBundle\Selection\Storage;
 
 
-use Tito10047\PersistentPreferenceBundle\Enum\SelectionMode;
+use Tito10047\PersistentStateBundle\Enum\SelectionMode;
 
 /**
  * Defines the contract for persisting selection state.

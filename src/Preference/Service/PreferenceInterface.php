@@ -1,6 +1,6 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Preference\Service;
+namespace Tito10047\PersistentStateBundle\Preference\Service;
 
 /**
  * The primary public API for interacting with user preferences in a specific context.

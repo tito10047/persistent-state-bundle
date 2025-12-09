@@ -1,10 +1,10 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Storage;
+namespace Tito10047\PersistentStateBundle\Storage;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceEntityInterface;
-use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceStorageInterface;
+use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceEntityInterface;
+use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceStorageInterface;
 
 final class DoctrinePreferenceStorage implements PreferenceStorageInterface
 {

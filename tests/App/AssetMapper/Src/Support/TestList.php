@@ -1,6 +1,6 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Support;
+namespace Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Support;
 
 /**
  * Jednoduchý wrapper okolo zoznamu položiek (polia s kľúčom 'id').

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Selection\Service;
+namespace Tito10047\PersistentStateBundle\Selection\Service;
 
 interface SelectionManagerInterface
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Resolver;
+namespace Tito10047\PersistentStateBundle\Resolver;
 
-use Tito10047\PersistentPreferenceBundle\Service\PersistentContextInterface;
+use Tito10047\PersistentStateBundle\Service\PersistentContextInterface;
 
 class ObjectContextResolver implements ContextKeyResolverInterface{
 

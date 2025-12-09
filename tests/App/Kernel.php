@@ -1,6 +1,6 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Tests\App;
+namespace Tito10047\PersistentStateBundle\Tests\App;
 
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\Config\Loader\LoaderInterface;

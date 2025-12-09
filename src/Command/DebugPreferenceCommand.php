@@ -1,6 +1,6 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Command;
+namespace Tito10047\PersistentStateBundle\Command;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -10,10 +10,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Tito10047\PersistentPreferenceBundle\Preference\Service\PreferenceManagerInterface;
-use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceSessionStorage;
-use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceStorageInterface;
-use Tito10047\PersistentPreferenceBundle\Storage\DoctrinePreferenceStorage;
+use Tito10047\PersistentStateBundle\Preference\Service\PreferenceManagerInterface;
+use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceSessionStorage;
+use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceStorageInterface;
+use Tito10047\PersistentStateBundle\Storage\DoctrinePreferenceStorage;
 
 #[AsCommand(name: 'debug:preference', description: 'Print preferences for a given context and manager')]
 final class DebugPreferenceCommand extends Command

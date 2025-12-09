@@ -1,17 +1,17 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Tests\Unit\Command;
+namespace Tito10047\PersistentStateBundle\Tests\Unit\Command;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Tito10047\PersistentPreferenceBundle\Command\DebugPreferenceCommand;
-use Tito10047\PersistentPreferenceBundle\Preference\Service\PreferenceInterface;
-use Tito10047\PersistentPreferenceBundle\Preference\Service\PreferenceManagerInterface;
-use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceSessionStorage;
-use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceStorageInterface;
-use Tito10047\PersistentPreferenceBundle\Service\PersistentManagerInterface;
+use Tito10047\PersistentStateBundle\Command\DebugPreferenceCommand;
+use Tito10047\PersistentStateBundle\Preference\Service\PreferenceInterface;
+use Tito10047\PersistentStateBundle\Preference\Service\PreferenceManagerInterface;
+use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceSessionStorage;
+use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceStorageInterface;
+use Tito10047\PersistentStateBundle\Service\PersistentManagerInterface;
 
 class DebugPreferenceCommandTest extends TestCase
 {

@@ -4,38 +4,38 @@ use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Tito10047\PersistentPreferenceBundle\Command\DebugPreferenceCommand;
-use Tito10047\PersistentPreferenceBundle\Controller\SelectController;
-use Tito10047\PersistentPreferenceBundle\Converter\MetadataConverterInterface;
-use Tito10047\PersistentPreferenceBundle\Converter\ObjectVarsConverter;
-use Tito10047\PersistentPreferenceBundle\DataCollector\PreferenceDataCollector;
-use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagContextKeyResolverPass;
-use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagIdentityLoadersPass;
-use Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler\AutoTagValueTransformerPass;
-use Tito10047\PersistentPreferenceBundle\PersistentPreferenceBundle;
-use Tito10047\PersistentPreferenceBundle\Preference\Service\PreferenceManager;
-use Tito10047\PersistentPreferenceBundle\Preference\Service\PreferenceManagerInterface;
-use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceSessionStorage;
-use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceStorageInterface;
-use Tito10047\PersistentPreferenceBundle\Selection\Loader\ArrayLoader;
-use Tito10047\PersistentPreferenceBundle\Selection\Loader\DoctrineCollectionLoader;
-use Tito10047\PersistentPreferenceBundle\Selection\Loader\DoctrineQueryBuilderLoader;
-use Tito10047\PersistentPreferenceBundle\Selection\Loader\DoctrineQueryLoader;
-use Tito10047\PersistentPreferenceBundle\Selection\Service\SelectionManager;
-use Tito10047\PersistentPreferenceBundle\Selection\Service\SelectionManagerInterface;
-use Tito10047\PersistentPreferenceBundle\Selection\Storage\SelectionSessionStorage;
-use Tito10047\PersistentPreferenceBundle\Selection\Storage\SelectionStorageInterface;
-use Tito10047\PersistentPreferenceBundle\Transformer\ArrayValueTransformer;
-use Tito10047\PersistentPreferenceBundle\Transformer\ScalarValueTransformer;
-use Tito10047\PersistentPreferenceBundle\Twig\PreferenceExtension;
-use Tito10047\PersistentPreferenceBundle\Twig\PreferenceRuntime;
-use Tito10047\PersistentPreferenceBundle\Twig\SelectionExtension;
-use Tito10047\PersistentPreferenceBundle\Twig\SelectionRuntime;
+use Tito10047\PersistentStateBundle\Command\DebugPreferenceCommand;
+use Tito10047\PersistentStateBundle\Controller\SelectController;
+use Tito10047\PersistentStateBundle\Converter\MetadataConverterInterface;
+use Tito10047\PersistentStateBundle\Converter\ObjectVarsConverter;
+use Tito10047\PersistentStateBundle\DataCollector\PreferenceDataCollector;
+use Tito10047\PersistentStateBundle\DependencyInjection\Compiler\AutoTagContextKeyResolverPass;
+use Tito10047\PersistentStateBundle\DependencyInjection\Compiler\AutoTagIdentityLoadersPass;
+use Tito10047\PersistentStateBundle\DependencyInjection\Compiler\AutoTagValueTransformerPass;
+use Tito10047\PersistentStateBundle\PersistentStateBundle;
+use Tito10047\PersistentStateBundle\Preference\Service\PreferenceManager;
+use Tito10047\PersistentStateBundle\Preference\Service\PreferenceManagerInterface;
+use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceSessionStorage;
+use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceStorageInterface;
+use Tito10047\PersistentStateBundle\Selection\Loader\ArrayLoader;
+use Tito10047\PersistentStateBundle\Selection\Loader\DoctrineCollectionLoader;
+use Tito10047\PersistentStateBundle\Selection\Loader\DoctrineQueryBuilderLoader;
+use Tito10047\PersistentStateBundle\Selection\Loader\DoctrineQueryLoader;
+use Tito10047\PersistentStateBundle\Selection\Service\SelectionManager;
+use Tito10047\PersistentStateBundle\Selection\Service\SelectionManagerInterface;
+use Tito10047\PersistentStateBundle\Selection\Storage\SelectionSessionStorage;
+use Tito10047\PersistentStateBundle\Selection\Storage\SelectionStorageInterface;
+use Tito10047\PersistentStateBundle\Transformer\ArrayValueTransformer;
+use Tito10047\PersistentStateBundle\Transformer\ScalarValueTransformer;
+use Tito10047\PersistentStateBundle\Twig\PreferenceExtension;
+use Tito10047\PersistentStateBundle\Twig\PreferenceRuntime;
+use Tito10047\PersistentStateBundle\Twig\SelectionExtension;
+use Tito10047\PersistentStateBundle\Twig\SelectionRuntime;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
 use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_iterator;
 
 /**
- * Konfigurácia služieb pre PersistentPreferenceBundle – bez autowire/autoconfigure.
+ * Konfigurácia služieb pre PersistentStateBundle – bez autowire/autoconfigure.
  * Všetko je definované manuálne.
  */
 return static function (ContainerConfigurator $container): void {
@@ -64,7 +64,7 @@ return static function (ContainerConfigurator $container): void {
         ->set('persistent.preference.manager.default', PreferenceManager::class)
             ->public()
             ->arg('$resolvers', tagged_iterator(AutoTagContextKeyResolverPass::TAG))
-            ->arg('$transformers', tagged_iterator(PersistentPreferenceBundle::TRANSFORMER_TAG))
+            ->arg('$transformers', tagged_iterator(PersistentStateBundle::TRANSFORMER_TAG))
             ->arg('$storage', service('persistent.preference.storage.session'))
             ->tag('persistent.preference.manager', ['name' => 'default'])
     ;
@@ -93,10 +93,10 @@ return static function (ContainerConfigurator $container): void {
 	// --- Built-in Value Transformers ---
 	$services->set("persistent.transformer.array",ArrayValueTransformer::class)
 		->public()
-		->tag(PersistentPreferenceBundle::TRANSFORMER_TAG);
+		->tag(PersistentStateBundle::TRANSFORMER_TAG);
 	$services->set("persistent.transformer.scalar",ScalarValueTransformer::class)
 		->public()
-		->tag(PersistentPreferenceBundle::TRANSFORMER_TAG);
+		->tag(PersistentStateBundle::TRANSFORMER_TAG);
 
     // --- Twig Runtime ---
     $services

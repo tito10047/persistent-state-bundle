@@ -1,13 +1,13 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Tests\Unit\Selection\Loader;
+namespace Tito10047\PersistentStateBundle\Tests\Unit\Selection\Loader;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Tito10047\PersistentPreferenceBundle\Selection\Loader\DoctrineQueryBuilderLoader;
-use Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Entity\RecordInteger;
-use Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Factory\RecordIntegerFactory;
-use Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Factory\TestCategoryFactory;
-use Tito10047\PersistentPreferenceBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
+use Tito10047\PersistentStateBundle\Selection\Loader\DoctrineQueryBuilderLoader;
+use Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity\RecordInteger;
+use Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Factory\RecordIntegerFactory;
+use Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Factory\TestCategoryFactory;
+use Tito10047\PersistentStateBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
 
 class DoctrineQueryBuilderLoaderTest extends AssetMapperKernelTestCase
 {

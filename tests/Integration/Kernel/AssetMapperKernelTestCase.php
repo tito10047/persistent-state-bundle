@@ -1,10 +1,10 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Tests\Integration\Kernel;
+namespace Tito10047\PersistentStateBundle\Tests\Integration\Kernel;
 
 use Symfony\Component\HttpKernel\KernelInterface;
-use Tito10047\PersistentPreferenceBundle\Tests\App\Kernel;
-use Tito10047\PersistentPreferenceBundle\Tests\App\KernelTestCase;
+use Tito10047\PersistentStateBundle\Tests\App\Kernel;
+use Tito10047\PersistentStateBundle\Tests\App\KernelTestCase;
 
 class AssetMapperKernelTestCase extends \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase {
 

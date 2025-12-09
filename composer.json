@@ -1,5 +1,5 @@
 {
-  "name": "tito10047/persistent-preference-bundle",
+  "name": "tito10047/persistent-state-bundle",
   "type": "symfony-bundle",
   "license": "MIT",
   "description": "Provides a unified API for handling persistent user preferences, UI states, and settings across different storage adapters (Doctrine, Session, Redis).",
@@ -32,12 +32,12 @@
   },
   "autoload": {
     "psr-4": {
-      "Tito10047\\PersistentPreferenceBundle\\": "src/"
+      "Tito10047\\PersistentStateBundle\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Tito10047\\PersistentPreferenceBundle\\Tests\\": "tests/"
+      "Tito10047\\PersistentStateBundle\\Tests\\": "tests/"
     }
   },
   "extra": {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Enum;
+namespace Tito10047\PersistentStateBundle\Enum;
 
 enum SelectionMode: string
 {

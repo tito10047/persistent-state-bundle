@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Tito10047\PersistentPreferenceBundle\DataCollector;
+namespace Tito10047\PersistentStateBundle\DataCollector;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
-use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceStorageInterface;
+use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceStorageInterface;
 
 final class PreferenceDataCollector extends DataCollector
 {

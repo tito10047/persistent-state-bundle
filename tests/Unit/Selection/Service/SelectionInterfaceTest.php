@@ -1,19 +1,19 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Tests\Unit\Selection\Service;
+namespace Tito10047\PersistentStateBundle\Tests\Unit\Selection\Service;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RequestStack;
 use stdClass;
-use Tito10047\PersistentPreferenceBundle\Enum\SelectionMode;
-use Tito10047\PersistentPreferenceBundle\Selection\Service\Selection;
-use Tito10047\PersistentPreferenceBundle\Selection\Storage\SelectionSessionStorage;
-use Tito10047\PersistentPreferenceBundle\Tests\Trait\SessionInterfaceTrait;
-use Tito10047\PersistentPreferenceBundle\Transformer\ArrayValueTransformer;
-use Tito10047\PersistentPreferenceBundle\Transformer\ScalarValueTransformer;
-use Tito10047\PersistentPreferenceBundle\Transformer\SerializableObjectTransformer;
-use Tito10047\PersistentPreferenceBundle\Transformer\ObjectIdValueTransformer;
-use Tito10047\PersistentPreferenceBundle\Transformer\ValueTransformerInterface;
+use Tito10047\PersistentStateBundle\Enum\SelectionMode;
+use Tito10047\PersistentStateBundle\Selection\Service\Selection;
+use Tito10047\PersistentStateBundle\Selection\Storage\SelectionSessionStorage;
+use Tito10047\PersistentStateBundle\Tests\Trait\SessionInterfaceTrait;
+use Tito10047\PersistentStateBundle\Transformer\ArrayValueTransformer;
+use Tito10047\PersistentStateBundle\Transformer\ScalarValueTransformer;
+use Tito10047\PersistentStateBundle\Transformer\SerializableObjectTransformer;
+use Tito10047\PersistentStateBundle\Transformer\ObjectIdValueTransformer;
+use Tito10047\PersistentStateBundle\Transformer\ValueTransformerInterface;
 
 class SelectionInterfaceTest  extends TestCase{
 
@@ -270,7 +270,7 @@ class SelectionInterfaceTest  extends TestCase{
         // Create a custom metadata transformer mock
         $custom = $this->createMock(ValueTransformerInterface::class);
         $custom->method('supports')->willReturnCallback(static fn($v) => is_array($v));
-        $custom->method('transform')->willReturnCallback(static fn($v) => new \Tito10047\PersistentPreferenceBundle\Storage\StorableEnvelope('custom', $v));
+        $custom->method('transform')->willReturnCallback(static fn($v) => new \Tito10047\PersistentStateBundle\Storage\StorableEnvelope('custom', $v));
         $custom->method('supportsReverse')->willReturnCallback(static fn($env) => $env->className === 'custom');
         $custom->method('reverseTransform')->willReturnCallback(static function ($env) {
             $o = new \stdClass();

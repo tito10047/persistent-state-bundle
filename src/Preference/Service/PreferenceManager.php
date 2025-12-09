@@ -1,12 +1,12 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Preference\Service;
+namespace Tito10047\PersistentStateBundle\Preference\Service;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceStorageInterface;
-use Tito10047\PersistentPreferenceBundle\Resolver\ContextKeyResolverInterface;
-use Tito10047\PersistentPreferenceBundle\Selection\Service\SelectionInterface;
-use Tito10047\PersistentPreferenceBundle\Transformer\ValueTransformerInterface;
+use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceStorageInterface;
+use Tito10047\PersistentStateBundle\Resolver\ContextKeyResolverInterface;
+use Tito10047\PersistentStateBundle\Selection\Service\SelectionInterface;
+use Tito10047\PersistentStateBundle\Transformer\ValueTransformerInterface;
 
 class PreferenceManager implements PreferenceManagerInterface
 {

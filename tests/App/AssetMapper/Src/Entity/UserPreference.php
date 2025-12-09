@@ -1,9 +1,9 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Entity;
+namespace Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Tito10047\PersistentPreferenceBundle\Preference\Storage\BasePreference;
+use Tito10047\PersistentStateBundle\Preference\Storage\BasePreference;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'user_preferences')]

@@ -1,14 +1,14 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler;
+namespace Tito10047\PersistentStateBundle\DependencyInjection\Compiler;
 
 use Symfony\Bundle\WebProfilerBundle\WebProfilerBundle;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-use Tito10047\PersistentPreferenceBundle\DataCollector\PreferenceDataCollector;
-use Tito10047\PersistentPreferenceBundle\Preference\Service\TraceablePersistentManager;
+use Tito10047\PersistentStateBundle\DataCollector\PreferenceDataCollector;
+use Tito10047\PersistentStateBundle\Preference\Service\TraceablePersistentManager;
 
 /**
  * Decorates all preference managers with TraceablePreferenceManager in debug mode
@@ -32,7 +32,7 @@ final class TraceableManagersPass implements CompilerPassInterface
         unset($tag);
 
         // Find all managers tagged with our custom tag
-        $tagName = 'persistent_preference.manager';
+        $tagName = 'persistent.preference.manager';
         foreach ($container->findTaggedServiceIds($tagName, true) as $serviceId => $tagAttrsList) {
             // Determine manager name from tag attribute 'name' if available
             $managerName = $tagAttrsList[0]['name'] ?? $serviceId;

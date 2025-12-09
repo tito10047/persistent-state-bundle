@@ -1,9 +1,9 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Selection\Loader;
+namespace Tito10047\PersistentStateBundle\Selection\Loader;
 
 
-use Tito10047\PersistentPreferenceBundle\Transformer\ValueTransformerInterface;
+use Tito10047\PersistentStateBundle\Transformer\ValueTransformerInterface;
 
 interface IdentityLoaderInterface {
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Entity;
+namespace Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 

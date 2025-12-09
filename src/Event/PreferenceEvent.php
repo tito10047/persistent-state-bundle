@@ -1,6 +1,6 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Event;
+namespace Tito10047\PersistentStateBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 

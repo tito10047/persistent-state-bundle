@@ -1,13 +1,13 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Tests\Unit\Preference\Storage;
+namespace Tito10047\PersistentStateBundle\Tests\Unit\Preference\Storage;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceSessionStorage;
+use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceSessionStorage;
 
 class PreferenceSessionStorageTest extends TestCase
 {
@@ -56,12 +56,12 @@ class PreferenceSessionStorageTest extends TestCase
         // initial bucket empty
         $session->expects($this->atLeastOnce())
             ->method('get')
-            ->with('_persistent_preference_ctx1', $this->isType('array'))
+            ->with('_persistent_ctx1', $this->isType('array'))
             ->willReturnOnConsecutiveCalls([], ['a' => 123]);
 
         $session->expects($this->once())
             ->method('set')
-            ->with('_persistent_preference_ctx1', ['a' => 123]);
+            ->with('_persistent_ctx1', ['a' => 123]);
 
         $storage = $this->createStorageWithSession($session);
         $storage->set('ctx1', 'a', 123);
@@ -75,12 +75,12 @@ class PreferenceSessionStorageTest extends TestCase
         // Start with existing bucket
         $session->expects($this->exactly(2))
             ->method('get')
-            ->with('_persistent_preference_ctx2', $this->isType('array'))
+            ->with('_persistent_ctx2', $this->isType('array'))
             ->willReturnOnConsecutiveCalls(['x' => 1], ['x' => 1, 'a' => 2, 'b' => 3]);
 
         $session->expects($this->once())
             ->method('set')
-            ->with('_persistent_preference_ctx2', ['x' => 1, 'a' => 2, 'b' => 3]);
+            ->with('_persistent_ctx2', ['x' => 1, 'a' => 2, 'b' => 3]);
 
         $storage = $this->createStorageWithSession($session);
         $storage->setMultiple('ctx2', ['a' => 2, 'b' => 3]);
@@ -93,12 +93,12 @@ class PreferenceSessionStorageTest extends TestCase
 
         $session->expects($this->exactly(3))
             ->method('get')
-            ->with('_persistent_preference_ctx3', $this->isType('array'))
+            ->with('_persistent_ctx3', $this->isType('array'))
             ->willReturnOnConsecutiveCalls(['k' => null], ['k' => null], []);
 
         $session->expects($this->once())
             ->method('set')
-            ->with('_persistent_preference_ctx3', []);
+            ->with('_persistent_ctx3', []);
 
         $storage = $this->createStorageWithSession($session);
         $this->assertTrue($storage->has('ctx3', 'k')); // exists even if null
@@ -113,20 +113,20 @@ class PreferenceSessionStorageTest extends TestCase
         $session->expects($this->exactly(4))
             ->method('get')
             ->with($this->logicalOr(
-                $this->equalTo('_persistent_preference_A'),
-                $this->equalTo('_persistent_preference_B')
+                $this->equalTo('_persistent_A'),
+                $this->equalTo('_persistent_B')
             ), $this->isType('array'))
             ->willReturnMap([
-                ['_persistent_preference_A', [], ['foo' => 1]],
-                ['_persistent_preference_A', [], ['foo' => 1]],
-                ['_persistent_preference_B', [], []],
-                ['_persistent_preference_B', [], []],
+                ['_persistent_A', [], ['foo' => 1]],
+                ['_persistent_A', [], ['foo' => 1]],
+                ['_persistent_B', [], []],
+                ['_persistent_B', [], []],
             ]);
 
         // one set call to put value into A
         $session->expects($this->once())
             ->method('set')
-            ->with('_persistent_preference_A', ['foo' => 1]);
+            ->with('_persistent_A', ['foo' => 1]);
 
         $storage = $this->createStorageWithSession($session);
         $storage->set('A', 'foo', 1);

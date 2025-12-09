@@ -1,13 +1,13 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Selection\Storage;
+namespace Tito10047\PersistentStateBundle\Selection\Storage;
 
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Tito10047\PersistentPreferenceBundle\Enum\SelectionMode;
+use Tito10047\PersistentStateBundle\Enum\SelectionMode;
 
 
 final class SelectionSessionStorage implements SelectionStorageInterface

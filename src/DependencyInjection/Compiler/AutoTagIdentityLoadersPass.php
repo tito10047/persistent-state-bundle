@@ -1,11 +1,11 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler;
+namespace Tito10047\PersistentStateBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Tito10047\PersistentPreferenceBundle\Selection\Loader\IdentityLoaderInterface;
+use Tito10047\PersistentStateBundle\Selection\Loader\IdentityLoaderInterface;
 
 /**
  * Automatically adds the persistent_selection.identity_loader tag to any

@@ -1,8 +1,8 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Preference\Service;
+namespace Tito10047\PersistentStateBundle\Preference\Service;
 
-use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceStorageInterface;
+use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceStorageInterface;
 
 interface PreferenceManagerInterface {
     /**

@@ -1,14 +1,14 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Tests\Integration\Twig;
+namespace Tito10047\PersistentStateBundle\Tests\Integration\Twig;
 
-use Tito10047\PersistentPreferenceBundle\Enum\SelectionMode;
-use Tito10047\PersistentPreferenceBundle\PersistentPreferenceBundle;
-use Tito10047\PersistentPreferenceBundle\Selection\Service\SelectionInterface;
-use Tito10047\PersistentPreferenceBundle\Selection\Service\SelectionManagerInterface;
-use Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Entity\User;
-use Tito10047\PersistentPreferenceBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
-use Tito10047\PersistentPreferenceBundle\Tests\Trait\SessionInterfaceTrait;
+use Tito10047\PersistentStateBundle\Enum\SelectionMode;
+use Tito10047\PersistentStateBundle\PersistentStateBundle;
+use Tito10047\PersistentStateBundle\Selection\Service\SelectionInterface;
+use Tito10047\PersistentStateBundle\Selection\Service\SelectionManagerInterface;
+use Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity\User;
+use Tito10047\PersistentStateBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
+use Tito10047\PersistentStateBundle\Tests\Trait\SessionInterfaceTrait;
 use Twig\Environment;
 
 class SelectionExtensionTest extends AssetMapperKernelTestCase
@@ -39,7 +39,7 @@ class SelectionExtensionTest extends AssetMapperKernelTestCase
     public function testTwigFunctionsBehavior(): void
     {
 		$this->initSession();
-		$controllerName = PersistentPreferenceBundle::STIMULUS_CONTROLLER;
+		$controllerName = PersistentStateBundle::STIMULUS_CONTROLLER;
         $container = self::getContainer();
 
         /** @var SelectionManagerInterface $manager */
@@ -109,11 +109,11 @@ class SelectionExtensionTest extends AssetMapperKernelTestCase
         $attrs = $tplStimulus->render();
         $this->assertStringContainsString("data-controller=\"{$controllerName}\"", $attrs);
         $this->assertStringContainsString("data-{$controllerName}-url-toggle-value=\"", $attrs);
-        $this->assertStringContainsString('/_persistent-selection/toggle', $attrs);
+        $this->assertStringContainsString('/_persistent-state-selection/toggle', $attrs);
         $this->assertStringContainsString("data-{$controllerName}-url-select-all-value=\"", $attrs);
-        $this->assertStringContainsString('/_persistent-selection/select-all', $attrs);
+        $this->assertStringContainsString('/_persistent-state-selection/select-all', $attrs);
         $this->assertStringContainsString("data-{$controllerName}-url-select-range-value=\"", $attrs);
-        $this->assertStringContainsString('/_persistent-selection/select-range', $attrs);
+        $this->assertStringContainsString('/_persistent-state-selection/select-range', $attrs);
         $this->assertStringContainsString("data-{$controllerName}-key-value=\"twig_key\"", $attrs);
         $this->assertStringContainsString("data-{$controllerName}-manager-value=\"default\"", $attrs);
     }
@@ -175,7 +175,7 @@ class SelectionExtensionTest extends AssetMapperKernelTestCase
         $container = self::getContainer();
         /** @var Environment $twig */
         $twig = $container->get('twig');
-        $controllerName = PersistentPreferenceBundle::STIMULUS_CONTROLLER;
+        $controllerName = PersistentStateBundle::STIMULUS_CONTROLLER;
 
         // Provide custom data-controller to be concatenated after the bundle's default
         $tpl = $twig->createTemplate(

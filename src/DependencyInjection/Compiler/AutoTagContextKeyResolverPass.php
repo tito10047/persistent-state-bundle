@@ -1,11 +1,11 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler;
+namespace Tito10047\PersistentStateBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Tito10047\PersistentPreferenceBundle\Resolver\ContextKeyResolverInterface;
+use Tito10047\PersistentStateBundle\Resolver\ContextKeyResolverInterface;
 // no need to reference specific resolver classes here
 
 /**
@@ -19,7 +19,7 @@ use Tito10047\PersistentPreferenceBundle\Resolver\ContextKeyResolverInterface;
  */
 final class AutoTagContextKeyResolverPass implements CompilerPassInterface
 {
-    public const TAG = 'persistent_preference.context_key_resolver';
+    public const TAG = 'persistent.preference.context_key_resolver';
 
     public function process(ContainerBuilder $container): void
     {

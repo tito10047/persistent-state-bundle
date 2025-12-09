@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tito10047\PersistentPreferenceBundle\Tests\Integration\DataCollector;
+namespace Tito10047\PersistentStateBundle\Tests\Integration\DataCollector;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -10,10 +10,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
-use Tito10047\PersistentPreferenceBundle\DataCollector\PreferenceDataCollector;
-use Tito10047\PersistentPreferenceBundle\Preference\Service\PreferenceManagerInterface;
-use Tito10047\PersistentPreferenceBundle\Service\PersistentManagerInterface;
-use Tito10047\PersistentPreferenceBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
+use Tito10047\PersistentStateBundle\DataCollector\PreferenceDataCollector;
+use Tito10047\PersistentStateBundle\Preference\Service\PreferenceManagerInterface;
+use Tito10047\PersistentStateBundle\Service\PersistentManagerInterface;
+use Tito10047\PersistentStateBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
 
 final class PreferenceDataCollectorIntegrationTest extends AssetMapperKernelTestCase
 {
@@ -43,7 +43,7 @@ final class PreferenceDataCollectorIntegrationTest extends AssetMapperKernelTest
         ]);
 
         // Create collector (service may not be registered when profiler is absent)
-        $storage = $container->get(\Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceStorageInterface::class);
+        $storage = $container->get(\Tito10047\PersistentStateBundle\Preference\Storage\PreferenceStorageInterface::class);
         $collector = new PreferenceDataCollector($storage);
         self::assertInstanceOf(DataCollectorInterface::class, $collector);
 

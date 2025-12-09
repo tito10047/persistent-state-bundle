@@ -1,11 +1,11 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Selection\Loader;
+namespace Tito10047\PersistentStateBundle\Selection\Loader;
 
 use Doctrine\Common\Collections\Collection;
 use InvalidArgumentException;
-use Tito10047\PersistentPreferenceBundle\Selection\Normalizer\IdentifierNormalizerInterface;
-use Tito10047\PersistentPreferenceBundle\Transformer\ValueTransformerInterface;
+use Tito10047\PersistentStateBundle\Selection\Normalizer\IdentifierNormalizerInterface;
+use Tito10047\PersistentStateBundle\Transformer\ValueTransformerInterface;
 
 /**
  * Loader responsible for extracting identifiers from Doctrine Collection objects.

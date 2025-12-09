@@ -1,16 +1,16 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Tests\Unit\Preference\Service;
+namespace Tito10047\PersistentStateBundle\Tests\Unit\Preference\Service;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Tito10047\PersistentPreferenceBundle\Event\PreferenceEvent;
-use Tito10047\PersistentPreferenceBundle\Event\PreferenceEvents;
-use Tito10047\PersistentPreferenceBundle\Preference\Service\Preference;
-use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceStorageInterface;
-use Tito10047\PersistentPreferenceBundle\Storage\StorableEnvelope;
-use Tito10047\PersistentPreferenceBundle\Transformer\ScalarValueTransformer;
-use Tito10047\PersistentPreferenceBundle\Transformer\ValueTransformerInterface;
+use Tito10047\PersistentStateBundle\Event\PreferenceEvent;
+use Tito10047\PersistentStateBundle\Event\PreferenceEvents;
+use Tito10047\PersistentStateBundle\Preference\Service\Preference;
+use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceStorageInterface;
+use Tito10047\PersistentStateBundle\Storage\StorableEnvelope;
+use Tito10047\PersistentStateBundle\Transformer\ScalarValueTransformer;
+use Tito10047\PersistentStateBundle\Transformer\ValueTransformerInterface;
 
 class PreferenceTest extends TestCase
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Preference\Storage;
+namespace Tito10047\PersistentStateBundle\Preference\Storage;
 
 /**
  * Interface that must be implemented by the Doctrine Entity used for storage.

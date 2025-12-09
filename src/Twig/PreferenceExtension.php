@@ -1,8 +1,8 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Twig;
+namespace Tito10047\PersistentStateBundle\Twig;
 
-use Tito10047\PersistentPreferenceBundle\Service\PersistentManagerInterface;
+use Tito10047\PersistentStateBundle\Service\PersistentManagerInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;

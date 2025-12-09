@@ -1,6 +1,6 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Resolver;
+namespace Tito10047\PersistentStateBundle\Resolver;
 
 /**
  * Strategy interface to resolve a persistent context string from an arbitrary object.

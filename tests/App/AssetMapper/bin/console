@@ -2,7 +2,7 @@
 <?php
 
 use Symfony\Component\Dotenv\Dotenv;
-use Tito10047\PersistentPreferenceBundle\Tests\App\Kernel;
+use Tito10047\PersistentStateBundle\Tests\App\Kernel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 
 $vendorDir = dirname(__DIR__,4);

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Storage;
+namespace Tito10047\PersistentStateBundle\Storage;
 
 /**
  * Toto je "obálka", ktorá drží dáta objektu a informáciu o jeho type,

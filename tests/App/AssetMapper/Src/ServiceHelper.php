@@ -1,10 +1,10 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src;
+namespace Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Tito10047\PersistentPreferenceBundle\Resolver\ContextKeyResolverInterface;
-use Tito10047\PersistentPreferenceBundle\Selection\Service\SelectionManagerInterface;
+use Tito10047\PersistentStateBundle\Resolver\ContextKeyResolverInterface;
+use Tito10047\PersistentStateBundle\Selection\Service\SelectionManagerInterface;
 
 class ServiceHelper {
 

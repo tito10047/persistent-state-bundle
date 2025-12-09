@@ -1,10 +1,10 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Selection\Service;
+namespace Tito10047\PersistentStateBundle\Selection\Service;
 
-use Tito10047\PersistentPreferenceBundle\Selection\Loader\IdentityLoaderInterface;
-use Tito10047\PersistentPreferenceBundle\Selection\Storage\SelectionStorageInterface;
-use Tito10047\PersistentPreferenceBundle\Transformer\ValueTransformerInterface;
+use Tito10047\PersistentStateBundle\Selection\Loader\IdentityLoaderInterface;
+use Tito10047\PersistentStateBundle\Selection\Storage\SelectionStorageInterface;
+use Tito10047\PersistentStateBundle\Transformer\ValueTransformerInterface;
 
 final class SelectionManager implements SelectionManagerInterface {
 

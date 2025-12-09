@@ -1,24 +1,24 @@
 services:
     app.users_resolver:
-        class: Tito10047\PersistentPreferenceBundle\Resolver\ObjectContextResolver
+        class: Tito10047\PersistentStateBundle\Resolver\ObjectContextResolver
         arguments:
-            $class: Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Entity\User
+            $class: Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity\User
             $prefix: 'user_'
     app.companies_resolver:
-        class: Tito10047\PersistentPreferenceBundle\Resolver\ObjectContextResolver
+        class: Tito10047\PersistentStateBundle\Resolver\ObjectContextResolver
         arguments:
-            $class: Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Entity\Company
+            $class: Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity\Company
             $prefix: 'company_'
             $identifierMethod: 'getUuid'
     app.storage.doctrine:
-        class: Tito10047\PersistentPreferenceBundle\Storage\DoctrinePreferenceStorage
+        class: Tito10047\PersistentStateBundle\Storage\DoctrinePreferenceStorage
         arguments:
             - '@doctrine.orm.entity_manager'
-            - Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Entity\UserPreference
+            - Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity\UserPreference
     app.transformer.id:
-        class: Tito10047\PersistentPreferenceBundle\Transformer\ObjectIdValueTransformer
+        class: Tito10047\PersistentStateBundle\Transformer\ObjectIdValueTransformer
         arguments:
-            $class: Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Entity\User
+            $class: Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity\User
             $identifierMethod: 'getId'
 
 persistent:

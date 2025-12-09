@@ -1,8 +1,8 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Twig;
+namespace Tito10047\PersistentStateBundle\Twig;
 
-use Tito10047\PersistentPreferenceBundle\PersistentPreferenceBundle;
+use Tito10047\PersistentStateBundle\PersistentStateBundle;
 use Twig\Extension\AbstractExtension;
 use Twig\Extension\GlobalsInterface;
 use Twig\TwigFunction;
@@ -25,7 +25,7 @@ final class SelectionExtension extends AbstractExtension implements GlobalsInter
 
 	public function getGlobals(): array {
 		return [
-			'persistent_selection_stimulus_controller_name'=> PersistentPreferenceBundle::STIMULUS_CONTROLLER,
+			'persistent_selection_stimulus_controller_name'=> PersistentStateBundle::STIMULUS_CONTROLLER,
 		];
 	}
 }

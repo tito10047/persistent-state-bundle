@@ -1,10 +1,10 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Tests\Unit\Transformer;
+namespace Tito10047\PersistentStateBundle\Tests\Unit\Transformer;
 
 use PHPUnit\Framework\TestCase;
-use Tito10047\PersistentPreferenceBundle\Storage\StorableEnvelope;
-use Tito10047\PersistentPreferenceBundle\Transformer\ScalarValueTransformer;
+use Tito10047\PersistentStateBundle\Storage\StorableEnvelope;
+use Tito10047\PersistentStateBundle\Transformer\ScalarValueTransformer;
 
 class ScalarValueTransformerTest extends TestCase
 {

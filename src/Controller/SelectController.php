@@ -1,11 +1,11 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Controller;
+namespace Tito10047\PersistentStateBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Tito10047\PersistentPreferenceBundle\Selection\Service\SelectionManagerInterface;
+use Tito10047\PersistentStateBundle\Selection\Service\SelectionManagerInterface;
 
 class SelectController {
 

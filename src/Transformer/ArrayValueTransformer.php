@@ -1,8 +1,8 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Transformer;
+namespace Tito10047\PersistentStateBundle\Transformer;
 
-use Tito10047\PersistentPreferenceBundle\Storage\StorableEnvelope;
+use Tito10047\PersistentStateBundle\Storage\StorableEnvelope;
 
 /**
  * Support all basic types. Int, String, Bool, Float, Null

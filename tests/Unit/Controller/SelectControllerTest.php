@@ -1,14 +1,14 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Tests\Unit\Controller;
+namespace Tito10047\PersistentStateBundle\Tests\Unit\Controller;
 
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Tito10047\PersistentPreferenceBundle\Controller\SelectController;
-use Tito10047\PersistentPreferenceBundle\Selection\Service\SelectionInterface;
-use Tito10047\PersistentPreferenceBundle\Selection\Service\SelectionManagerInterface;
+use Tito10047\PersistentStateBundle\Controller\SelectController;
+use Tito10047\PersistentStateBundle\Selection\Service\SelectionInterface;
+use Tito10047\PersistentStateBundle\Selection\Service\SelectionManagerInterface;
 
 class SelectControllerTest extends TestCase {
 

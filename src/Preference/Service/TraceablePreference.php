@@ -1,8 +1,8 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Preference\Service;
+namespace Tito10047\PersistentStateBundle\Preference\Service;
 
-use Tito10047\PersistentPreferenceBundle\DataCollector\PreferenceDataCollector;
+use Tito10047\PersistentStateBundle\DataCollector\PreferenceDataCollector;
 
 /**
  * Decorates a Preference to report changes to the DataCollector in debug mode.

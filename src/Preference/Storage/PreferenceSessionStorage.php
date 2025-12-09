@@ -1,13 +1,13 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Preference\Storage;
+namespace Tito10047\PersistentStateBundle\Preference\Storage;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 final class PreferenceSessionStorage implements PreferenceStorageInterface
 {
-    private const SESSION_PREFIX = '_persistent_preference_';
+    private const SESSION_PREFIX = '_persistent_';
 
     public function __construct(
         private readonly RequestStack $requestStack

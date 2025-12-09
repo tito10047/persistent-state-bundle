@@ -1,10 +1,10 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Preference\Service;
+namespace Tito10047\PersistentStateBundle\Preference\Service;
 
-use Tito10047\PersistentPreferenceBundle\DataCollector\PreferenceDataCollector;
-use Tito10047\PersistentPreferenceBundle\Selection\Service\SelectionInterface;
-use Tito10047\PersistentPreferenceBundle\Service\PersistentManagerInterface;
+use Tito10047\PersistentStateBundle\DataCollector\PreferenceDataCollector;
+use Tito10047\PersistentStateBundle\Selection\Service\SelectionInterface;
+use Tito10047\PersistentStateBundle\Service\PersistentManagerInterface;
 
 final class TraceablePersistentManager implements PreferenceManagerInterface
 {
@@ -20,7 +20,7 @@ final class TraceablePersistentManager implements PreferenceManagerInterface
         return new TraceablePreference($this->managerName, $preference, $this->collector);
     }
 
-    public function getPreferenceStorage(): \Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceStorageInterface
+    public function getPreferenceStorage(): \Tito10047\PersistentStateBundle\Preference\Storage\PreferenceStorageInterface
     {
         return $this->inner->getPreferenceStorage();
     }

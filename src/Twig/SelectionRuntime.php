@@ -1,16 +1,16 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Twig;
+namespace Tito10047\PersistentStateBundle\Twig;
 
 use InvalidArgumentException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Tito10047\PersistentPreferenceBundle\PersistentPreferenceBundle;
-use Tito10047\PersistentPreferenceBundle\Selection\Service\SelectionManagerInterface;
+use Tito10047\PersistentStateBundle\PersistentStateBundle;
+use Tito10047\PersistentStateBundle\Selection\Service\SelectionManagerInterface;
 use Twig\Extension\RuntimeExtensionInterface;
 
 final class SelectionRuntime implements RuntimeExtensionInterface {
 
-	private string $controllerName = PersistentPreferenceBundle::STIMULUS_CONTROLLER;
+	private string $controllerName = PersistentStateBundle::STIMULUS_CONTROLLER;
 
 	/**
 	 * @param iterable<SelectionManagerInterface> $selectionManagers

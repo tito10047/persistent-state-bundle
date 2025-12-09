@@ -1,16 +1,16 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Tests\Integration\Preference\Service;
+namespace Tito10047\PersistentStateBundle\Tests\Integration\Preference\Service;
 
 use stdClass;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Tito10047\PersistentPreferenceBundle\Preference\Service\PreferenceManagerInterface;
-use Tito10047\PersistentPreferenceBundle\Preference\Service\PreferenceInterface;
-use Tito10047\PersistentPreferenceBundle\Service\PersistentContextInterface;
-use Tito10047\PersistentPreferenceBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
+use Tito10047\PersistentStateBundle\Preference\Service\PreferenceManagerInterface;
+use Tito10047\PersistentStateBundle\Preference\Service\PreferenceInterface;
+use Tito10047\PersistentStateBundle\Service\PersistentContextInterface;
+use Tito10047\PersistentStateBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
 
 class PreferenceManagerTest extends AssetMapperKernelTestCase
 {

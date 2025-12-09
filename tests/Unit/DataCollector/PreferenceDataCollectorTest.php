@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Tito10047\PersistentPreferenceBundle\Tests\Unit\DataCollector;
+namespace Tito10047\PersistentStateBundle\Tests\Unit\DataCollector;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Tito10047\PersistentPreferenceBundle\DataCollector\PreferenceDataCollector;
-use Tito10047\PersistentPreferenceBundle\Preference\Storage\PreferenceStorageInterface;
+use Tito10047\PersistentStateBundle\DataCollector\PreferenceDataCollector;
+use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceStorageInterface;
 
 final class PreferenceDataCollectorTest extends TestCase
 {

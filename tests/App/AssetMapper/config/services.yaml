@@ -13,13 +13,13 @@ services:
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
-    Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\:
+    Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\:
         resource: '../Src/'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
-    Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\ServiceHelper:
+    Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\ServiceHelper:
         arguments:
             $resolvers: !tagged_iterator persistent.preference.context_key_resolver
             $transformers: !tagged_iterator persistent.preference.value_transformer

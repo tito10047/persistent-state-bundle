@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tito10047\PersistentPreferenceBundle\Selection\Loader;
+namespace Tito10047\PersistentStateBundle\Selection\Loader;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
@@ -10,9 +10,9 @@ use Exception;
 use InvalidArgumentException;
 use RuntimeException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Tito10047\PersistentPreferenceBundle\Selection\Normalizer\IdentifierNormalizerInterface;
-use Tito10047\PersistentPreferenceBundle\Transformer\ObjectIdValueTransformer;
-use Tito10047\PersistentPreferenceBundle\Transformer\ValueTransformerInterface;
+use Tito10047\PersistentStateBundle\Selection\Normalizer\IdentifierNormalizerInterface;
+use Tito10047\PersistentStateBundle\Transformer\ObjectIdValueTransformer;
+use Tito10047\PersistentStateBundle\Transformer\ValueTransformerInterface;
 
 /**
  * Loader pre Doctrine QueryBuilder.

@@ -1,9 +1,9 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Tests\Integration\Preference\Storage;
+namespace Tito10047\PersistentStateBundle\Tests\Integration\Preference\Storage;
 
-use Tito10047\PersistentPreferenceBundle\Storage\DoctrinePreferenceStorage;
-use Tito10047\PersistentPreferenceBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
+use Tito10047\PersistentStateBundle\Storage\DoctrinePreferenceStorage;
+use Tito10047\PersistentStateBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
 
 class DoctrineStorageTest extends AssetMapperKernelTestCase
 {
