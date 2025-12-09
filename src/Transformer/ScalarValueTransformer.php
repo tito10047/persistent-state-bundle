@@ -1,6 +1,8 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Transformer;
+namespace Tito10047\PersistentStateBundle\Transformer;
+
+use Tito10047\PersistentStateBundle\Storage\StorableEnvelope;
 
 /**
  * Support all basic types. Int, String, Bool, Float, Null
@@ -11,15 +13,15 @@ class ScalarValueTransformer implements ValueTransformerInterface{
         return is_scalar($value) || $value === null;
     }
 
-    public function transform(mixed $value): mixed {
-        return $value;
+    public function transform(mixed $value): StorableEnvelope {
+        return new StorableEnvelope("scalar",$value);
     }
 
-    public function supportsReverse(mixed $value): bool {
-        return is_scalar($value) || $value === null;
+    public function supportsReverse(StorableEnvelope $value): bool {
+        return $value->className === "scalar";
     }
 
-    public function reverseTransform(mixed $value): mixed {
-        return $value;
+    public function reverseTransform(StorableEnvelope $value): mixed {
+        return $value->data;
     }
 }

@@ -1,2 +1,2 @@
 maker:
-    root_namespace: 'Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\'
+    root_namespace: 'Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\'

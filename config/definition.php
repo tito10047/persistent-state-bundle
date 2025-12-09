@@ -6,58 +6,57 @@ use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
  * @link https://symfony.com/doc/current/bundles/best_practices.html#configuration
  */
 return static function (DefinitionConfigurator $definition): void {
-    $definition
-        ->rootNode()
-            ->children()
-				// Sekcia 1: Resolvery (Ako z objektu spraviť kľúč)
-				->arrayNode('context_providers')
-					->info('Map entities to context prefixes (e.g. User -> "user_123")')
-					->useAttributeAsKey('name')
-					->arrayPrototype()
-						->children()
-							->scalarNode('class')->isRequired()->cannotBeEmpty()->end()
-							->scalarNode('prefix')->isRequired()->cannotBeEmpty()->end()
-							->scalarNode('identifier_method')->defaultValue('getId')->end()
-						->end()
-					->end()
-				->end()
+    $rootNode = $definition->rootNode();
+	$children = $rootNode->children();
 
-				// Sekcia 2: Storage (Kde to uložiť)
-				->arrayNode('storage')
-					->addDefaultsIfNotSet()
-					->children()
-						->arrayNode('doctrine')
-							->canBeEnabled() // Creates an 'enabled' boolean key
-							->children()
-								->scalarNode('id')
-									->info('Service ID to register the Doctrine storage under')
-									->isRequired()
-								->end()
-								->scalarNode('preference_class')
-									->info('The Entity class that implements PreferenceEntityInterface')
-									->isRequired()
-								->end()
-								->scalarNode('entity_manager')
-									->defaultValue('default')
-									->info('The Doctrine Entity Manager to use')
-								->end()
-							->end()
-						->end()
-						// Tu môžeme v budúcnosti pridať ->arrayNode('redis')...
-					->end()
-				->end()
-                ->arrayNode('managers')
-                    ->useAttributeAsKey('name')
-                    ->arrayPrototype()
-                        ->children()
-
-                            // ID storage služby; ak nie je zadané, použije sa defaultná storage aliasovaná na StorageInterface
-                            ->scalarNode('storage')->defaultNull()->end()
-
+	$children
+            ->arrayNode('preference')
+                ->addDefaultsIfNotSet()
+                ->children()
+                    ->arrayNode('managers')
+                        ->useAttributeAsKey('name')
+                        ->arrayPrototype()
+                            ->children()
+                                ->scalarNode('storage')
+                                    ->isRequired()
+                                    ->cannotBeEmpty()
+                                    ->info('The service ID of the storage backend to use (e.g. "@app.storage.doctrine").')
+                                ->end()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()
             ->end()
-        ->end()
-    ;
+            ->arrayNode('selection')
+                ->addDefaultsIfNotSet()
+                ->children()
+                    ->arrayNode('managers')
+                        ->useAttributeAsKey('name')
+                        ->arrayPrototype()
+                            ->children()
+                                ->scalarNode('storage')
+									->defaultValue('@persistent.selection.storage.session')
+                                    ->cannotBeEmpty()
+                                    ->info('The service ID of the storage backend to use (e.g. "@app.storage.doctrine").')
+                                ->end()
+                                ->scalarNode('transformer')
+                                    ->defaultValue('@persistent.transformer.scalar')
+                                    ->cannotBeEmpty()
+                                    ->info('')
+                                ->end()
+                                ->scalarNode('metadata_transformer')
+                                    ->defaultValue('@persistent.transformer.array')
+                                    ->cannotBeEmpty()
+                                    ->info('')
+                                ->end()
+								->integerNode('ttl')->defaultNull()->min(0)->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+
+
+	$children->end();
+
 };

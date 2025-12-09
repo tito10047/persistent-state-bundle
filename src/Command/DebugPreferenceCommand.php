@@ -1,6 +1,6 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Command;
+namespace Tito10047\PersistentStateBundle\Command;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -10,10 +10,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Tito10047\PersistentPreferenceBundle\Service\PreferenceManagerInterface;
-use Tito10047\PersistentPreferenceBundle\Storage\DoctrineStorage;
-use Tito10047\PersistentPreferenceBundle\Storage\SessionStorage;
-use Tito10047\PersistentPreferenceBundle\Storage\StorageInterface;
+use Tito10047\PersistentStateBundle\Preference\Service\PreferenceManagerInterface;
+use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceSessionStorage;
+use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceStorageInterface;
+use Tito10047\PersistentStateBundle\Storage\DoctrinePreferenceStorage;
 
 #[AsCommand(name: 'debug:preference', description: 'Print preferences for a given context and manager')]
 final class DebugPreferenceCommand extends Command
@@ -37,7 +37,7 @@ final class DebugPreferenceCommand extends Command
         $context = (string) $input->getArgument('context');
         $managerName = (string) $input->getOption('manager');
 
-        $serviceId = 'persistent_preference.manager.' . $managerName;
+        $serviceId = 'persistent.preference.manager.' . $managerName;
         if (!$this->container->has($serviceId)) {
             $io->error(sprintf('Preference manager "%s" not found (service id "%s").', $managerName, $serviceId));
             return Command::FAILURE;
@@ -49,7 +49,7 @@ final class DebugPreferenceCommand extends Command
             return Command::FAILURE;
         }
 
-        $storage = $manager->getStorage();
+        $storage = $manager->getPreferenceStorage();
         $storageName = $this->detectStorageName($storage);
 
         $preference = $manager->getPreference($context);
@@ -77,11 +77,11 @@ final class DebugPreferenceCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function detectStorageName(StorageInterface $storage): string
+    private function detectStorageName(PreferenceStorageInterface $storage): string
     {
         return match (true) {
-            $storage instanceof DoctrineStorage => 'doctrine',
-            $storage instanceof SessionStorage => 'session',
+            $storage instanceof DoctrinePreferenceStorage => 'doctrine',
+            $storage instanceof PreferenceSessionStorage => 'session',
             default => (new \ReflectionClass($storage))->getShortName(),
         };
     }

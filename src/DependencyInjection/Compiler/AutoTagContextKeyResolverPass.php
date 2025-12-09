@@ -1,12 +1,12 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\DependencyInjection\Compiler;
+namespace Tito10047\PersistentStateBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Tito10047\PersistentPreferenceBundle\Resolver\ContextKeyResolverInterface;
-use Tito10047\PersistentPreferenceBundle\Resolver\ObjectContextResolver;
+use Tito10047\PersistentStateBundle\Resolver\ContextKeyResolverInterface;
+// no need to reference specific resolver classes here
 
 /**
  * Automatically adds the persistent_selection.identifier_normalizer tag to any
@@ -19,7 +19,7 @@ use Tito10047\PersistentPreferenceBundle\Resolver\ObjectContextResolver;
  */
 final class AutoTagContextKeyResolverPass implements CompilerPassInterface
 {
-    public const TAG = 'persistent_preference.context_key_resolver';
+    public const TAG = 'persistent.preference.context_key_resolver';
 
     public function process(ContainerBuilder $container): void
     {
@@ -50,9 +50,6 @@ final class AutoTagContextKeyResolverPass implements CompilerPassInterface
             if (!is_string($class)) {
                 continue;
             }
-			if ($class == ObjectContextResolver::class){
-				continue;
-			}
 
             // Use ContainerBuilder's reflection helper to avoid triggering
             // autoload errors for vendor/dev classes that may not be present.

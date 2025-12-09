@@ -1,8 +1,8 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Resolver;
+namespace Tito10047\PersistentStateBundle\Resolver;
 
-use Tito10047\PersistentPreferenceBundle\Service\PersistentContextInterface;
+use Tito10047\PersistentStateBundle\Service\PersistentContextInterface;
 
 class ObjectContextResolver implements ContextKeyResolverInterface{
 
@@ -10,7 +10,7 @@ class ObjectContextResolver implements ContextKeyResolverInterface{
 	public function __construct(
 		private readonly string $class,
 		private readonly string $prefix,
-		private readonly string $identifierMethod,
+		private readonly string $identifierMethod = 'getId',
 
 	) { }
 
@@ -22,6 +22,6 @@ class ObjectContextResolver implements ContextKeyResolverInterface{
 		if (!method_exists($context, $this->identifierMethod)){
 			throw new \LogicException('Method ' . $this->identifierMethod . ' not found in ' . get_class($context));
 		}
-		return $this->prefix . '_' . $context->{$this->identifierMethod}();
+		return $this->prefix . $context->{$this->identifierMethod}();
 	}
 }

@@ -1,0 +1,44 @@
+services:
+    app.users_resolver:
+        class: Tito10047\PersistentStateBundle\Resolver\ObjectContextResolver
+        arguments:
+            $class: Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity\User
+            $prefix: 'user_'
+    app.companies_resolver:
+        class: Tito10047\PersistentStateBundle\Resolver\ObjectContextResolver
+        arguments:
+            $class: Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity\Company
+            $prefix: 'company_'
+            $identifierMethod: 'getUuid'
+    app.storage.doctrine:
+        class: Tito10047\PersistentStateBundle\Storage\DoctrinePreferenceStorage
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity\UserPreference
+    app.transformer.id:
+        class: Tito10047\PersistentStateBundle\Transformer\ObjectIdValueTransformer
+        arguments:
+            $class: Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity\User
+            $identifierMethod: 'getId'
+
+persistent:
+    preference:
+        managers:
+            default:
+                storage: '@persistent.preference.storage.session'
+            my_pref_manager:
+                storage: '@app.storage.doctrine'
+
+    selection:
+        managers:
+            default:
+                storage: '@persistent.selection.storage.session'
+                transformer: '@app.transformer.id'
+                metadata_transformer: '@app.transformer.id'
+                ttl: 3600
+            scalar:
+                transformer: '@persistent.transformer.scalar'
+                metadata_transformer: '@app.transformer.id'
+            array:
+                transformer: '@persistent.transformer.scalar'
+                metadata_transformer: '@app.transformer.id'

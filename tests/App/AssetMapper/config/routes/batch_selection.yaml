@@ -1,2 +1,2 @@
-persistent_preference:
-    resource: '@PersistentPreferenceBundle/config/routes.php'
+persistent:
+    resource: '@PersistentStateBundle/config/routes.php'

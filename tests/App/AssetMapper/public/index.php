@@ -10,5 +10,5 @@ $_SERVER['APP_RUNTIME_OPTIONS'] = [
 require_once dirname(__DIR__).'/../../../vendor/autoload_runtime.php';
 
 return function (array $context) {
-    return new \Tito10047\PersistentPreferenceBundle\Tests\App\Kernel("dev","AssetMapper/config");
+    return new \Tito10047\PersistentStateBundle\Tests\App\Kernel("dev","AssetMapper/config");
 };

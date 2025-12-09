@@ -21,7 +21,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
 					'type'      => 'attribute',
 					'is_bundle' => false,
 					'dir'       => '%kernel.project_dir%/tests/App/AssetMapper/Src/Entity',
-					'prefix'    => 'Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Entity',
+					'prefix'    => 'Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity',
 					'alias'     => 'App',
 				],
 			],

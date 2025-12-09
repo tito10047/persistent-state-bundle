@@ -1,6 +1,6 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Converter;
+namespace Tito10047\PersistentStateBundle\Converter;
 
 use Symfony\Component\Serializer\SerializerInterface;
 

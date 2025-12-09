@@ -1,11 +1,11 @@
 <?php
 
-namespace Tito10047\PersistentPreferenceBundle\Tests\Integration\Command;
+namespace Tito10047\PersistentStateBundle\Tests\Integration\Command;
 
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
-use Tito10047\PersistentPreferenceBundle\Service\PreferenceManagerInterface;
-use Tito10047\PersistentPreferenceBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
+use Tito10047\PersistentStateBundle\Preference\Service\PreferenceManagerInterface;
+use Tito10047\PersistentStateBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
 
 class DebugPreferenceCommandIntegrationTest extends AssetMapperKernelTestCase
 {
@@ -15,7 +15,7 @@ class DebugPreferenceCommandIntegrationTest extends AssetMapperKernelTestCase
 
         // Seed some preferences into doctrine-backed manager
         /** @var PreferenceManagerInterface $pmDoctrine */
-        $pmDoctrine = static::getContainer()->get('persistent_preference.manager.my_pref_manager');
+        $pmDoctrine = static::getContainer()->get('persistent.preference.manager.my_pref_manager');
         $pmDoctrine->getPreference('user_15')->import([
             'theme' => 'dark',
             'limit' => 50,

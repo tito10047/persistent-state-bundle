@@ -1,5 +1,5 @@
 controllers:
     resource:
         path: ../Src/Controller/
-        namespace: Tito10047\PersistentPreferenceBundle\Tests\App\AssetMapper\Src\Controller
+        namespace: Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Controller
     type: attribute
