@@ -1,6 +1,15 @@
 ![Tests](https://github.com//tito10047/persistent-state-bundle/actions/workflows/symfony.yml/badge.svg)
 
-# 🛒 Persistent State Bundle
+# Persistent State Bundle
+
+<p align="center">
+<img src="docs/image/promo_small.png"><br>
+</p>
+
+This bundle provides a unified and robust solution for managing persistent user interface state in Symfony applications. It covers two key areas: Selections for efficient
+handling of bulk operations (e.g., "Select All" across pagination) and Preferences for storing key-value settings. With a flexible architecture based on context
+resolvers (e.g., binding to a user or company) and support for various storage backends (Session, Redis, Doctrine), it allows you to elegantly solve UI state persistence
+without cluttering your controllers with boilerplate code.
 
 ```yaml
 services:
@@ -124,6 +133,7 @@ Storage: doctrine
 ```
 
 Notes:
+
 - The `context` argument accepts either a pre-resolved key like `user_15` or any object supported by your configured context resolvers.
 - The `--manager` option selects which preference manager to use. It maps to the service id `persistent.manager.{name}` and defaults to `default` when omitted.
 - The Storage line reflects the underlying storage: `session`, `doctrine`, or the short class name for custom storages.
