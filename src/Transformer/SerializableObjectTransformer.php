@@ -24,4 +24,8 @@ class SerializableObjectTransformer implements ValueTransformerInterface{
     public function reverseTransform(StorableEnvelope $value): mixed {
         return unserialize($value->data);
     }
+
+	public function getIdentifier(mixed $value): int|string {
+		return md5(serialize($value));
+	}
 }

@@ -14,6 +14,9 @@ class ScalarValueTransformer implements ValueTransformerInterface{
     }
 
     public function transform(mixed $value): StorableEnvelope {
+		if (!$this->supports($value)){
+			throw new \InvalidArgumentException('Unsupported scalar value');
+		}
         return new StorableEnvelope("scalar",$value);
     }
 
@@ -24,4 +27,8 @@ class ScalarValueTransformer implements ValueTransformerInterface{
     public function reverseTransform(StorableEnvelope $value): mixed {
         return $value->data;
     }
+
+	public function getIdentifier(mixed $value): int|string {
+		return $value??"null";
+	}
 }

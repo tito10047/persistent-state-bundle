@@ -107,5 +107,6 @@ interface SelectionInterface {
      * Useful for UI displaying "X of Y selected".
      */
     public function getTotal():int;
+	public function getIdentifier(mixed $value): int|string;
 
 }

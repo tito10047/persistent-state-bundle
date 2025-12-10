@@ -64,9 +64,10 @@ final class SelectionRuntime implements RuntimeExtensionInterface {
 	}
 
 	public function rowSelector(string $key, mixed $item, array $attributes = [], string $manager = 'default'): string {
-		$selected  = "";
 		$manager   = $this->getRowsSelector($manager);
 		$selection = $manager->getSelection($key);
+
+		$id = $selection->getIdentifier($item);
 
 		$myAttributes = [
 			"name"  => "row-selector[]",
@@ -118,6 +119,7 @@ final class SelectionRuntime implements RuntimeExtensionInterface {
 
 	public function renderAttributes(array $attributes): string {
 		// Render attributes: for boolean-like true use key="key", for strings escape
+		$out = [];
 		foreach ($attributes as $key => $value) {
 			if ($value === true || ($key === 'checked' && $value === 'checked')) {
 				$out[] = sprintf('%s="%s"', $key, $key);
@@ -132,6 +134,7 @@ final class SelectionRuntime implements RuntimeExtensionInterface {
 
 		return implode(' ', $out);
 	}
+
 
 	public function rowSelectorAll(string $key, array $attributes = [], string $manager = 'default'): string {
 		$selected = "";

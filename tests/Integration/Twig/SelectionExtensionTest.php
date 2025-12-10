@@ -169,6 +169,42 @@ class SelectionExtensionTest extends AssetMapperKernelTestCase
         $this->assertStringContainsString('data-title="A &quot;quote&quot; &amp; more"', $html);
     }
 
+    public function testRowSelectorHasValueAndStimulusParams(): void
+    {
+        $this->initSession();
+        $container = self::getContainer();
+
+        /** @var SelectionManagerInterface $manager */
+        $manager = $container->get(SelectionManagerInterface::class);
+
+        $user = new User();
+        $user->setId(42);
+        $user->setName('John');
+
+        $selection = $manager->registerSelection('twig_value_key', [$user]);
+        // not selected initially
+
+        /** @var Environment $twig */
+        $twig = $container->get('twig');
+
+        $tpl = $twig->createTemplate("{{ persistent_selection_row_selector('twig_value_key', item) }}");
+        $html = $tpl->render(['item' => $user]);
+
+        // has default name and class
+        $this->assertStringContainsString('name="row-selector[]"', $html);
+        $this->assertStringContainsString('class="row-selector"', $html);
+        // has value equal to item's id and proper stimulus params
+        $this->assertStringContainsString('value=\'42\'', $html);
+        $this->assertStringContainsString("data-".PersistentStateBundle::STIMULUS_CONTROLLER."-id-param='42'", $html);
+        $this->assertStringContainsString("data-".PersistentStateBundle::STIMULUS_CONTROLLER."-target=\"checkbox\"", $html);
+        $this->assertStringContainsString("data-action='".PersistentStateBundle::STIMULUS_CONTROLLER."#toggle'", $html);
+
+        // when selected, it should become checked
+        $selection->select($user);
+        $htmlSelected = $tpl->render(['item' => $user]);
+        $this->assertStringContainsString('checked="checked"', $htmlSelected);
+    }
+
     public function testStimulusControllerMergesDataController(): void
     {
 		$this->initSession();

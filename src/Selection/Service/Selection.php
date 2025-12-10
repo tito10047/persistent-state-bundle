@@ -220,23 +220,11 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
 	/**
 	 * Normalize an item into a storage identifier (int|string|array).
 	 */
-	private function normalizeIdentifier(mixed $item): int|string|array {
-		if (is_scalar($item)) {
+	private function normalizeIdentifier(mixed $item): int|string {
+		if (is_scalar($item) || $item === null) {
 			return $item;
 		}
-		$transformed = $this->transformer->transform($item);
-		if ($transformed instanceof StorableEnvelope) {
-			// If transformer can reverse, prefer scalar identifier (e.g., ObjectId -> int)
-			if ($this->transformer->supportsReverse($transformed)) {
-				$reversed = $this->transformer->reverseTransform($transformed);
-				if (is_scalar($reversed)) {
-					return $reversed;
-				}
-			}
-			// Fallback to serializable array form
-			return $transformed->toArray();
-		}
-		return $transformed; // assume transformer returns scalar or array
+		return $this->transformer->getIdentifier($item);
 	}
 
 	public function destroy(): static {
@@ -307,5 +295,9 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
 		$this->storage->set($this->getAllMetaContext(), $cacheKey, $meta);
 
 		return $this;
+	}
+
+	public function getIdentifier(mixed $value): int|string {
+		return $this->normalizeIdentifier($value);
 	}
 }

@@ -24,6 +24,8 @@ interface ValueTransformerInterface
 	 */
 	public function transform(mixed $value): StorableEnvelope;
 
+	public function getIdentifier(mixed $value): int|string;
+
 	/**
 	 * Checks if the raw value from storage looks like something this transformer created.
 	 * Used during get().

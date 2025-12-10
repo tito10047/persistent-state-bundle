@@ -24,4 +24,8 @@ class ArrayValueTransformer implements ValueTransformerInterface{
     public function reverseTransform(StorableEnvelope $value): mixed {
         return $value->data;
     }
+
+	public function getIdentifier(mixed $value): int|string {
+		return md5(serialize($value));
+	}
 }
