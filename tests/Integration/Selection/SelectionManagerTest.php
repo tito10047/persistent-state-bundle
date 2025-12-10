@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Tito10047\PersistentStateBundle\Enum\SelectionMode;
 use Tito10047\PersistentStateBundle\Selection\Service\SelectionManagerInterface;
 use Tito10047\PersistentStateBundle\Selection\Service\SelectionInterface;
+use Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity\User;
 use Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\ServiceHelper;
 use Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Support\TestList;
 use Tito10047\PersistentStateBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
@@ -60,6 +61,45 @@ class SelectionManagerTest extends AssetMapperKernelTestCase
         $ids = $selection->getSelectedIdentifiers();
         sort($ids);
         $this->assertSame([1, 3], $ids);
+    }
+
+    public function testGetSelectionWithObjectOwner(): void
+    {
+        $this->initSession();
+        $container = self::getContainer();
+
+        /** @var SelectionManagerInterface $manager */
+        $manager = $container->get('persistent.selection.manager.scalar');
+        $this->assertInstanceOf(SelectionManagerInterface::class, $manager);
+
+        $owner1 = (new User())->setId(1);
+        $owner2 = (new User())->setId(2);
+
+        $selection1 = $manager->getSelection('test_key_owner_obj', $owner1);
+        $this->assertInstanceOf(SelectionInterface::class, $selection1);
+        $selection2 = $manager->getSelection('test_key_owner_obj', $owner2);
+        $this->assertInstanceOf(SelectionInterface::class, $selection2);
+
+		$selection1->select(1);
+		$selection2->select(2);
+
+		$this->assertTrue( $selection1->isSelected(1) );
+		$this->assertTrue( $selection2->isSelected(2) );
+		$this->assertFalse( $selection1->isSelected(2) );
+		$this->assertFalse( $selection2->isSelected(1) );
+    }
+
+    public function testGetSelectionWithStringOwner(): void
+    {
+        $this->initSession();
+        $container = self::getContainer();
+
+        /** @var SelectionManagerInterface $manager */
+        $manager = $container->get('persistent.selection.manager.scalar');
+        $this->assertInstanceOf(SelectionManagerInterface::class, $manager);
+
+        $selection = $manager->getSelection('test_key_owner_str', 'user-123');
+        $this->assertInstanceOf(SelectionInterface::class, $selection);
     }
 
     public function testRegisterSourceThrowsWhenNoLoader(): void

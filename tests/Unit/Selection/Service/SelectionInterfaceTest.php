@@ -82,6 +82,45 @@ class SelectionInterfaceTest  extends TestCase{
 		$this->assertSame([1, '2', 3], $selection->getSelectedIdentifiers());
 	}
 
+	public function testOwnerScopedPersistenceAndIsolation(): void
+	{
+		// Simulate owner scoping by composing the selection key with the owner context
+		$stringOwner = 'user-123';
+		$stringKey   = 'ctx_owner_' . $stringOwner;
+
+		$selectionA = new Selection($stringKey, $this->storage, $this->normalizer, $this->converter);
+		$selectionA->unselectAll(); // start clean for this key
+		$selectionA->select(1)->select(2);
+
+		// Recreate to verify data is persisted for the same owner context
+		$selectionA2 = new Selection($stringKey, $this->storage, $this->normalizer, $this->converter);
+		$idsA = $selectionA2->getSelectedIdentifiers();
+		sort($idsA);
+		$this->assertSame([1, 2], $idsA, 'String owner selection should persist and reload correctly.');
+
+		// Now use an object owner and ensure isolation between owners
+		$objectOwner = new stdClass();
+		$objectKey   = 'ctx_owner_obj_' . spl_object_hash($objectOwner);
+
+		$selectionB = new Selection($objectKey, $this->storage, $this->normalizer, $this->converter);
+		$selectionB->unselectAll(); // start clean for this key
+		$selectionB->select(10);
+
+		$selectionB2 = new Selection($objectKey, $this->storage, $this->normalizer, $this->converter);
+		$idsB = $selectionB2->getSelectedIdentifiers();
+		sort($idsB);
+		$this->assertSame([10], $idsB, 'Object owner selection should persist and reload correctly.');
+
+		// Cross-check that data does not mix between different owners
+		$this->assertTrue($selectionA2->isSelected(1));
+		$this->assertTrue($selectionA2->isSelected(2));
+		$this->assertFalse($selectionA2->isSelected(10));
+
+		$this->assertTrue($selectionB2->isSelected(10));
+		$this->assertFalse($selectionB2->isSelected(1));
+		$this->assertFalse($selectionB2->isSelected(2));
+	}
+
 	public function testClearSelected(): void
 	{
 		$selection = new Selection('ctx_clear', $this->storage, $this->normalizer, $this->converter);

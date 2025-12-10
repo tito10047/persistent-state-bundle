@@ -24,5 +24,5 @@ interface SelectionManagerInterface
      * If $owner is provided, its context may be used by the storage layer
      * (e.g. to scope selection to a user/tenant).
      */
-    public function getSelection(string $namespace, mixed $owner = null): SelectionInterface;
+    public function getSelection(string $namespace, object|string $owner = null): SelectionInterface;
 }

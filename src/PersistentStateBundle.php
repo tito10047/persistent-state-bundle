@@ -64,6 +64,7 @@ class PersistentStateBundle extends AbstractBundle {
 				->arg('$transformer', $transformer)
 				->arg('$metadataTransformer', $metadataTransformer)
 				->arg('$loaders', tagged_iterator(AutoTagIdentityLoadersPass::TAG))
+				->arg('$resolvers', tagged_iterator(AutoTagContextKeyResolverPass::TAG))
 				->arg('$ttl', $ttl)
 				->tag('persistent.selection.manager', ['name' => $name])
 			;
