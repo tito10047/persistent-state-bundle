@@ -78,6 +78,7 @@ return static function (ContainerConfigurator $container): void {
 		->arg('$transformer',  service('persistent_state.transformer.scalar'))
 		->arg('$metadataTransformer', service('persistent_state.transformer.array'))
 		->arg('$loaders', tagged_iterator(AutoTagIdentityLoadersPass::TAG))
+		->arg('$resolvers', tagged_iterator(AutoTagContextKeyResolverPass::TAG))
 		->arg('$ttl', null)
 		->tag('persistent_state.selection.manager', ['name' => 'default']);
 	$services->alias(SelectionManagerInterface::class, 'persistent_state.selection.manager.default');
