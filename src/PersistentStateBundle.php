@@ -20,7 +20,7 @@ use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_it
  * @link https://symfony.com/doc/current/bundles/best_practices.html
  */
 class PersistentStateBundle extends AbstractBundle {
-	public const STIMULUS_CONTROLLER='tito10047--persistent-state-bundle--persistent-state-selection';
+	public const STIMULUS_CONTROLLER='tito10047--persistent-state-bundle--selection';
 
 	protected string $extensionAlias = 'persistent';
 	const TRANSFORMER_TAG = 'persistent.preference.value_transformer';
