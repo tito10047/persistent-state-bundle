@@ -21,24 +21,24 @@ services:
             $class: Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity\User
             $identifierMethod: 'getId'
 
-persistent:
+persistent_state:
     preference:
         managers:
             default:
-                storage: '@persistent.preference.storage.session'
+                storage: '@persistent_state.preference.storage.session'
             my_pref_manager:
                 storage: '@app.storage.doctrine'
 
     selection:
         managers:
             default:
-                storage: '@persistent.selection.storage.session'
+                storage: '@persistent_state.selection.storage.session'
                 transformer: '@app.transformer.id'
                 metadata_transformer: '@app.transformer.id'
                 ttl: 3600
             scalar:
-                transformer: '@persistent.transformer.scalar'
+                transformer: '@persistent_state.transformer.scalar'
                 metadata_transformer: '@app.transformer.id'
             array:
-                transformer: '@persistent.transformer.scalar'
+                transformer: '@persistent_state.transformer.scalar'
                 metadata_transformer: '@app.transformer.id'

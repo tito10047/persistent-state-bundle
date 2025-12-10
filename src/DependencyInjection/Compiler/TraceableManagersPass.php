@@ -32,7 +32,7 @@ final class TraceableManagersPass implements CompilerPassInterface
         unset($tag);
 
         // Find all managers tagged with our custom tag
-        $tagName = 'persistent.preference.manager';
+        $tagName = 'persistent_state.preference.manager';
         foreach ($container->findTaggedServiceIds($tagName, true) as $serviceId => $tagAttrsList) {
             // Determine manager name from tag attribute 'name' if available
             $managerName = $tagAttrsList[0]['name'] ?? $serviceId;

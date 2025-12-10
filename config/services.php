@@ -45,42 +45,42 @@ return static function (ContainerConfigurator $container): void {
 
 	// --- Storage ---
     $services
-        ->set('persistent.preference.storage.session',PreferenceSessionStorage::class)
+        ->set('persistent_state.preference.storage.session',PreferenceSessionStorage::class)
             ->arg('$requestStack', service(RequestStack::class))
 		->public()
     ;
     // Alias the interface to our concrete storage service id
-    $services->alias(PreferenceStorageInterface::class, 'persistent.preference.storage.session');
+    $services->alias(PreferenceStorageInterface::class, 'persistent_state.preference.storage.session');
 
     // --- Metadata Converters ---
     $services
-        ->set('persistent.preference.converter.object_vars', ObjectVarsConverter::class)
+        ->set('persistent_state.preference.converter.object_vars', ObjectVarsConverter::class)
 		->public()
     ;
-    $services->alias(MetadataConverterInterface::class, 'persistent.preference.converter.object_vars');
+    $services->alias(MetadataConverterInterface::class, 'persistent_state.preference.converter.object_vars');
 
     // --- PreferenceManager ---
     $services
-        ->set('persistent.preference.manager.default', PreferenceManager::class)
+        ->set('persistent_state.preference.manager.default', PreferenceManager::class)
             ->public()
             ->arg('$resolvers', tagged_iterator(AutoTagContextKeyResolverPass::TAG))
             ->arg('$transformers', tagged_iterator(PersistentStateBundle::TRANSFORMER_TAG))
-            ->arg('$storage', service('persistent.preference.storage.session'))
-            ->tag('persistent.preference.manager', ['name' => 'default'])
+            ->arg('$storage', service('persistent_state.preference.storage.session'))
+            ->tag('persistent_state.preference.manager', ['name' => 'default'])
     ;
-    $services->alias(PreferenceManagerInterface::class, 'persistent.preference.manager.default');
+    $services->alias(PreferenceManagerInterface::class, 'persistent_state.preference.manager.default');
 
 	// --- SelectionManager ---
 	$services
-		->set('persistent.selection.manager.default', SelectionManager::class)
+		->set('persistent_state.selection.manager.default', SelectionManager::class)
 		->public()
-		->arg('$storage', service('persistent.selection.storage.session'))
-		->arg('$transformer',  service('persistent.transformer.scalar'))
-		->arg('$metadataTransformer', service('persistent.transformer.array'))
+		->arg('$storage', service('persistent_state.selection.storage.session'))
+		->arg('$transformer',  service('persistent_state.transformer.scalar'))
+		->arg('$metadataTransformer', service('persistent_state.transformer.array'))
 		->arg('$loaders', tagged_iterator(AutoTagIdentityLoadersPass::TAG))
 		->arg('$ttl', null)
-		->tag('persistent.selection.manager', ['name' => 'default']);
-	$services->alias(SelectionManagerInterface::class, 'persistent.selection.manager.default');
+		->tag('persistent_state.selection.manager', ['name' => 'default']);
+	$services->alias(SelectionManagerInterface::class, 'persistent_state.selection.manager.default');
 
 
 	// --- Twig Extension ---
@@ -91,10 +91,10 @@ return static function (ContainerConfigurator $container): void {
     ;
 
 	// --- Built-in Value Transformers ---
-	$services->set("persistent.transformer.array",ArrayValueTransformer::class)
+	$services->set("persistent_state.transformer.array",ArrayValueTransformer::class)
 		->public()
 		->tag(PersistentStateBundle::TRANSFORMER_TAG);
-	$services->set("persistent.transformer.scalar",ScalarValueTransformer::class)
+	$services->set("persistent_state.transformer.scalar",ScalarValueTransformer::class)
 		->public()
 		->tag(PersistentStateBundle::TRANSFORMER_TAG);
 
@@ -133,7 +133,7 @@ return static function (ContainerConfigurator $container): void {
             ->tag('console.command')
     ;
 	$services
-		->set('persistent.selection.storage.session', SelectionSessionStorage::class)
+		->set('persistent_state.selection.storage.session', SelectionSessionStorage::class)
 		->arg('$requestStack', service(RequestStack::class))
 	;
 	$services->alias(SelectionStorageInterface::class, SelectionSessionStorage::class);
@@ -160,7 +160,7 @@ return static function (ContainerConfigurator $container): void {
 	$services
 		->set(SelectController::class)
 		->public()
-		->arg('$selectionManagers', tagged_iterator('persistent.selection.manager', 'name'));
+		->arg('$selectionManagers', tagged_iterator('persistent_state.selection.manager', 'name'));
 
 	// --- Twig integration ---
 	$services
@@ -170,7 +170,7 @@ return static function (ContainerConfigurator $container): void {
 
 	$services
 		->set(SelectionRuntime::class)
-		->arg('$selectionManagers', tagged_iterator('persistent.selection.manager', 'name'))
+		->arg('$selectionManagers', tagged_iterator('persistent_state.selection.manager', 'name'))
 		->arg('$router', service(UrlGeneratorInterface::class))
 		->tag('twig.runtime')
 	;

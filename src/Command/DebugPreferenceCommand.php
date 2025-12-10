@@ -37,7 +37,7 @@ final class DebugPreferenceCommand extends Command
         $context = (string) $input->getArgument('context');
         $managerName = (string) $input->getOption('manager');
 
-        $serviceId = 'persistent.preference.manager.' . $managerName;
+        $serviceId = 'persistent_state.preference.manager.' . $managerName;
         if (!$this->container->has($serviceId)) {
             $io->error(sprintf('Preference manager "%s" not found (service id "%s").', $managerName, $serviceId));
             return Command::FAILURE;

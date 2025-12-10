@@ -16,7 +16,7 @@ use Tito10047\PersistentStateBundle\Selection\Loader\IdentityLoaderInterface;
  */
 final class AutoTagIdentityLoadersPass implements CompilerPassInterface
 {
-    public const TAG = 'persistent.selection.identity_loader';
+    public const TAG = 'persistent_state.selection.identity_loader';
 
     public function process(ContainerBuilder $container): void
     {

@@ -19,7 +19,7 @@ use Tito10047\PersistentStateBundle\Resolver\ContextKeyResolverInterface;
  */
 final class AutoTagContextKeyResolverPass implements CompilerPassInterface
 {
-    public const TAG = 'persistent.preference.context_key_resolver';
+    public const TAG = 'persistent_state.preference.context_key_resolver';
 
     public function process(ContainerBuilder $container): void
     {

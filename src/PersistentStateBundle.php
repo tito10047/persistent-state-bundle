@@ -22,8 +22,8 @@ use function Symfony\Component\DependencyInjection\Loader\Configurator\tagged_it
 class PersistentStateBundle extends AbstractBundle {
 	public const STIMULUS_CONTROLLER='tito10047--persistent-state-bundle--selection';
 
-	protected string $extensionAlias = 'persistent';
-	const TRANSFORMER_TAG = 'persistent.preference.value_transformer';
+	protected string $extensionAlias = 'persistent_state';
+	const TRANSFORMER_TAG = 'persistent_state.preference.value_transformer';
 
 	public function configure(DefinitionConfigurator $definition): void {
 		$definition->import('../config/definition.php');
@@ -33,22 +33,22 @@ class PersistentStateBundle extends AbstractBundle {
 		$container->import('../config/services.php');
 		$services = $container->services();
 		// Default metadata converter service
-		$services->set('persistent.preference.converter.object_vars', ObjectVarsConverter::class)
-			->alias(MetadataConverterInterface::class, 'persistent.preference.converter.object_vars');
+		$services->set('persistent_state.preference.converter.object_vars', ObjectVarsConverter::class)
+			->alias(MetadataConverterInterface::class, 'persistent_state.preference.converter.object_vars');
 
 
 		$configManagers = $config['preference']['managers'] ?? [];
 		foreach ($configManagers as $name => $subConfig) {
-			$storage = service($subConfig['storage'] ?? '@persistent.preference.storage.session');
+			$storage = service($subConfig['storage'] ?? '@persistent_state.preference.storage.session');
 			$storage = ltrim($storage, '@');
 			$services
-				->set('persistent.preference.manager.' . $name, PreferenceManager::class)
+				->set('persistent_state.preference.manager.' . $name, PreferenceManager::class)
 				->public()
 				->arg('$resolvers', tagged_iterator(AutoTagContextKeyResolverPass::TAG))
 				->arg('$transformers', tagged_iterator(self::TRANSFORMER_TAG))
 				->arg('$storage', service($storage))
 				->arg('$dispatcher', service('event_dispatcher'))
-				->tag('persistent.preference.manager', ['name' => $name]);
+				->tag('persistent_state.preference.manager', ['name' => $name]);
 		}
 
 		$configManagers = $config['selection']['managers'] ?? [];
@@ -58,7 +58,7 @@ class PersistentStateBundle extends AbstractBundle {
 			$metadataTransformer = service(ltrim($subConfig['metadata_transformer'], '@'));
 			$ttl = $subConfig['ttl']??null;
 			$services
-				->set('persistent.selection.manager.'.$name,SelectionManager::class)
+				->set('persistent_state.selection.manager.'.$name,SelectionManager::class)
 				->public()
 				->arg('$storage', $storage)
 				->arg('$transformer', $transformer)
@@ -66,7 +66,7 @@ class PersistentStateBundle extends AbstractBundle {
 				->arg('$loaders', tagged_iterator(AutoTagIdentityLoadersPass::TAG))
 				->arg('$resolvers', tagged_iterator(AutoTagContextKeyResolverPass::TAG))
 				->arg('$ttl', $ttl)
-				->tag('persistent.selection.manager', ['name' => $name])
+				->tag('persistent_state.selection.manager', ['name' => $name])
 			;
 		}
 	}

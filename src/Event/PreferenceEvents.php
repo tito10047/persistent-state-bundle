@@ -10,7 +10,7 @@ final class PreferenceEvents
 	 *
 	 * @Event("App\PersistentStateBundle\Event\PreferenceEvent")
 	 */
-	public const PRE_SET = 'persistent.pre_set';
+	public const PRE_SET = 'persistent_state.pre_set';
 
 	/**
 	 * Vyvolaný PO tom, čo boli dáta úspešne odovzdané do storage.
@@ -18,5 +18,5 @@ final class PreferenceEvents
 	 *
 	 * @Event("App\PersistentStateBundle\Event\PreferenceEvent")
 	 */
-	public const POST_SET = 'persistent.post_set';
+	public const POST_SET = 'persistent_state.post_set';
 }

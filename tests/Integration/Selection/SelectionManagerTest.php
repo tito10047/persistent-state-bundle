@@ -27,7 +27,7 @@ class SelectionManagerTest extends AssetMapperKernelTestCase
 		$container = self::getContainer();
 
 		/** @var SelectionInterface $manager */
-        $manager = $container->get('persistent.selection.manager.scalar');
+        $manager = $container->get('persistent_state.selection.manager.scalar');
         $this->assertInstanceOf(SelectionManagerInterface::class, $manager);
 
         // Use the test normalizer that supports type "array" and requires identifierPath
@@ -69,7 +69,7 @@ class SelectionManagerTest extends AssetMapperKernelTestCase
         $container = self::getContainer();
 
         /** @var SelectionManagerInterface $manager */
-        $manager = $container->get('persistent.selection.manager.scalar');
+        $manager = $container->get('persistent_state.selection.manager.scalar');
         $this->assertInstanceOf(SelectionManagerInterface::class, $manager);
 
         $owner1 = (new User())->setId(1);
@@ -95,7 +95,7 @@ class SelectionManagerTest extends AssetMapperKernelTestCase
         $container = self::getContainer();
 
         /** @var SelectionManagerInterface $manager */
-        $manager = $container->get('persistent.selection.manager.scalar');
+        $manager = $container->get('persistent_state.selection.manager.scalar');
         $this->assertInstanceOf(SelectionManagerInterface::class, $manager);
 
         $selection = $manager->getSelection('test_key_owner_str', 'user-123');
@@ -107,7 +107,7 @@ class SelectionManagerTest extends AssetMapperKernelTestCase
         $container = self::getContainer();
 
         /** @var SelectionManagerInterface $manager */
-        $manager = $container->get('persistent.selection.manager.default');
+        $manager = $container->get('persistent_state.selection.manager.default');
         $this->assertInstanceOf(SelectionManagerInterface::class, $manager);
 
         $this->expectException(\InvalidArgumentException::class);
@@ -126,7 +126,7 @@ class SelectionManagerTest extends AssetMapperKernelTestCase
 		$container = self::getContainer();
 
 		/** @var SelectionManagerInterface $manager */
-		$manager = $container->get('persistent.selection.manager.'.$service);
+		$manager = $container->get('persistent_state.selection.manager.'.$service);
 
 		$this->expectException(\InvalidArgumentException::class);
 		$this->expectExceptionMessage('is not supported');

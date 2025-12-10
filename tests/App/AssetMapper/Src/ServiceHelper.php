@@ -15,7 +15,7 @@ class ServiceHelper {
 	public function __construct(
 		private readonly iterable                 $resolvers,
 		private readonly iterable                 $transformers,
-		#[Autowire(service: 'persistent.selection.manager.array')]
+		#[Autowire(service: 'persistent_state.selection.manager.array')]
 		public readonly SelectionManagerInterface $arraySelectionManager,
 	) { }
 }

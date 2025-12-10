@@ -41,7 +41,7 @@ class DebugPreferenceCommandTest extends TestCase
     public function testSuccessWithRowsAndSessionStorageLabel(): void
     {
         $context = 'user_15';
-        $serviceId = 'persistent.preference.manager.default';
+        $serviceId = 'persistent_state.preference.manager.default';
 
         $preference = $this->createMock(PreferenceInterface::class);
         $preference->method('all')->willReturn([
@@ -87,7 +87,7 @@ class DebugPreferenceCommandTest extends TestCase
     public function testEmptyPreferencesShowsMessage(): void
     {
         $context = 'ctx';
-        $serviceId = 'persistent.preference.manager.default';
+        $serviceId = 'persistent_state.preference.manager.default';
 
         $preference = $this->createMock(PreferenceInterface::class);
         $preference->method('all')->willReturn([]);
@@ -116,7 +116,7 @@ class DebugPreferenceCommandTest extends TestCase
     public function testMissingManagerServiceFails(): void
     {
         $container = $this->makeContainerMock([], [
-            'persistent.preference.manager.missing' => false,
+            'persistent_state.preference.manager.missing' => false,
         ]);
 
         $command = new DebugPreferenceCommand($container);
@@ -133,7 +133,7 @@ class DebugPreferenceCommandTest extends TestCase
 
     public function testWrongServiceTypeFails(): void
     {
-        $serviceId = 'persistent.preference.manager.weird';
+        $serviceId = 'persistent_state.preference.manager.weird';
         $container = $this->makeContainerMock([
             $serviceId => new \stdClass(),
         ]);
@@ -154,7 +154,7 @@ class DebugPreferenceCommandTest extends TestCase
     public function testFallbackStorageNameUsesShortClassName(): void
     {
         $context = 'c';
-        $serviceId = 'persistent.preference.manager.default';
+        $serviceId = 'persistent_state.preference.manager.default';
 
         $preference = $this->createMock(PreferenceInterface::class);
         $preference->method('all')->willReturn(['a' => 1]);
