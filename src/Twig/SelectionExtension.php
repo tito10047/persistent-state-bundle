@@ -22,10 +22,10 @@ final class SelectionExtension extends AbstractExtension implements GlobalsInter
         ];
     }
 
-
-	public function getGlobals(): array {
-		return [
-			'persistent_selection_stimulus_controller_name'=> PersistentStateBundle::STIMULUS_CONTROLLER,
-		];
-	}
+    public function getGlobals(): array
+    {
+        return [
+            'persistent_selection_stimulus_controller_name' => PersistentStateBundle::STIMULUS_CONTROLLER,
+        ];
+    }
 }

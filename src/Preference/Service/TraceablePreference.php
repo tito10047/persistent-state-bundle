@@ -12,8 +12,9 @@ final class TraceablePreference implements PreferenceInterface
     public function __construct(
         private readonly string $managerName,
         private readonly PreferenceInterface $inner,
-        private readonly PreferenceDataCollector $collector
-    ) {}
+        private readonly PreferenceDataCollector $collector,
+    ) {
+    }
 
     public function getContext(): string
     {
@@ -24,6 +25,7 @@ final class TraceablePreference implements PreferenceInterface
     {
         $this->inner->set($key, $value);
         $this->collector->onPreferenceChanged($this->managerName, $this->getContext(), $this->inner->all());
+
         return $this;
     }
 
@@ -31,6 +33,7 @@ final class TraceablePreference implements PreferenceInterface
     {
         $this->inner->import($values);
         $this->collector->onPreferenceChanged($this->managerName, $this->getContext(), $this->inner->all());
+
         return $this;
     }
 
@@ -58,6 +61,7 @@ final class TraceablePreference implements PreferenceInterface
     {
         $this->inner->remove($key);
         $this->collector->onPreferenceChanged($this->managerName, $this->getContext(), $this->inner->all());
+
         return $this;
     }
 

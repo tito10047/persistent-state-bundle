@@ -10,14 +10,12 @@ use Tito10047\PersistentStateBundle\Tests\Trait\SessionInterfaceTrait;
 
 class SelectionSessionStorageTest extends TestCase
 {
-	use SessionInterfaceTrait;
+    use SessionInterfaceTrait;
 
     private SelectionSessionStorage $storage;
 
-
     protected function setUp(): void
     {
-
         // Mock RequestStack to return our fake session
         $requestStack = $this->createMock(RequestStack::class);
         $requestStack->method('getSession')->willReturn($this->mockSessionInterface());
@@ -70,7 +68,7 @@ class SelectionSessionStorageTest extends TestCase
     {
         $ctx = 'ctx_has';
         $this->storage->setMultiple($ctx, [5]);
-        
+
         // uses in_array with loose comparison in the implementation
         $this->assertTrue($this->storage->hasIdentifier($ctx, '5'));
         $this->assertTrue($this->storage->hasIdentifier($ctx, 5));

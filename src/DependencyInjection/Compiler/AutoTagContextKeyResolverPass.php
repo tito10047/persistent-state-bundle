@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Tito10047\PersistentStateBundle\Resolver\ContextKeyResolverInterface;
+
 // no need to reference specific resolver classes here
 
 /**
@@ -41,7 +42,7 @@ final class AutoTagContextKeyResolverPass implements CompilerPassInterface
 
             // Try to resolve the class name
             $class = $definition->getClass() ?: $id; // Fallback: service id can be FQCN
-            if (!is_string($class) || $class === '') {
+            if (!is_string($class) || '' === $class) {
                 continue;
             }
 

@@ -11,7 +11,6 @@ use Tito10047\PersistentStateBundle\Preference\Service\PreferenceInterface;
 use Tito10047\PersistentStateBundle\Preference\Service\PreferenceManagerInterface;
 use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceSessionStorage;
 use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceStorageInterface;
-use Tito10047\PersistentStateBundle\Service\PersistentManagerInterface;
 
 class DebugPreferenceCommandTest extends TestCase
 {
@@ -24,14 +23,16 @@ class DebugPreferenceCommandTest extends TestCase
                 if (array_key_exists($id, $hasMap)) {
                     return (bool) $hasMap[$id];
                 }
+
                 return array_key_exists($id, $services);
             });
 
         $container->method('get')
             ->willReturnCallback(static function (string $id) use ($services) {
                 if (!array_key_exists($id, $services)) {
-                    throw new \RuntimeException('Service not found: ' . $id);
+                    throw new \RuntimeException('Service not found: '.$id);
                 }
+
                 return $services[$id];
             });
 
@@ -160,13 +161,33 @@ class DebugPreferenceCommandTest extends TestCase
         $preference->method('all')->willReturn(['a' => 1]);
 
         // Custom storage implementing interface to trigger fallback name
-        $customStorage = new class() implements PreferenceStorageInterface {
-            public function get(string $context, string $key, mixed $default = null): mixed { return null; }
-            public function set(string $context, string $key, mixed $value): void {}
-            public function setMultiple(string $context, array $values): void {}
-            public function remove(string $context, string $key): void {}
-            public function has(string $context, string $key): bool { return false; }
-            public function all(string $context): array { return []; }
+        $customStorage = new class implements PreferenceStorageInterface {
+            public function get(string $context, string $key, mixed $default = null): mixed
+            {
+                return null;
+            }
+
+            public function set(string $context, string $key, mixed $value): void
+            {
+            }
+
+            public function setMultiple(string $context, array $values): void
+            {
+            }
+
+            public function remove(string $context, string $key): void
+            {
+            }
+
+            public function has(string $context, string $key): bool
+            {
+                return false;
+            }
+
+            public function all(string $context): array
+            {
+                return [];
+            }
         };
 
         $manager = $this->createMock(PreferenceManagerInterface::class);

@@ -13,7 +13,8 @@ use Twig\Environment;
 
 class SelectionExtensionTest extends AssetMapperKernelTestCase
 {
-	use SessionInterfaceTrait;
+    use SessionInterfaceTrait;
+
     public function testTwigFunctionsAreRegistered(): void
     {
         $container = self::getContainer();
@@ -32,14 +33,14 @@ class SelectionExtensionTest extends AssetMapperKernelTestCase
             'persistent_selection_stimulus_controller',
         ] as $functionName) {
             $this->assertNotNull($twig->getFunction($functionName), sprintf('Twig function %s should be registered.', $functionName));
-		}
-		$this->assertArrayHasKey('persistent_selection_stimulus_controller_name',$twig->getGlobals());
-	}
+        }
+        $this->assertArrayHasKey('persistent_selection_stimulus_controller_name', $twig->getGlobals());
+    }
 
     public function testTwigFunctionsBehavior(): void
     {
-		$this->initSession();
-		$controllerName = PersistentStateBundle::STIMULUS_CONTROLLER;
+        $this->initSession();
+        $controllerName = PersistentStateBundle::STIMULUS_CONTROLLER;
         $container = self::getContainer();
 
         /** @var SelectionManagerInterface $manager */
@@ -47,7 +48,7 @@ class SelectionExtensionTest extends AssetMapperKernelTestCase
 
         // Prepare simple object list with "id" property
         $items = [];
-        for ($i = 1; $i <= 3; $i++) {
+        for ($i = 1; $i <= 3; ++$i) {
             $o = new User();
             $o->setId($i);
             $o->setName('Item '.$i);
@@ -90,8 +91,8 @@ class SelectionExtensionTest extends AssetMapperKernelTestCase
         $this->assertSame('1', trim($tplCount->render()));
 
         // check controller name
-        $name = $twig->createTemplate("{{ persistent_selection_stimulus_controller_name }}");
-		$this->assertSame($controllerName, trim($name->render()));
+        $name = $twig->createTemplate('{{ persistent_selection_stimulus_controller_name }}');
+        $this->assertSame($controllerName, trim($name->render()));
 
         // persistent_row_selector_all should not be checked in default INCLUDE mode
         $tplAll = $twig->createTemplate("{{ persistent_selection_row_selector_all('twig_key') }}");
@@ -120,7 +121,7 @@ class SelectionExtensionTest extends AssetMapperKernelTestCase
 
     public function testRowSelectorCustomAttributesAreMergedAndEscaped(): void
     {
-		$this->initSession();
+        $this->initSession();
         $container = self::getContainer();
 
         /** @var SelectionManagerInterface $manager */
@@ -128,11 +129,11 @@ class SelectionExtensionTest extends AssetMapperKernelTestCase
 
         // Items
         $items = [];
-        for ($i = 1; $i <= 1; $i++) {
-			$o = new User();
-			$o->setId($i);
-			$o->setName('Item '.$i);
-			$items[] = $o;
+        for ($i = 1; $i <= 1; ++$i) {
+            $o = new User();
+            $o->setId($i);
+            $o->setName('Item '.$i);
+            $items[] = $o;
         }
 
         // Register & select item to ensure 'checked' attribute appears
@@ -150,7 +151,7 @@ class SelectionExtensionTest extends AssetMapperKernelTestCase
             "  'data-foo': 'bar',\n".
             "  'disabled': true,\n".
             "  'data-title': 'A \"quote\" & more'\n".
-            "}) }}"
+            '}) }}'
         );
 
         $html = $tpl->render(['item' => $items[0]]);
@@ -195,8 +196,8 @@ class SelectionExtensionTest extends AssetMapperKernelTestCase
         $this->assertStringContainsString('class="row-selector"', $html);
         // has value equal to item's id and proper stimulus params
         $this->assertStringContainsString('value=\'42\'', $html);
-        $this->assertStringContainsString("data-".PersistentStateBundle::STIMULUS_CONTROLLER."-id-param='42'", $html);
-        $this->assertStringContainsString("data-".PersistentStateBundle::STIMULUS_CONTROLLER."-target=\"checkbox\"", $html);
+        $this->assertStringContainsString('data-'.PersistentStateBundle::STIMULUS_CONTROLLER."-id-param='42'", $html);
+        $this->assertStringContainsString('data-'.PersistentStateBundle::STIMULUS_CONTROLLER.'-target="checkbox"', $html);
         $this->assertStringContainsString("data-action='".PersistentStateBundle::STIMULUS_CONTROLLER."#toggle'", $html);
 
         // when selected, it should become checked
@@ -207,7 +208,7 @@ class SelectionExtensionTest extends AssetMapperKernelTestCase
 
     public function testStimulusControllerMergesDataController(): void
     {
-		$this->initSession();
+        $this->initSession();
         $container = self::getContainer();
         /** @var Environment $twig */
         $twig = $container->get('twig');

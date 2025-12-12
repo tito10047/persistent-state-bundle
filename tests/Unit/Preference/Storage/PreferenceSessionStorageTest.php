@@ -15,7 +15,7 @@ class PreferenceSessionStorageTest extends TestCase
     {
         $stack = $this->createMock(RequestStack::class);
 
-        if ($session === null) {
+        if (null === $session) {
             $stack->method('getCurrentRequest')->willReturn(null);
         } else {
             $request = new Request();
@@ -31,6 +31,7 @@ class PreferenceSessionStorageTest extends TestCase
     {
         /** @var SessionInterface&MockObject $session */
         $session = $this->createMock(SessionInterface::class);
+
         return $session;
     }
 

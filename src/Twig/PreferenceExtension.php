@@ -2,7 +2,6 @@
 
 namespace Tito10047\PersistentStateBundle\Twig;
 
-use Tito10047\PersistentStateBundle\Service\PersistentManagerInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
@@ -16,7 +15,6 @@ use Twig\TwigFunction;
  */
 final class PreferenceExtension extends AbstractExtension
 {
-
     public function getFunctions(): array
     {
         return [

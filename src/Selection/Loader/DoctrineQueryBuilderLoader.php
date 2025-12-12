@@ -6,12 +6,6 @@ namespace Tito10047\PersistentStateBundle\Selection\Loader;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Exception;
-use InvalidArgumentException;
-use RuntimeException;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Tito10047\PersistentStateBundle\Selection\Normalizer\IdentifierNormalizerInterface;
-use Tito10047\PersistentStateBundle\Transformer\ObjectIdValueTransformer;
 use Tito10047\PersistentStateBundle\Transformer\ValueTransformerInterface;
 
 /**
@@ -20,21 +14,20 @@ use Tito10047\PersistentStateBundle\Transformer\ValueTransformerInterface;
  */
 final class DoctrineQueryBuilderLoader implements IdentityLoaderInterface
 {
-
-	public function supports(mixed $source): bool
+    public function supports(mixed $source): bool
     {
         return $source instanceof QueryBuilder;
     }
 
     /**
      * @param QueryBuilder $source
-	 *
+     *
      * @return array<int|string>
      */
     public function loadAllIdentifiers(?ValueTransformerInterface $transformer, mixed $source): array
     {
         if (!$this->supports($source)) {
-            throw new InvalidArgumentException('Source must be a Doctrine QueryBuilder instance.');
+            throw new \InvalidArgumentException('Source must be a Doctrine QueryBuilder instance.');
         }
 
         $baseQb = clone $source;
@@ -54,8 +47,8 @@ final class DoctrineQueryBuilderLoader implements IdentityLoaderInterface
 
         $metadata = $em->getClassMetadata($rootEntity);
         $identifierFields = $metadata->getIdentifierFieldNames();
-        if (count($identifierFields) !== 1) {
-            throw new RuntimeException('Composite alebo neštandardný identifikátor nie je podporovaný pre loadAllIdentifiers().');
+        if (1 !== count($identifierFields)) {
+            throw new \RuntimeException('Composite alebo neštandardný identifikátor nie je podporovaný pre loadAllIdentifiers().');
         }
 
         $defaultIdField = $identifierFields[0];
@@ -63,7 +56,7 @@ final class DoctrineQueryBuilderLoader implements IdentityLoaderInterface
 
         // prepis SELECT, ostatné časti dotazu (WHERE, JOIN, GROUP BY, HAVING, ORDER BY) ponechaj
         $baseQb->resetDQLPart('select');
-        $baseQb->select($rootAlias . '.' . $identifierField);
+        $baseQb->select($rootAlias.'.'.$identifierField);
 
         // ignoruj stránkovanie – chceme všetky identifikátory z danej filtrácie
         $baseQb->setFirstResult(null);
@@ -71,10 +64,9 @@ final class DoctrineQueryBuilderLoader implements IdentityLoaderInterface
 
         $rows = $baseQb->getQuery()->getResult();
 
-
-        return array_map(function($item) use($identifierField){
-			return $item[$identifierField];
-		}, $rows);
+        return array_map(function ($item) use ($identifierField) {
+            return $item[$identifierField];
+        }, $rows);
     }
 
     /**
@@ -83,7 +75,7 @@ final class DoctrineQueryBuilderLoader implements IdentityLoaderInterface
     public function getTotalCount(mixed $source): int
     {
         if (!$this->supports($source)) {
-            throw new InvalidArgumentException('Source must be a Doctrine QueryBuilder instance.');
+            throw new \InvalidArgumentException('Source must be a Doctrine QueryBuilder instance.');
         }
 
         $baseQb = clone $source;
@@ -105,10 +97,10 @@ final class DoctrineQueryBuilderLoader implements IdentityLoaderInterface
         $identifierFields = $metadata->getIdentifierFieldNames();
 
         // COUNT výraz
-        if (count($identifierFields) === 1) {
-            $countExpr = 'COUNT(DISTINCT ' . $rootAlias . '.' . $identifierFields[0] . ')';
+        if (1 === count($identifierFields)) {
+            $countExpr = 'COUNT(DISTINCT '.$rootAlias.'.'.$identifierFields[0].')';
         } else {
-            $countExpr = 'COUNT(' . $rootAlias . ')'; // fallback
+            $countExpr = 'COUNT('.$rootAlias.')'; // fallback
         }
 
         // uprav SELECT na COUNT, odstráň orderBy, ignoruj stránkovanie
@@ -120,8 +112,8 @@ final class DoctrineQueryBuilderLoader implements IdentityLoaderInterface
 
         try {
             return (int) $baseQb->getQuery()->getSingleScalarResult();
-        } catch (Exception $e) {
-            throw new RuntimeException('Failed to execute count query.', 0, $e);
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Failed to execute count query.', 0, $e);
         }
     }
 
@@ -136,71 +128,75 @@ final class DoctrineQueryBuilderLoader implements IdentityLoaderInterface
 
         /** @var Query\AST\IdentificationVariableDeclaration $from */
         $from = $AST->fromClause->identificationVariableDeclarations[0] ?? null;
-        if ($from === null || $from->rangeVariableDeclaration === null) {
-            throw new RuntimeException('Nepodarilo sa zistiť root entitu z DQL dotazu.');
+        if (null === $from || null === $from->rangeVariableDeclaration) {
+            throw new \RuntimeException('Nepodarilo sa zistiť root entitu z DQL dotazu.');
         }
 
         $rootEntity = $from->rangeVariableDeclaration->abstractSchemaName;
-        $rootAlias  = $from->rangeVariableDeclaration->aliasIdentificationVariable;
+        $rootAlias = $from->rangeVariableDeclaration->aliasIdentificationVariable;
 
         if (!is_string($rootEntity) || !is_string($rootAlias)) {
-            throw new RuntimeException('Neplatný FROM klauzula v DQL dotaze.');
+            throw new \RuntimeException('Neplatný FROM klauzula v DQL dotaze.');
         }
 
         return [$rootEntity, $rootAlias];
     }
 
-	public function getCacheKey(mixed $source): string {
-		if (!$this->supports($source)) {
-			throw new InvalidArgumentException('Source must be a Doctrine QueryBuilder instance.');
-		}
+    public function getCacheKey(mixed $source): string
+    {
+        if (!$this->supports($source)) {
+            throw new \InvalidArgumentException('Source must be a Doctrine QueryBuilder instance.');
+        }
 
-		/** @var QueryBuilder $source */
-		// Use the generated DQL from the QB for a stable representation of structure
-		$dql = $source->getQuery()->getDQL();
-		$params = $source->getParameters();
-		$normParams = [];
-		foreach ($params as $p) {
-			$name = method_exists($p, 'getName') ? $p->getName() : null;
-			$value = method_exists($p, 'getValue') ? $p->getValue() : null;
-			$normParams[] = [
-				'name' => $name,
-				'value' => self::normalizeValue($value),
-			];
-		}
-		usort($normParams, function($a, $b){
-			return strcmp((string)$a['name'], (string)$b['name']);
-		});
+        /** @var QueryBuilder $source */
+        // Use the generated DQL from the QB for a stable representation of structure
+        $dql = $source->getQuery()->getDQL();
+        $params = $source->getParameters();
+        $normParams = [];
+        foreach ($params as $p) {
+            $name = method_exists($p, 'getName') ? $p->getName() : null;
+            $value = method_exists($p, 'getValue') ? $p->getValue() : null;
+            $normParams[] = [
+                'name' => $name,
+                'value' => self::normalizeValue($value),
+            ];
+        }
+        usort($normParams, function ($a, $b) {
+            return strcmp((string) $a['name'], (string) $b['name']);
+        });
 
-		return 'doctrine_qb:' . md5(serialize([$dql, $normParams]));
-	}
+        return 'doctrine_qb:'.md5(serialize([$dql, $normParams]));
+    }
 
-	/**
-	 * Normalize values for a deterministic cache key.
-	 */
-	private static function normalizeValue(mixed $value): mixed
-	{
-		if (is_scalar($value) || $value === null) {
-			return $value;
-		}
-		if ($value instanceof \DateTimeInterface) {
-			return ['__dt__' => true, 'v' => $value->format(DATE_ATOM)];
-		}
-		if (is_array($value)) {
-			$normalized = [];
-			foreach ($value as $k => $v) {
-				$normalized[$k] = self::normalizeValue($v);
-			}
-			if (!array_is_list($normalized)) {
-				ksort($normalized);
-			}
-			return $normalized;
-		}
-		if (is_object($value)) {
-			$vars = get_object_vars($value);
-			ksort($vars);
-			return ['__class__' => get_class($value), 'props' => self::normalizeValue($vars)];
-		}
-		return (string)$value;
-	}
+    /**
+     * Normalize values for a deterministic cache key.
+     */
+    private static function normalizeValue(mixed $value): mixed
+    {
+        if (is_scalar($value) || null === $value) {
+            return $value;
+        }
+        if ($value instanceof \DateTimeInterface) {
+            return ['__dt__' => true, 'v' => $value->format(DATE_ATOM)];
+        }
+        if (is_array($value)) {
+            $normalized = [];
+            foreach ($value as $k => $v) {
+                $normalized[$k] = self::normalizeValue($v);
+            }
+            if (!array_is_list($normalized)) {
+                ksort($normalized);
+            }
+
+            return $normalized;
+        }
+        if (is_object($value)) {
+            $vars = get_object_vars($value);
+            ksort($vars);
+
+            return ['__class__' => get_class($value), 'props' => self::normalizeValue($vars)];
+        }
+
+        return (string) $value;
+    }
 }

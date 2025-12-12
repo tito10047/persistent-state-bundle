@@ -10,12 +10,14 @@ final class DoctrinePreferenceStorage implements PreferenceStorageInterface
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
-        private readonly string $entityClass
-    ) {}
+        private readonly string $entityClass,
+    ) {
+    }
 
     public function get(string $context, string $key, mixed $default = null): mixed
     {
         $entity = $this->findOne($context, $key);
+
         return $entity?->getValue() ?? $default;
     }
 
@@ -37,7 +39,7 @@ final class DoctrinePreferenceStorage implements PreferenceStorageInterface
 
     public function setMultiple(string $context, array $values): void
     {
-        if ($values === []) {
+        if ([] === $values) {
             return;
         }
 
@@ -71,6 +73,7 @@ final class DoctrinePreferenceStorage implements PreferenceStorageInterface
         foreach ($rows as $row) {
             $out[$row->getKey()] = $row->getValue();
         }
+
         return $out;
     }
 
@@ -79,12 +82,13 @@ final class DoctrinePreferenceStorage implements PreferenceStorageInterface
         $repo = $this->em->getRepository($this->entityClass);
         /** @var object|null $entity */
         $entity = $repo->findOneBy(['context' => $context, 'key' => $key]);
-        if ($entity === null) {
+        if (null === $entity) {
             return null;
         }
         if (!$entity instanceof PreferenceEntityInterface) {
             throw new \RuntimeException(sprintf('Entity %s must implement %s', get_debug_type($entity), PreferenceEntityInterface::class));
         }
+
         return $entity;
     }
 }

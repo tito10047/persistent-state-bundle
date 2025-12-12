@@ -2,16 +2,14 @@
 
 namespace Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Factory;
 
-use Doctrine\ORM\EntityRepository;
 use Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity\RecordUuid;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
-use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 
 /**
  * @extends PersistentProxyObjectFactory<RecordUuid>
  */
-final class RecordUuidFactory extends PersistentProxyObjectFactory{
+final class RecordUuidFactory extends PersistentProxyObjectFactory
+{
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
      *

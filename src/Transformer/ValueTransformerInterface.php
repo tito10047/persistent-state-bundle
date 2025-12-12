@@ -12,31 +12,31 @@ use Tito10047\PersistentStateBundle\Storage\StorableEnvelope;
  */
 interface ValueTransformerInterface
 {
-	/**
-	 * Checks if the transformer can convert the PHP value to storage format.
-	 * Used during set().
-	 */
-	public function supports(mixed $value): bool;
+    /**
+     * Checks if the transformer can convert the PHP value to storage format.
+     * Used during set().
+     */
+    public function supports(mixed $value): bool;
 
-	/**
-	 * Converts PHP value to a storage-friendly format (scalar/array).
-	 * Example: Object -> ['__type' => 'MyClass', 'data' => {...}]
-	 */
-	public function transform(mixed $value): StorableEnvelope;
+    /**
+     * Converts PHP value to a storage-friendly format (scalar/array).
+     * Example: Object -> ['__type' => 'MyClass', 'data' => {...}].
+     */
+    public function transform(mixed $value): StorableEnvelope;
 
-	public function getIdentifier(mixed $value): int|string;
+    public function getIdentifier(mixed $value): int|string;
 
-	/**
-	 * Checks if the raw value from storage looks like something this transformer created.
-	 * Used during get().
-	 *
-	 * Example: Checks if array has '__type' key.
-	 */
-	public function supportsReverse(StorableEnvelope $value): bool;
+    /**
+     * Checks if the raw value from storage looks like something this transformer created.
+     * Used during get().
+     *
+     * Example: Checks if array has '__type' key.
+     */
+    public function supportsReverse(StorableEnvelope $value): bool;
 
-	/**
-	 * Converts storage format back to PHP value.
-	 * Example: ['__type' => 'MyClass', ...] -> Object
-	 */
-	public function reverseTransform(StorableEnvelope $value): mixed;
+    /**
+     * Converts storage format back to PHP value.
+     * Example: ['__type' => 'MyClass', ...] -> Object.
+     */
+    public function reverseTransform(StorableEnvelope $value): mixed;
 }

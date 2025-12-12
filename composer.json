@@ -55,6 +55,7 @@
   "require-dev": {
     "dama/doctrine-test-bundle": "^8.4",
     "pagerfanta/pagerfanta": "^3.6",
+    "php-cs-fixer/shim": "^3.91",
     "phpunit/phpunit": "^10.5",
     "symfony/asset-mapper": "^6.4|^7.4|^8.0",
     "symfony/dotenv": "^6.4|^7.4|^8.0",

@@ -37,7 +37,7 @@ final class TraceableManagersPass implements CompilerPassInterface
             // Determine manager name from tag attribute 'name' if available
             $managerName = $tagAttrsList[0]['name'] ?? $serviceId;
 
-            $decoratorId = $serviceId . '.traceable';
+            $decoratorId = $serviceId.'.traceable';
             if ($container->hasDefinition($decoratorId)) {
                 continue; // already decorated
             }
@@ -46,7 +46,7 @@ final class TraceableManagersPass implements CompilerPassInterface
             $definition->setPublic(true);
             $definition->setDecoratedService($serviceId);
             $definition->setArguments([
-                new Reference($decoratorId . '.inner'),
+                new Reference($decoratorId.'.inner'),
                 new Reference(PreferenceDataCollector::class),
                 $managerName,
             ]);

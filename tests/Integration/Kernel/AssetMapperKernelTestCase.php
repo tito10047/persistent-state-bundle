@@ -4,19 +4,18 @@ namespace Tito10047\PersistentStateBundle\Tests\Integration\Kernel;
 
 use Symfony\Component\HttpKernel\KernelInterface;
 use Tito10047\PersistentStateBundle\Tests\App\Kernel;
-use Tito10047\PersistentStateBundle\Tests\App\KernelTestCase;
 
-class AssetMapperKernelTestCase extends \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase {
+class AssetMapperKernelTestCase extends \Symfony\Bundle\FrameworkBundle\Test\KernelTestCase
+{
+    protected static function bootKernel(array $options = []): KernelInterface
+    {
+        static::ensureKernelShutdown();
 
-	protected static function bootKernel(array $options = []): KernelInterface {
-		static::ensureKernelShutdown();
+        $kernel = new Kernel('test', 'AssetMapper/config' ?? null, $options['preBoot'] ?? null);
+        $kernel->boot();
+        static::$kernel = $kernel;
+        static::$booted = true;
 
-
-		$kernel = new Kernel("test","AssetMapper/config" ?? null, $options['preBoot'] ?? null);
-		$kernel->boot();
-		static::$kernel = $kernel;
-		static::$booted = true;
-
-		return static::$kernel;
-	}
+        return static::$kernel;
+    }
 }

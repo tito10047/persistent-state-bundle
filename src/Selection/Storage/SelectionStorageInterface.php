@@ -1,9 +1,8 @@
 <?php
+
 declare(strict_types=1);
 
-
 namespace Tito10047\PersistentStateBundle\Selection\Storage;
-
 
 use Tito10047\PersistentStateBundle\Enum\SelectionMode;
 
@@ -14,8 +13,8 @@ use Tito10047\PersistentStateBundle\Enum\SelectionMode;
  * or if they exist in the database. It only persists scalar values (int/string).
  * Complex logic regarding objects/UUIDs must be handled by the Manager layer.
  */
-interface SelectionStorageInterface {
-
+interface SelectionStorageInterface
+{
     /**
      * Adds or updates a single identifier and its associated metadata.
      *
@@ -31,72 +30,73 @@ interface SelectionStorageInterface {
      */
     public function setMultiple(string $context, array $identifiers): void;
 
-	/**
-	 * Removes identifiers from the storage for a specific context.
-	 *
-	 * @param string           $context    The unique context key
-	 * @param string|int|array $identifier List of identifiers to remove
-	 */
-	public function remove(string $context, array $identifier): void;
+    /**
+     * Removes identifiers from the storage for a specific context.
+     *
+     * @param string           $context    The unique context key
+     * @param string|int|array $identifier List of identifiers to remove
+     */
+    public function remove(string $context, array $identifier): void;
 
-	/**
-	 * Removes identifiers from the storage for a specific context.
-	 *
-	 * @param string                  $context     The unique context key
-	 * @param array<string|int|array> $identifiers List of identifiers to remove
-	 */
-	public function removeMultiple(string $context, array $identifiers): void;
+    /**
+     * Removes identifiers from the storage for a specific context.
+     *
+     * @param string                  $context     The unique context key
+     * @param array<string|int|array> $identifiers List of identifiers to remove
+     */
+    public function removeMultiple(string $context, array $identifiers): void;
 
-	/**
-	 * Clears all data for the given context and resets the mode to INCLUDE.
-	 *
-	 * @param string $context The unique context key
-	 */
-	public function clear(string $context): void;
+    /**
+     * Clears all data for the given context and resets the mode to INCLUDE.
+     *
+     * @param string $context The unique context key
+     */
+    public function clear(string $context): void;
 
-	/**
-	 * Returns the raw identifiers currently stored.
-	 *
-	 * NOTE: The meaning of these IDs depends on the current SelectionMode.
-	 * - If Mode is INCLUDE: These are the selected items.
-	 * - If Mode is EXCLUDE: These are the unselected items (exceptions).
-	 *
-	 * @param string $context The unique context key
-	 *
-	 * @return array<string|int>
-	 */
-	public function getStored(string $context): array;
+    /**
+     * Returns the raw identifiers currently stored.
+     *
+     * NOTE: The meaning of these IDs depends on the current SelectionMode.
+     * - If Mode is INCLUDE: These are the selected items.
+     * - If Mode is EXCLUDE: These are the unselected items (exceptions).
+     *
+     * @param string $context The unique context key
+     *
+     * @return array<string|int>
+     */
+    public function getStored(string $context): array;
 
- /**
-  * Returns metadata stored for the given identifier(s).
-  *
-  * @param string                 $context     The unique context key
-  * @param string|int|array       $identifiers Single id or list of ids
-  * @return array<string|int, array|null>     Map of id => metadata (or null)
-  */
- public function getMetadata(string $context, string|int|array $identifiers): array;
+    /**
+     * Returns metadata stored for the given identifier(s).
+     *
+     * @param string           $context     The unique context key
+     * @param string|int|array $identifiers Single id or list of ids
+     *
+     * @return array<string|int, array|null> Map of id => metadata (or null)
+     */
+    public function getMetadata(string $context, string|int|array $identifiers): array;
 
-	/**
-	 * Checks if a specific identifier is present in the storage.
-	 * This checks the raw storage, ignoring the current Mode logic.
-	 *
-  * @param string           $context    The unique context key
-  * @param string|int|array $identifiers The identifier to check
-  */
- public function hasIdentifier(string $context, string|int|array $identifiers): bool;
+    /**
+     * Checks if a specific identifier is present in the storage.
+     * This checks the raw storage, ignoring the current Mode logic.
+     *
+     * @param string           $context     The unique context key
+     * @param string|int|array $identifiers The identifier to check
+     */
+    public function hasIdentifier(string $context, string|int|array $identifiers): bool;
 
-	/**
-	 * Sets the selection mode (Include vs Exclude).
-	 *
-	 * @param string        $context The unique context key
-	 * @param SelectionMode $mode    The target mode
-	 */
-	public function setMode(string $context, SelectionMode $mode): void;
+    /**
+     * Sets the selection mode (Include vs Exclude).
+     *
+     * @param string        $context The unique context key
+     * @param SelectionMode $mode    The target mode
+     */
+    public function setMode(string $context, SelectionMode $mode): void;
 
-	/**
-	 * Retrieves the current selection mode.
-	 *
-	 * @param string $context The unique context key
-	 */
-	public function getMode(string $context): SelectionMode;
+    /**
+     * Retrieves the current selection mode.
+     *
+     * @param string $context The unique context key
+     */
+    public function getMode(string $context): SelectionMode;
 }

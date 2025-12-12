@@ -10,38 +10,34 @@ namespace Tito10047\PersistentStateBundle\Preference\Storage;
  */
 interface PreferenceEntityInterface
 {
-	/**
-	 * Gets the context identifier (e.g., "user_123").
-	 */
-	public function getContext(): string;
+    /**
+     * Gets the context identifier (e.g., "user_123").
+     */
+    public function getContext(): string;
 
-	/**
-	 * Sets the context identifier.
-	 * @return self
-	 */
-	public function setContext(string $context): self;
+    /**
+     * Sets the context identifier.
+     */
+    public function setContext(string $context): self;
 
-	/**
-	 * Gets the setting key (e.g., "theme").
-	 */
-	public function getKey(): string;
+    /**
+     * Gets the setting key (e.g., "theme").
+     */
+    public function getKey(): string;
 
-	/**
-	 * Sets the setting key.
-	 * @return self
-	 */
-	public function setKey(string $key): self;
+    /**
+     * Sets the setting key.
+     */
+    public function setKey(string $key): self;
 
-	/**
-	 * Gets the raw value (usually from a JSON column).
-	 * @return mixed
-	 */
-	public function getValue(): mixed;
+    /**
+     * Gets the raw value (usually from a JSON column).
+     */
+    public function getValue(): mixed;
 
-	/**
-	 * Sets the value to be stored.
-	 * The value should be serializable to JSON (array, string, int, bool, null).
-	 * @return self
-	 */
-	public function setValue(mixed $value): self;
+    /**
+     * Sets the value to be stored.
+     * The value should be serializable to JSON (array, string, int, bool, null).
+     */
+    public function setValue(mixed $value): self;
 }

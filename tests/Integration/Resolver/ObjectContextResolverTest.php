@@ -7,7 +7,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Tito10047\PersistentStateBundle\Preference\Service\PreferenceManagerInterface;
-use Tito10047\PersistentStateBundle\Service\PersistentManagerInterface;
 use Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity\Company;
 use Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity\User;
 use Tito10047\PersistentStateBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;

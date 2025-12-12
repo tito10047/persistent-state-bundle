@@ -3,263 +3,262 @@
 namespace Tito10047\PersistentStateBundle\Tests\Unit\Selection\Service;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\RequestStack;
 use stdClass;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Tito10047\PersistentStateBundle\Enum\SelectionMode;
 use Tito10047\PersistentStateBundle\Selection\Service\Selection;
 use Tito10047\PersistentStateBundle\Selection\Storage\SelectionSessionStorage;
 use Tito10047\PersistentStateBundle\Tests\Trait\SessionInterfaceTrait;
 use Tito10047\PersistentStateBundle\Transformer\ArrayValueTransformer;
+use Tito10047\PersistentStateBundle\Transformer\ObjectIdValueTransformer;
 use Tito10047\PersistentStateBundle\Transformer\ScalarValueTransformer;
 use Tito10047\PersistentStateBundle\Transformer\SerializableObjectTransformer;
-use Tito10047\PersistentStateBundle\Transformer\ObjectIdValueTransformer;
 use Tito10047\PersistentStateBundle\Transformer\ValueTransformerInterface;
 
-class SelectionInterfaceTest  extends TestCase{
+class SelectionInterfaceTest extends TestCase
+{
+    use SessionInterfaceTrait;
+    private ValueTransformerInterface $normalizer;
+    private SelectionSessionStorage $storage;
+    private ValueTransformerInterface $converter;
 
-	use SessionInterfaceTrait;
-	private ValueTransformerInterface $normalizer;
-	private SelectionSessionStorage $storage;
-	private ValueTransformerInterface $converter;
+    protected function setUp(): void
+    {
+        $requestStack = $this->createMock(RequestStack::class);
+        $requestStack->method('getSession')->willReturn($this->mockSessionInterface());
 
-	protected function setUp(): void
-	{
-		$requestStack = $this->createMock(RequestStack::class);
-		$requestStack->method('getSession')->willReturn($this->mockSessionInterface());
+        $this->storage = new SelectionSessionStorage($requestStack);
 
-		$this->storage = new SelectionSessionStorage($requestStack);
+        $this->normalizer = new ScalarValueTransformer();
+        $this->converter = new ArrayValueTransformer();
+    }
 
-		$this->normalizer = new ScalarValueTransformer();
-		$this->converter = new ArrayValueTransformer();
-	}
+    public function testGetSelectedIdentifiersWithExcludeModeRemembersAll(): void
+    {
+        $selection = new Selection('test', $this->storage, $this->normalizer, $this->converter);
+        $selection->rememberAll([1, 2, 3]);
+        $selection->setMode(SelectionMode::EXCLUDE);
 
-	public function testGetSelectedIdentifiersWithExcludeModeRemembersAll():void {
-		$selection = new Selection('test', $this->storage, $this->normalizer, $this->converter);
-		$selection->rememberAll([1, 2, 3]);
-		$selection->setMode(SelectionMode::EXCLUDE);
+        /** @var SelectionInterface $selection */
+        $ids = $selection->getSelectedIdentifiers();
 
-		/** @var SelectionInterface $selection */
-		$ids = $selection->getSelectedIdentifiers();
+        $this->assertSame([1, 2, 3], $ids);
+    }
 
-		$this->assertSame([1, 2, 3], $ids);
-	}
+    public function testSelectAndIsSelected(): void
+    {
+        $selection = new Selection('ctx_select', $this->storage, $this->normalizer, $this->converter);
 
-	public function testSelectAndIsSelected(): void
-	{
-		$selection = new Selection('ctx_select',  $this->storage, $this->normalizer, $this->converter);
+        // selection methods should be fluent
+        $chain = $selection->select(5)->select(6);
+        $this->assertSame($selection, $chain);
 
-		// selection methods should be fluent
-		$chain = $selection->select(5)->select(6);
-		$this->assertSame($selection, $chain);
+        $this->assertTrue($selection->isSelected(5));
+        $this->assertTrue($selection->isSelected(6));
+        $this->assertFalse($selection->isSelected(7));
+    }
 
-		$this->assertTrue($selection->isSelected(5));
-		$this->assertTrue($selection->isSelected(6));
-		$this->assertFalse($selection->isSelected(7));
-	}
+    public function testUnselect(): void
+    {
+        $selection = new Selection('ctx_unselect', $this->storage, $this->normalizer, $this->converter);
+        $selection->select(10)->select(11);
 
-	public function testUnselect(): void
-	{
-		$selection = new Selection('ctx_unselect',  $this->storage, $this->normalizer, $this->converter);
-		$selection->select(10)->select(11);
+        $this->assertTrue($selection->isSelected(10));
+        $this->assertTrue($selection->isSelected(11));
 
-		$this->assertTrue($selection->isSelected(10));
-		$this->assertTrue($selection->isSelected(11));
+        $chain = $selection->unselect(10);
+        $this->assertSame($selection, $chain);
 
-		$chain = $selection->unselect(10);
-		$this->assertSame($selection, $chain);
+        $this->assertFalse($selection->isSelected(10));
+        $this->assertTrue($selection->isSelected(11));
+    }
 
-		$this->assertFalse($selection->isSelected(10));
-		$this->assertTrue($selection->isSelected(11));
-	}
+    public function testSelectMultiple(): void
+    {
+        $selection = new Selection('ctx_multi', $this->storage, $this->normalizer, $this->converter);
+        // intentionally pass mixed types, storage supports loose comparisons
+        $selection->selectMultiple([1, '2', 3]);
 
-	public function testSelectMultiple(): void
-	{
-		$selection = new Selection('ctx_multi', $this->storage, $this->normalizer, $this->converter);
-		// intentionally pass mixed types, storage supports loose comparisons
-		$selection->selectMultiple([1, '2', 3]);
+        /* @var SelectionInterface $selection */
+        $this->assertSame([1, '2', 3], $selection->getSelectedIdentifiers());
+    }
 
-		/** @var SelectionInterface $selection */
-		$this->assertSame([1, '2', 3], $selection->getSelectedIdentifiers());
-	}
+    public function testOwnerScopedPersistenceAndIsolation(): void
+    {
+        // Simulate owner scoping by composing the selection key with the owner context
+        $stringOwner = 'user-123';
+        $stringKey = 'ctx_owner_'.$stringOwner;
 
-	public function testOwnerScopedPersistenceAndIsolation(): void
-	{
-		// Simulate owner scoping by composing the selection key with the owner context
-		$stringOwner = 'user-123';
-		$stringKey   = 'ctx_owner_' . $stringOwner;
+        $selectionA = new Selection($stringKey, $this->storage, $this->normalizer, $this->converter);
+        $selectionA->unselectAll(); // start clean for this key
+        $selectionA->select(1)->select(2);
 
-		$selectionA = new Selection($stringKey, $this->storage, $this->normalizer, $this->converter);
-		$selectionA->unselectAll(); // start clean for this key
-		$selectionA->select(1)->select(2);
+        // Recreate to verify data is persisted for the same owner context
+        $selectionA2 = new Selection($stringKey, $this->storage, $this->normalizer, $this->converter);
+        $idsA = $selectionA2->getSelectedIdentifiers();
+        sort($idsA);
+        $this->assertSame([1, 2], $idsA, 'String owner selection should persist and reload correctly.');
 
-		// Recreate to verify data is persisted for the same owner context
-		$selectionA2 = new Selection($stringKey, $this->storage, $this->normalizer, $this->converter);
-		$idsA = $selectionA2->getSelectedIdentifiers();
-		sort($idsA);
-		$this->assertSame([1, 2], $idsA, 'String owner selection should persist and reload correctly.');
+        // Now use an object owner and ensure isolation between owners
+        $objectOwner = new \stdClass();
+        $objectKey = 'ctx_owner_obj_'.spl_object_hash($objectOwner);
 
-		// Now use an object owner and ensure isolation between owners
-		$objectOwner = new stdClass();
-		$objectKey   = 'ctx_owner_obj_' . spl_object_hash($objectOwner);
+        $selectionB = new Selection($objectKey, $this->storage, $this->normalizer, $this->converter);
+        $selectionB->unselectAll(); // start clean for this key
+        $selectionB->select(10);
 
-		$selectionB = new Selection($objectKey, $this->storage, $this->normalizer, $this->converter);
-		$selectionB->unselectAll(); // start clean for this key
-		$selectionB->select(10);
+        $selectionB2 = new Selection($objectKey, $this->storage, $this->normalizer, $this->converter);
+        $idsB = $selectionB2->getSelectedIdentifiers();
+        sort($idsB);
+        $this->assertSame([10], $idsB, 'Object owner selection should persist and reload correctly.');
 
-		$selectionB2 = new Selection($objectKey, $this->storage, $this->normalizer, $this->converter);
-		$idsB = $selectionB2->getSelectedIdentifiers();
-		sort($idsB);
-		$this->assertSame([10], $idsB, 'Object owner selection should persist and reload correctly.');
+        // Cross-check that data does not mix between different owners
+        $this->assertTrue($selectionA2->isSelected(1));
+        $this->assertTrue($selectionA2->isSelected(2));
+        $this->assertFalse($selectionA2->isSelected(10));
 
-		// Cross-check that data does not mix between different owners
-		$this->assertTrue($selectionA2->isSelected(1));
-		$this->assertTrue($selectionA2->isSelected(2));
-		$this->assertFalse($selectionA2->isSelected(10));
+        $this->assertTrue($selectionB2->isSelected(10));
+        $this->assertFalse($selectionB2->isSelected(1));
+        $this->assertFalse($selectionB2->isSelected(2));
+    }
 
-		$this->assertTrue($selectionB2->isSelected(10));
-		$this->assertFalse($selectionB2->isSelected(1));
-		$this->assertFalse($selectionB2->isSelected(2));
-	}
+    public function testClearSelected(): void
+    {
+        $selection = new Selection('ctx_clear', $this->storage, $this->normalizer, $this->converter);
+        $selection->select(1)->select(2);
+        $this->assertSame([1, 2], $selection->getSelectedIdentifiers());
 
-	public function testClearSelected(): void
-	{
-		$selection = new Selection('ctx_clear', $this->storage, $this->normalizer, $this->converter);
-		$selection->select(1)->select(2);
-		$this->assertSame([1, 2], $selection->getSelectedIdentifiers());
+        $chain = $selection->unselectAll();
+        $this->assertSame($selection, $chain);
+        $this->assertSame([], $selection->getSelectedIdentifiers());
+        $this->assertFalse($selection->isSelected(1));
+    }
 
-		$chain = $selection->unselectAll();
-		$this->assertSame($selection, $chain);
-		$this->assertSame([], $selection->getSelectedIdentifiers());
-		$this->assertFalse($selection->isSelected(1));
-	}
+    public function testDestroyClearsAllContexts(): void
+    {
+        $selection = new Selection('ctx_destroy', $this->storage, $this->normalizer, $this->converter);
+        // Setup some state in both primary and __ALL__ contexts (using helper methods only for setup)
+        $selection->rememberAll([100, 200, 300]);
+        $selection->select(200)->select(400);
 
-	public function testDestroyClearsAllContexts(): void
-	{
-		$selection = new Selection('ctx_destroy', $this->storage, $this->normalizer, $this->converter);
-		// Setup some state in both primary and __ALL__ contexts (using helper methods only for setup)
-		$selection->rememberAll([100, 200, 300]);
-		$selection->select(200)->select(400);
+        // Sanity before destroy
+        $this->assertNotSame([], $selection->getSelectedIdentifiers());
 
-		// Sanity before destroy
-		$this->assertNotSame([], $selection->getSelectedIdentifiers());
+        $chain = $selection->destroy();
+        $this->assertSame($selection, $chain);
 
-		$chain = $selection->destroy();
-		$this->assertSame($selection, $chain);
+        // After destroy, include-mode default with no identifiers
+        $this->assertSame([], $selection->getSelectedIdentifiers());
+        $this->assertFalse($selection->isSelected(200));
+    }
 
-		// After destroy, include-mode default with no identifiers
-		$this->assertSame([], $selection->getSelectedIdentifiers());
-		$this->assertFalse($selection->isSelected(200));
-	}
+    public function testGetSelectedIdentifiersInIncludeMode(): void
+    {
+        $selection = new Selection('ctx_ids', $this->storage, $this->normalizer, $this->converter);
+        $selection->select(1)->select(2)->select(2); // duplicate should be deduped by storage
 
- public function testGetSelectedIdentifiersInIncludeMode(): void
- {
-     $selection = new Selection('ctx_ids', $this->storage, $this->normalizer, $this->converter);
-     $selection->select(1)->select(2)->select(2); // duplicate should be deduped by storage
+        /* @var SelectionInterface $selection */
+        $this->assertSame([1, 2], $selection->getSelectedIdentifiers());
+    }
 
-     /** @var SelectionInterface $selection */
-     $this->assertSame([1, 2], $selection->getSelectedIdentifiers());
- }
+    public function testSelectWithArrayMetadataAndRetrieve(): void
+    {
+        $selection = new Selection('ctx_meta_array', $this->storage, $this->normalizer, $this->converter);
+        $meta = ['foo' => 'bar', 'n' => 42];
+        $selection->select(7, $meta);
 
- public function testSelectWithArrayMetadataAndRetrieve(): void
- {
-     $selection = new Selection('ctx_meta_array', $this->storage, $this->normalizer, $this->converter);
-     $meta = ['foo' => 'bar', 'n' => 42];
-     $selection->select(7, $meta);
+        // getMetadata returns array when no class is requested
+        $this->assertSame($meta, $selection->getMetadata(7));
 
-     // getMetadata returns array when no class is requested
-     $this->assertSame($meta, $selection->getMetadata(7));
+        // getSelected returns id=>metadata map
+        $this->assertSame([7 => $meta], $selection->getSelected());
+    }
 
-     // getSelected returns id=>metadata map
-     $this->assertSame([7 => $meta], $selection->getSelected());
- }
+    public function testSelectWithObjectMetadataAndHydration(): void
+    {
+        $selection = new Selection('ctx_meta_object', $this->storage, $this->normalizer, new SerializableObjectTransformer());
+        $obj = new \stdClass();
+        $obj->foo = 'baz';
+        $obj->num = 13;
 
- public function testSelectWithObjectMetadataAndHydration(): void
- {
-     $selection = new Selection('ctx_meta_object', $this->storage, $this->normalizer, new SerializableObjectTransformer());
-     $obj = new stdClass();
-     $obj->foo = 'baz';
-     $obj->num = 13;
+        $selection->select(8, $obj);
 
-     $selection->select(8, $obj);
+        // With class, we get hydrated stdClass
+        $hydrated = $selection->getMetadata(8);
+        $this->assertInstanceOf(\stdClass::class, $hydrated);
+        $this->assertSame('baz', $hydrated->foo);
+        $this->assertSame(13, $hydrated->num);
+    }
 
+    public function testSelectMultipleWithPerIdMetadata(): void
+    {
+        $selection = new Selection('ctx_meta_multi', $this->storage, $this->normalizer, $this->converter);
+        $items = [1, 2, 3];
+        $metadataMap = [
+            1 => ['x' => 1],
+            2 => ['x' => 2],
+            3 => ['x' => 0],
+            // 3 will fallback to sharing same array if provided, here we provide a default
+        ];
+        $selection->selectMultiple($items, $metadataMap);
 
-     // With class, we get hydrated stdClass
-     $hydrated = $selection->getMetadata(8);
-     $this->assertInstanceOf(stdClass::class, $hydrated);
-     $this->assertSame('baz', $hydrated->foo);
-     $this->assertSame(13, $hydrated->num);
- }
+        $selected = $selection->getSelected();
+        $this->assertSame(['x' => 1], $selected[1]);
+        $this->assertSame(['x' => 2], $selected[2]);
+        $this->assertSame(['x' => 0], $selected[3]);
+    }
 
- public function testSelectMultipleWithPerIdMetadata(): void
- {
-     $selection = new Selection('ctx_meta_multi',  $this->storage, $this->normalizer, $this->converter);
-     $items = [1, 2, 3];
-     $metadataMap = [
-         1 => ['x' => 1],
-         2 => ['x' => 2],
-		 3 => ['x' => 0]
-         // 3 will fallback to sharing same array if provided, here we provide a default
-     ];
-     $selection->selectMultiple($items, $metadataMap);
+    public function testUpdateMetadataOverwrites(): void
+    {
+        $selection = new Selection('ctx_update', $this->storage, $this->normalizer, $this->converter);
+        $selection->select(55, ['a' => 1]);
 
-     $selected = $selection->getSelected();
-     $this->assertSame(['x' => 1], $selected[1]);
-     $this->assertSame(['x' => 2], $selected[2]);
-     $this->assertSame(['x' => 0], $selected[3]);
- }
+        $selection->update(55, ['a' => 2, 'b' => 3]);
+        $this->assertSame(['a' => 2, 'b' => 3], $selection->getMetadata(55));
+    }
 
- public function testUpdateMetadataOverwrites(): void
- {
-     $selection = new Selection('ctx_update', $this->storage, $this->normalizer, $this->converter);
-     $selection->select(55, ['a' => 1]);
+    public function testHasSelectionWithCacheKeyAndTtl(): void
+    {
+        $selection = new Selection('ctx_meta', $this->storage, $this->normalizer, $this->converter);
 
-     $selection->update(55, ['a' => 2, 'b' => 3]);
-     $this->assertSame(['a' => 2, 'b' => 3], $selection->getMetadata(55));
- }
+        // Initially no selection cached
+        $this->assertFalse($selection->hasSource('abc'));
 
+        // Set with cache key without ttl
+        $selection->registerSource('abc', [10, 20]);
+        $this->assertTrue($selection->hasSource('abc'));
+        $this->assertFalse($selection->hasSource('other'));
+    }
 
- public function testHasSelectionWithCacheKeyAndTtl(): void
- {
-     $selection = new Selection('ctx_meta', $this->storage, $this->normalizer, $this->converter);
+    public function testHasSourceExpiresWithIntTtl(): void
+    {
+        $selection = new Selection('ctx_meta_ttl_int', $this->storage, $this->normalizer, $this->converter);
 
-     // Initially no selection cached
-     $this->assertFalse($selection->hasSource('abc'));
+        $this->assertFalse($selection->hasSource('src1'));
 
-     // Set with cache key without ttl
-     $selection->registerSource("abc", [10, 20]);
-     $this->assertTrue($selection->hasSource('abc'));
-     $this->assertFalse($selection->hasSource('other'));
+        // ttl 1 second
+        $selection->registerSource('src1', [1, 2, 3], 1);
+        $this->assertTrue($selection->hasSource('src1'));
 
- }
+        // wait for expiry
+        sleep(2);
+        $this->assertFalse($selection->hasSource('src1'));
+    }
 
- public function testHasSourceExpiresWithIntTtl(): void
- {
-     $selection = new Selection('ctx_meta_ttl_int', $this->storage, $this->normalizer, $this->converter);
+    public function testHasSourceExpiresWithDateIntervalTtl(): void
+    {
+        $selection = new Selection('ctx_meta_ttl_interval', $this->storage, $this->normalizer, $this->converter);
 
-     $this->assertFalse($selection->hasSource('src1'));
+        $this->assertFalse($selection->hasSource('src2'));
 
-     // ttl 1 second
-     $selection->registerSource('src1', [1, 2, 3], 1);
-     $this->assertTrue($selection->hasSource('src1'));
-    
-    // wait for expiry
-    sleep(2);
-     $this->assertFalse($selection->hasSource('src1'));
- }
-
- public function testHasSourceExpiresWithDateIntervalTtl(): void
- {
-     $selection = new Selection('ctx_meta_ttl_interval',  $this->storage, $this->normalizer, $this->converter);
-
-     $this->assertFalse($selection->hasSource('src2'));
-
-     $interval = new \DateInterval('PT1S');
-     $selection->registerSource('src2', [4, 5], $interval);
-     $this->assertTrue($selection->hasSource('src2'));
+        $interval = new \DateInterval('PT1S');
+        $selection->registerSource('src2', [4, 5], $interval);
+        $this->assertTrue($selection->hasSource('src2'));
 
         sleep(2);
         $this->assertFalse($selection->hasSource('src2'));
     }
+
     public function testToggleInIncludeModeWithMetadata(): void
     {
         $selection = new Selection('ctx_toggle_include', $this->storage, $this->normalizer, $this->converter);
@@ -308,12 +307,15 @@ class SelectionInterfaceTest  extends TestCase{
 
         // Create a custom metadata transformer mock
         $custom = $this->createMock(ValueTransformerInterface::class);
-        $custom->method('supports')->willReturnCallback(static fn($v) => is_array($v));
-        $custom->method('transform')->willReturnCallback(static fn($v) => new \Tito10047\PersistentStateBundle\Storage\StorableEnvelope('custom', $v));
-        $custom->method('supportsReverse')->willReturnCallback(static fn($env) => $env->className === 'custom');
+        $custom->method('supports')->willReturnCallback(static fn ($v) => is_array($v));
+        $custom->method('transform')->willReturnCallback(static fn ($v) => new \Tito10047\PersistentStateBundle\Storage\StorableEnvelope('custom', $v));
+        $custom->method('supportsReverse')->willReturnCallback(static fn ($env) => 'custom' === $env->className);
         $custom->method('reverseTransform')->willReturnCallback(static function ($env) {
             $o = new \stdClass();
-            foreach ((array)$env->data as $k => $v) { $o->{$k} = $v; }
+            foreach ((array) $env->data as $k => $v) {
+                $o->{$k} = $v;
+            }
+
             return $o;
         });
 
@@ -341,8 +343,14 @@ class SelectionInterfaceTest  extends TestCase{
     {
         // Dummy object with getId()
         $fooClass = new class(77) {
-            public function __construct(private int $id) {}
-            public function getId(): int { return $this->id; }
+            public function __construct(private int $id)
+            {
+            }
+
+            public function getId(): int
+            {
+                return $this->id;
+            }
         };
 
         $transformer = new ObjectIdValueTransformer($fooClass::class);
@@ -358,9 +366,9 @@ class SelectionInterfaceTest  extends TestCase{
         $selected = $selection->getSelectedIdentifiers();
         $this->assertSame([77], $selected);
 
-		$selected=$selection->getSelected();
-		$this->assertSame([77=>[]], $selected);
+        $selected = $selection->getSelected();
+        $this->assertSame([77 => []], $selected);
 
-		$this->assertTrue($selection->isSelected(77));;
+        $this->assertTrue($selection->isSelected(77));
     }
 }

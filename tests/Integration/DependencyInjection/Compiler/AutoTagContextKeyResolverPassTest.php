@@ -14,6 +14,5 @@ class AutoTagContextKeyResolverPassTest extends AssetMapperKernelTestCase
         /** @var ServiceHelper $locator */
         $locator = $container->get(ServiceHelper::class);
         $this->assertInstanceOf(ServiceHelper::class, $locator);
-
     }
 }

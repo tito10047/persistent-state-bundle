@@ -37,15 +37,17 @@ final class DebugPreferenceCommand extends Command
         $context = (string) $input->getArgument('context');
         $managerName = (string) $input->getOption('manager');
 
-        $serviceId = 'persistent_state.preference.manager.' . $managerName;
+        $serviceId = 'persistent_state.preference.manager.'.$managerName;
         if (!$this->container->has($serviceId)) {
             $io->error(sprintf('Preference manager "%s" not found (service id "%s").', $managerName, $serviceId));
+
             return Command::FAILURE;
         }
 
         $manager = $this->container->get($serviceId);
         if (!$manager instanceof PreferenceManagerInterface) {
             $io->error(sprintf('Service "%s" is not a PreferenceManagerInterface.', $serviceId));
+
             return Command::FAILURE;
         }
 
@@ -59,8 +61,9 @@ final class DebugPreferenceCommand extends Command
         $io->writeln(sprintf('Storage: %s', $storageName));
         $io->writeln('');
 
-        if ($all === []) {
+        if ([] === $all) {
             $io->writeln('(no preferences)');
+
             return Command::SUCCESS;
         }
 
@@ -88,9 +91,9 @@ final class DebugPreferenceCommand extends Command
 
     private function stringifyValue(mixed $value): string
     {
-        if (is_scalar($value) || $value === null) {
+        if (is_scalar($value) || null === $value) {
             return match (true) {
-                $value === null => 'null',
+                null === $value => 'null',
                 is_bool($value) => $value ? 'true' : 'false',
                 default => (string) $value,
             };

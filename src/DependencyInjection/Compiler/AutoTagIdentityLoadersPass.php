@@ -38,7 +38,7 @@ final class AutoTagIdentityLoadersPass implements CompilerPassInterface
 
             // Try to resolve the class name
             $class = $definition->getClass() ?: $id; // FQCN service id fallback
-            if (!is_string($class) || $class === '') {
+            if (!is_string($class) || '' === $class) {
                 continue;
             }
 

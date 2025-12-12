@@ -4,7 +4,8 @@ namespace Tito10047\PersistentStateBundle\Preference\Service;
 
 use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceStorageInterface;
 
-interface PreferenceManagerInterface {
+interface PreferenceManagerInterface
+{
     /**
      * Returns a Preference API instance bound to a resolved context for the given owner.
      *
@@ -18,5 +19,4 @@ interface PreferenceManagerInterface {
      * Useful for advanced scenarios or debugging.
      */
     public function getPreferenceStorage(): PreferenceStorageInterface;
-
 }

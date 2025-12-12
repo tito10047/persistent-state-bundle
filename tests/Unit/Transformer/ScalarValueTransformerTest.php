@@ -52,7 +52,7 @@ class ScalarValueTransformerTest extends TestCase
 
         $unsupported = [[], ['a' => 1]];
         foreach ($unsupported as $val) {
-            $this->assertFalse($this->transformer->supportsReverse($this->getEnvelope($val, "array")));
+            $this->assertFalse($this->transformer->supportsReverse($this->getEnvelope($val, 'array')));
         }
     }
 
@@ -61,14 +61,15 @@ class ScalarValueTransformerTest extends TestCase
         $inputs = [0, 123, 1.5, '', 'hello', true, false, null];
         foreach ($inputs as $in) {
             $this->assertEquals($in,
-				$this->transformer->reverseTransform(
-					$this->transformer->transform($in)
-				)
-			);
+                $this->transformer->reverseTransform(
+                    $this->transformer->transform($in)
+                )
+            );
         }
     }
 
-	private function getEnvelope(mixed $data, string $className = "scalar"): StorableEnvelope {
-		return new StorableEnvelope($className,$data);
-	}
+    private function getEnvelope(mixed $data, string $className = 'scalar'): StorableEnvelope
+    {
+        return new StorableEnvelope($className, $data);
+    }
 }

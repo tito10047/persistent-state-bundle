@@ -19,8 +19,9 @@ class PreferenceTest extends TestCase
         $tr = $this->createMock(ValueTransformerInterface::class);
         $tr->method('supports')->willReturnCallback($supports);
         $tr->method('transform')->willReturnCallback($transform);
-        $tr->method('supportsReverse')->willReturnCallback($supportsReverse ?? static fn() => false);
-        $tr->method('reverseTransform')->willReturnCallback($reverseTransform ?? static fn($v) => $v);
+        $tr->method('supportsReverse')->willReturnCallback($supportsReverse ?? static fn () => false);
+        $tr->method('reverseTransform')->willReturnCallback($reverseTransform ?? static fn ($v) => $v);
+
         return $tr;
     }
 
@@ -39,7 +40,7 @@ class PreferenceTest extends TestCase
         $context = 'ctx1';
         $key = 'theme';
         $input = 'dark';
-        $transformed = new StorableEnvelope("scalar",'dark_trans');
+        $transformed = new StorableEnvelope('scalar', 'dark_trans');
 
         $storage = $this->createMock(PreferenceStorageInterface::class);
         $storage->expects(self::once())
@@ -51,26 +52,27 @@ class PreferenceTest extends TestCase
         $dispatcher->expects(self::exactly(2))
             ->method('dispatch')
             ->willReturnCallback(function ($evt, $name) use (&$order, $context, $key, $input) {
-                $order++;
-                if ($order === 1) {
+                ++$order;
+                if (1 === $order) {
                     TestCase::assertInstanceOf(PreferenceEvent::class, $evt);
                     TestCase::assertSame(PreferenceEvents::PRE_SET, $name);
                     TestCase::assertSame($context, $evt->context);
                     TestCase::assertSame($key, $evt->key);
                     TestCase::assertSame($input, $evt->value);
-                } elseif ($order === 2) {
+                } elseif (2 === $order) {
                     TestCase::assertInstanceOf(PreferenceEvent::class, $evt);
                     TestCase::assertSame(PreferenceEvents::POST_SET, $name);
                     TestCase::assertSame($context, $evt->context);
                     TestCase::assertSame($key, $evt->key);
                     TestCase::assertSame($input, $evt->value);
                 }
+
                 return $evt;
             });
 
         $transformer = $this->makeTransformer(
-            supports: static fn($v) => true,
-            transform: static fn($v) => $transformed,
+            supports: static fn ($v) => true,
+            transform: static fn ($v) => $transformed,
         );
 
         $service = new Preference([$transformer], $context, $storage, $dispatcher);
@@ -92,6 +94,7 @@ class PreferenceTest extends TestCase
             ->with(self::isInstanceOf(PreferenceEvent::class), PreferenceEvents::PRE_SET)
             ->willReturnCallback(function (PreferenceEvent $event) {
                 $event->stopPropagation();
+
                 return $event;
             });
 
@@ -104,9 +107,9 @@ class PreferenceTest extends TestCase
         $context = 'ctx3';
         $values = ['a' => 1, 'b' => 2];
         $transformed = [
-			'a' => (new StorableEnvelope("scalar",'1t'))->toArray(),
-			'b' =>  (new StorableEnvelope("scalar",'2t'))->toArray()
-		];
+            'a' => (new StorableEnvelope('scalar', '1t'))->toArray(),
+            'b' => (new StorableEnvelope('scalar', '2t'))->toArray(),
+        ];
 
         $storage = $this->createMock(PreferenceStorageInterface::class);
         $storage->expects(self::once())
@@ -121,8 +124,8 @@ class PreferenceTest extends TestCase
             ->willReturnArgument(0);
 
         $transformer = $this->makeTransformer(
-            supports: static fn($v) => true,
-            transform: static function ($v) { return new StorableEnvelope('scalar',  $v . 't'); }
+            supports: static fn ($v) => true,
+            transform: static function ($v) { return new StorableEnvelope('scalar', $v.'t'); }
         );
 
         $service = new Preference([$transformer], $context, $storage, $dispatcher);
@@ -143,9 +146,10 @@ class PreferenceTest extends TestCase
             ->method('dispatch')
             ->willReturnCallback(function (PreferenceEvent $event, string $name) use (&$call) {
                 ++$call;
-                if ($name === PreferenceEvents::PRE_SET) {
+                if (PreferenceEvents::PRE_SET === $name) {
                     $event->stopPropagation(); // stop on first key
                 }
+
                 return $event;
             });
 
@@ -186,10 +190,10 @@ class PreferenceTest extends TestCase
 
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $transformer = $this->makeTransformer(
-            supports: static fn($v) => false,
-            transform: static fn($v) => new StorableEnvelope('scalar', $v),
-            supportsReverse: static fn(StorableEnvelope $v) => $v->className=='scalar',
-            reverseTransform: static fn(StorableEnvelope $v) => $v->data.'_rt',
+            supports: static fn ($v) => false,
+            transform: static fn ($v) => new StorableEnvelope('scalar', $v),
+            supportsReverse: static fn (StorableEnvelope $v) => 'scalar' == $v->className,
+            reverseTransform: static fn (StorableEnvelope $v) => $v->data.'_rt',
         );
 
         $service = new Preference([$transformer], $context, $storage, $dispatcher);
@@ -201,17 +205,17 @@ class PreferenceTest extends TestCase
         $context = 'ctx7';
         $storage = $this->createMock(PreferenceStorageInterface::class);
 
-		$transformer = new ScalarValueTransformer();
-		$map = [
+        $transformer = new ScalarValueTransformer();
+        $map = [
             // context, key, default => return
             [$context, 'i1', 0, $transformer->transform(7)->toArray()],
             [$context, 'i2', 0, $transformer->transform('15')->toArray()],
             [$context, 'i3', 5, $transformer->transform('no-number')->toArray()],
         ];
-		$storage->method('get')->willReturnMap($map);
+        $storage->method('get')->willReturnMap($map);
 
-		$dispatcher             = $this->createMock(EventDispatcherInterface::class);
-		$service                = new Preference([$transformer], $context, $storage, $dispatcher);
+        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $service = new Preference([$transformer], $context, $storage, $dispatcher);
 
         self::assertSame(7, $service->getInt('i1'));
         self::assertSame(15, $service->getInt('i2'));
@@ -264,10 +268,10 @@ class PreferenceTest extends TestCase
 
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $transformer = $this->makeTransformer(
-            supports: static fn($v) => false,
-            transform: static fn($v) => new StorableEnvelope('scalar', $v),
-            supportsReverse: static fn(StorableEnvelope $v) => $v->className === 'scalar',
-            reverseTransform: static fn(StorableEnvelope $v) => 'rt-'.$v->data,
+            supports: static fn ($v) => false,
+            transform: static fn ($v) => new StorableEnvelope('scalar', $v),
+            supportsReverse: static fn (StorableEnvelope $v) => 'scalar' === $v->className,
+            reverseTransform: static fn (StorableEnvelope $v) => 'rt-'.$v->data,
         );
 
         $service = new Preference([$transformer], $context, $storage, $dispatcher);
@@ -294,10 +298,10 @@ class PreferenceTest extends TestCase
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         // Identity forward transform into envelope and exact reverse
         $transformer = $this->makeTransformer(
-            supports: static fn($v) => is_array($v),
-            transform: static fn($v) => new StorableEnvelope('json', json_encode($v)),
-            supportsReverse: static fn(StorableEnvelope $v) => $v->className=='json',
-            reverseTransform: static fn(StorableEnvelope $v) => json_decode($v->data, true),
+            supports: static fn ($v) => is_array($v),
+            transform: static fn ($v) => new StorableEnvelope('json', json_encode($v)),
+            supportsReverse: static fn (StorableEnvelope $v) => 'json' == $v->className,
+            reverseTransform: static fn (StorableEnvelope $v) => json_decode($v->data, true),
         );
 
         $service = new Preference([$transformer], $context, $storage, $dispatcher);

@@ -2,8 +2,8 @@
 
 namespace Tito10047\PersistentStateBundle\Selection\Service;
 
-interface RegisterSelectionInterface {
-
+interface RegisterSelectionInterface
+{
     /**
      * Registers a source for later reuse under a stable cache key.
      *
@@ -13,7 +13,6 @@ interface RegisterSelectionInterface {
      * @param string                 $cacheKey Stable key representing the source
      * @param mixed                  $source   Data source supported by an IdentityLoader
      * @param int|\DateInterval|null $ttl      Optional TTL for identifier caching
-     * @return static
      */
     public function registerSource(string $cacheKey, mixed $source, int|\DateInterval|null $ttl = null): static;
 

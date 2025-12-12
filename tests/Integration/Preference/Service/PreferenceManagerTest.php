@@ -2,14 +2,12 @@
 
 namespace Tito10047\PersistentStateBundle\Tests\Integration\Preference\Service;
 
-use stdClass;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Tito10047\PersistentStateBundle\Preference\Service\PreferenceManagerInterface;
 use Tito10047\PersistentStateBundle\Preference\Service\PreferenceInterface;
-use Tito10047\PersistentStateBundle\Service\PersistentContextInterface;
+use Tito10047\PersistentStateBundle\Preference\Service\PreferenceManagerInterface;
 use Tito10047\PersistentStateBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
 
 class PreferenceManagerTest extends AssetMapperKernelTestCase
@@ -50,7 +48,6 @@ class PreferenceManagerTest extends AssetMapperKernelTestCase
         $this->assertFalse($pref2->has('limit'));
     }
 
-
     public function testThrowsForUnsupportedObject(): void
     {
         static::bootKernel();
@@ -58,6 +55,6 @@ class PreferenceManagerTest extends AssetMapperKernelTestCase
         $pm = static::getContainer()->get(PreferenceManagerInterface::class);
 
         $this->expectException(\InvalidArgumentException::class);
-        $pm->getPreference(new stdClass());
+        $pm->getPreference(new \stdClass());
     }
 }

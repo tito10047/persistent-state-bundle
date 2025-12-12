@@ -29,7 +29,7 @@ class DoctrineQueryBuilderLoaderTest extends AssetMapperKernelTestCase
         $this->assertTrue($loader->supports($qb));
         $this->assertEquals(10, $loader->getTotalCount($qb));
 
-        $ids = array_map(fn(RecordInteger $record) => $record->getId(), $records);
+        $ids = array_map(fn (RecordInteger $record) => $record->getId(), $records);
         sort($ids);
         $foundIds = $loader->loadAllIdentifiers(null, $qb);
         sort($foundIds);
@@ -78,10 +78,10 @@ class DoctrineQueryBuilderLoaderTest extends AssetMapperKernelTestCase
         /** @var EntityManagerInterface $em */
         $em = self::getContainer()->get('doctrine')->getManager();
 
-		$expectedIds = array_values(array_map(
-			fn(RecordInteger $r) => $r->getId(),
-			array_filter($records, fn(RecordInteger $r) => $r->getName()=='keep', ARRAY_FILTER_USE_BOTH)
-		));
+        $expectedIds = array_values(array_map(
+            fn (RecordInteger $r) => $r->getId(),
+            array_filter($records, fn (RecordInteger $r) => 'keep' == $r->getName(), ARRAY_FILTER_USE_BOTH)
+        ));
 
         $loader = new DoctrineQueryBuilderLoader();
 
@@ -97,7 +97,6 @@ class DoctrineQueryBuilderLoaderTest extends AssetMapperKernelTestCase
         $this->assertTrue($loader->supports($qb));
         $this->assertEquals(count($expectedIds), $loader->getTotalCount($qb));
 
-
         sort($expectedIds);
 
         $foundIds = $loader->loadAllIdentifiers(null, $qb);
@@ -111,20 +110,20 @@ class DoctrineQueryBuilderLoaderTest extends AssetMapperKernelTestCase
         /** @var EntityManagerInterface $em */
         $em = self::getContainer()->get('doctrine')->getManager();
 
-		TestCategoryFactory::createOne([
-			"name"=>"A"
-		]);
-		TestCategoryFactory::createOne([
-			"name"=>"A"
-		]);
+        TestCategoryFactory::createOne([
+            'name' => 'A',
+        ]);
+        TestCategoryFactory::createOne([
+            'name' => 'A',
+        ]);
 
-		$records = RecordIntegerFactory::createMany(10);
+        $records = RecordIntegerFactory::createMany(10);
         $loader = new DoctrineQueryBuilderLoader();
 
-		$expectedIds = array_values(array_map(
-			fn(RecordInteger $r) => $r->getId(),
-			array_filter($records, fn(RecordInteger $r) => $r->getCategory()->getName()=='A', ARRAY_FILTER_USE_BOTH)
-		));
+        $expectedIds = array_values(array_map(
+            fn (RecordInteger $r) => $r->getId(),
+            array_filter($records, fn (RecordInteger $r) => 'A' == $r->getCategory()->getName(), ARRAY_FILTER_USE_BOTH)
+        ));
 
         $qb = $em->createQueryBuilder()
             ->select('i')

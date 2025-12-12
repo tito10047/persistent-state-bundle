@@ -2,10 +2,10 @@
 
 namespace Tito10047\PersistentStateBundle\Selection\Service;
 
-
 use Tito10047\PersistentStateBundle\Enum\SelectionMode;
 
-interface HasModeInterface {
+interface HasModeInterface
+{
     /**
      * Sets how the selection interprets stored identifiers.
      *

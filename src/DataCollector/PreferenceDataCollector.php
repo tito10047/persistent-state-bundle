@@ -21,12 +21,12 @@ final class PreferenceDataCollector extends DataCollector
         // Provide generic info; detailed stats are fed through trace hooks
         $storage = $this->storage;
 
-        $managers = (array)($this->data['managers'] ?? []);
+        $managers = (array) ($this->data['managers'] ?? []);
         $total = 0;
         $flattenedContexts = [];
         $perManager = [];
         foreach ($managers as $managerName => $info) {
-            $contexts = (array)($info['contexts'] ?? []);
+            $contexts = (array) ($info['contexts'] ?? []);
             $ctxCount = 0;
             foreach ($contexts as $ctxId => $values) {
                 $count = is_array($values) ? \count($values) : 0;
@@ -67,12 +67,12 @@ final class PreferenceDataCollector extends DataCollector
 
     public function isEnabled(): bool
     {
-        return (bool)($this->data['enabled'] ?? false);
+        return (bool) ($this->data['enabled'] ?? false);
     }
 
     public function getPreferencesCount(): int
     {
-        return (int)($this->data['preferencesCount'] ?? 0);
+        return (int) ($this->data['preferencesCount'] ?? 0);
     }
 
     /**
@@ -80,14 +80,12 @@ final class PreferenceDataCollector extends DataCollector
      */
     public function getContext(): array
     {
-        return (array)($this->data['context'] ?? []);
+        return (array) ($this->data['context'] ?? []);
     }
 
     /**
      * Trace hook used by TraceablePreference[Manager] to push current snapshot.
      *
-     * @param string               $managerName
-     * @param string               $contextId
      * @param array<string, mixed> $allValues
      */
     public function onPreferenceChanged(string $managerName, string $contextId, array $allValues): void

@@ -12,7 +12,7 @@ final class PreferenceRuntime implements RuntimeExtensionInterface
     }
 
     /**
-     * Function variant: {{ preference(context, key, default) }}
+     * Function variant: {{ preference(context, key, default) }}.
      */
     public function getPreferenceValue(object|string $context, string $key, mixed $default = null): mixed
     {
@@ -20,7 +20,7 @@ final class PreferenceRuntime implements RuntimeExtensionInterface
     }
 
     /**
-     * Filter variant: {{ context|pref(key, default) }}
+     * Filter variant: {{ context|pref(key, default) }}.
      */
     public function filterPref(object|string $context, string $key, mixed $default = null): mixed
     {

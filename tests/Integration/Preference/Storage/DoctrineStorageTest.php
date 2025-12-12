@@ -30,11 +30,11 @@ class DoctrineStorageTest extends AssetMapperKernelTestCase
 
         $storage->setMultiple($ctx, ['limit' => 10, 'enabled' => true]);
         $all = $storage->all($ctx);
-        $this->assertSame(['enabled' => true, 'limit' => 10,'theme' => 'dark'], $all);
+        $this->assertSame(['enabled' => true, 'limit' => 10, 'theme' => 'dark'], $all);
 
         $storage->remove($ctx, 'theme');
         $this->assertFalse($storage->has($ctx, 'theme'));
-        $this->assertSame(['enabled' => true,'limit' => 10], $storage->all($ctx));
+        $this->assertSame(['enabled' => true, 'limit' => 10], $storage->all($ctx));
     }
 
     public function testManagerUsesConfiguredDoctrineStorage(): void

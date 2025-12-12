@@ -10,13 +10,13 @@ use Tito10047\PersistentStateBundle\Preference\Storage\BasePreference;
 #[ORM\UniqueConstraint(name: 'uniq_preference_context_key', columns: ['context', 'name'])]
 class UserPreference extends BasePreference
 {
-	#[ORM\Id]
-	#[ORM\GeneratedValue]
-	#[ORM\Column]
-	private ?int $id = null;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
 
-	public function getId(): ?int
-	{
-		return $this->id;
-	}
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 }

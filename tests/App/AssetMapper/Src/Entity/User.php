@@ -5,33 +5,37 @@ namespace Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-class User {
+class User
+{
+    #[ORM\Column(name: 'id', type: 'integer', nullable: false)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    private ?int $id = null;
 
-	#[ORM\Column(name: 'id', type: 'integer', nullable: false)]
-	#[ORM\Id]
-	#[ORM\GeneratedValue(strategy: 'IDENTITY')]
-	private ?int $id = null;
+    #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: true)]
+    private ?string $name = null;
 
-	#[ORM\Column(name: 'name', type: 'string', length: 255, nullable: true)]
-	private ?string $name = null;
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
+    public function setId(?int $id): self
+    {
+        $this->id = $id;
 
-	public function getId(): ?int {
-		return $this->id;
-	}
+        return $this;
+    }
 
-	public function setId(?int $id): self {
-		$this->id = $id;
-		return $this;
-	}
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
 
-	public function getName(): ?string {
-		return $this->name;
-	}
+    public function setName(?string $name): self
+    {
+        $this->name = $name;
 
-	public function setName(?string $name): self {
-		$this->name = $name;
-		return $this;
-	}
-
+        return $this;
+    }
 }

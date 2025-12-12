@@ -9,73 +9,72 @@ use Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Factory\RecordInte
 use Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Factory\TestCategoryFactory;
 use Tito10047\PersistentStateBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
 
-class DoctrineQueryLoaderTest extends AssetMapperKernelTestCase {
+class DoctrineQueryLoaderTest extends AssetMapperKernelTestCase
+{
+    public function testBasic()
+    {
+        $records = RecordIntegerFactory::createMany(10);
 
-	public function testBasic() {
-		$records = RecordIntegerFactory::createMany(10);
+        $loader = new DoctrineQueryLoader();
 
-		$loader = new DoctrineQueryLoader();
+        /** @var EntityManagerInterface $em */
+        $em = self::getContainer()->get('doctrine')->getManager();
+        $query = $em->createQueryBuilder()
+                ->select('i')
+                ->from(RecordInteger::class, 'i')
+                ->orderBy('i.id', 'ASC')
+                ->setMaxResults(5)
+                ->getQuery();
 
-		/** @var EntityManagerInterface $em */
-		$em = self::getContainer()->get('doctrine')->getManager();
-		$query = $em->createQueryBuilder()
-				->select('i')
-				->from(RecordInteger::class, 'i')
-				->orderBy('i.id', 'ASC')
-				->setMaxResults(5)
-				->getQuery();
+        $this->assertTrue($loader->supports($query));
+        $this->assertEquals(10, $loader->getTotalCount($query));
 
-		$this->assertTrue($loader->supports($query));
-		$this->assertEquals(10, $loader->getTotalCount($query));
+        $ids = array_map(fn (RecordInteger $record) => $record->getId(), $records);
+        sort($ids);
+        $foundIds = $loader->loadAllIdentifiers(null, $query);
+        sort($foundIds);
 
-		$ids = array_map(fn(RecordInteger $record) => $record->getId(), $records);
-		sort($ids);
-		$foundIds = $loader->loadAllIdentifiers(null, $query);
-		sort($foundIds);
+        $this->assertEquals($ids, $foundIds);
+    }
 
-		$this->assertEquals($ids, $foundIds);
+    public function testWithWhere(): void
+    {
+        $records = RecordIntegerFactory::createMany(10);
 
+        /** @var EntityManagerInterface $em */
+        $em = self::getContainer()->get('doctrine')->getManager();
 
-	}
+        // očakávané ID podľa vygenerovaného mena z factory
+        $expectedIds = array_values(array_map(
+            fn (RecordInteger $r) => $r->getId(),
+            array_filter($records, fn (RecordInteger $r) => 'keep' === $r->getName(), ARRAY_FILTER_USE_BOTH)
+        ));
 
-	public function testWithWhere(): void
-	{
-		$records = RecordIntegerFactory::createMany(10);
+        $loader = new DoctrineQueryLoader();
 
-		/** @var EntityManagerInterface $em */
-		$em = self::getContainer()->get('doctrine')->getManager();
+        $qb = $em->createQueryBuilder()
+                ->select('i')
+                ->from(RecordInteger::class, 'i')
+                ->where('i.name = :name')
+                ->setParameter('name', 'keep')
+                ->orderBy('i.id', 'DESC')
+                ->setFirstResult(2)
+                ->setMaxResults(3);
 
-		// očakávané ID podľa vygenerovaného mena z factory
-		$expectedIds = array_values(array_map(
-				fn(RecordInteger $r) => $r->getId(),
-				array_filter($records, fn(RecordInteger $r) => $r->getName() === 'keep', ARRAY_FILTER_USE_BOTH)
-		));
+        $query = $qb->getQuery();
 
-		$loader = new DoctrineQueryLoader();
+        $this->assertTrue($loader->supports($query));
+        $this->assertEquals(count($expectedIds), $loader->getTotalCount($query));
+        sort($expectedIds);
 
-		$qb = $em->createQueryBuilder()
-				->select('i')
-				->from(RecordInteger::class, 'i')
-				->where('i.name = :name')
-				->setParameter('name', 'keep')
-				->orderBy('i.id', 'DESC')
-				->setFirstResult(2)
-				->setMaxResults(3);
+        $foundIds = $loader->loadAllIdentifiers(null, $query);
+        sort($foundIds);
 
-		$query = $qb->getQuery();
+        $this->assertEquals($expectedIds, $foundIds);
+    }
 
-		$this->assertTrue($loader->supports($query));
-		$this->assertEquals(count($expectedIds), $loader->getTotalCount($query));
-		sort($expectedIds);
-
-		$foundIds = $loader->loadAllIdentifiers(null, $query);
-		sort($foundIds);
-
-		$this->assertEquals($expectedIds, $foundIds);
-	}
-
-	public function testWithJoin(): void
-	{       /** @var EntityManagerInterface $em */
+    public function testWithJoin(): void
+    {       /** @var EntityManagerInterface $em */
         $em = self::getContainer()->get('doctrine')->getManager();
 
         // vytvor pár kategórií s názvom "A" (nemusia byť priradené žiadnemu záznamu)
@@ -87,8 +86,8 @@ class DoctrineQueryLoaderTest extends AssetMapperKernelTestCase {
 
         // očakávané ID podľa kategórie s názvom A
         $expectedIds = array_values(array_map(
-            fn(RecordInteger $r) => $r->getId(),
-            array_filter($records, fn(RecordInteger $r) => $r->getCategory() && $r->getCategory()->getName() === 'A', ARRAY_FILTER_USE_BOTH)
+            fn (RecordInteger $r) => $r->getId(),
+            array_filter($records, fn (RecordInteger $r) => $r->getCategory() && 'A' === $r->getCategory()->getName(), ARRAY_FILTER_USE_BOTH)
         ));
 
         $qb = $em->createQueryBuilder()
@@ -138,7 +137,7 @@ class DoctrineQueryLoaderTest extends AssetMapperKernelTestCase {
         // Rovnaká filtrácia → rovnaký cache key
         $k1a = $loader->getCacheKey($q1);
         $k1b = $loader->getCacheKey($q1);
-        $k2  = $loader->getCacheKey($q2);
+        $k2 = $loader->getCacheKey($q2);
         $this->assertSame($k1a, $k1b);
         $this->assertSame($k1a, $k2);
 

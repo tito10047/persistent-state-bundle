@@ -8,3 +8,4 @@ composer.lock
 yarn.lock
 /package.json
 /tests/App/AssetMapper/config/reference.php
+.php-cs-fixer.cache

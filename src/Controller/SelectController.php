@@ -7,97 +7,99 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Tito10047\PersistentStateBundle\Selection\Service\SelectionManagerInterface;
 
-class SelectController {
+class SelectController
+{
+    /**
+     * @param iterable<SelectionManagerInterface> $selectionManagers
+     */
+    public function __construct(
+        private readonly iterable $selectionManagers,
+    ) {
+    }
 
-	/**
-	 * @param iterable<SelectionManagerInterface> $selectionManagers
-	 */
-	public function __construct(
-		private readonly iterable $selectionManagers,
-	) {
-	}
+    public function rowSelectorToggle(Request $request): Response
+    {
+        $key = $request->query->getString('key', '');
+        $manager = $request->query->getString('manager', '');
+        $id = $request->query->get('id', null);
+        $selected = $request->query->getBoolean('selected', true);
 
+        if (!$manager || !$key || !$id) {
+            throw new BadRequestHttpException('Missing key or value or id');
+        }
 
-	public function rowSelectorToggle(Request $request): Response {
-		$key      = $request->query->getString("key", "");
-		$manager  = $request->query->getString("manager", "");
-		$id       = $request->query->get("id", null);
-		$selected = $request->query->getBoolean("selected", true);
+        $selector = $this->getRowsSelector($manager)->getSelection($key);
 
-		if (!$manager || !$key || !$id) {
-			throw new BadRequestHttpException("Missing key or value or id");
-		}
+        if ($selected) {
+            $selector->select($id);
+        } else {
+            $selector->unselect($id);
+        }
 
-		$selector = $this->getRowsSelector($manager)->getSelection($key);
+        return new Response(null, 202);
+    }
 
-		if ($selected) {
-			$selector->select($id);
-		} else {
-			$selector->unselect($id);
-		}
+    public function rowSelectorSelectRange(Request $request): Response
+    {
+        $key = $request->query->getString('key', '');
+        $manager = $request->query->getString('manager', '');
+        $ids = json_decode($request->getContent(), true);
+        if (JSON_ERROR_NONE !== json_last_error() || null === $ids) {
+            throw new BadRequestHttpException('Body is not valid json');
+        }
+        if (!is_array($ids)) {
+            $ids = [$ids];
+        }
+        $selected = $request->query->getBoolean('selected', true);
 
-		return new Response(null, 202);
-	}
+        $onlyScalar = 0 === count(array_filter($ids, fn ($value) => !is_scalar($value)));
 
-	public function rowSelectorSelectRange(Request $request): Response {
-		$key      = $request->query->getString("key", "");
-		$manager  = $request->query->getString("manager", "");
-		$ids = json_decode($request->getContent(), true);
-		if (json_last_error() !== JSON_ERROR_NONE || $ids === null) {
-			throw new BadRequestHttpException("Body is not valid json");
-		}
-		if (!is_array($ids)) {
-			$ids = [$ids];
-		}
-		$selected = $request->query->getBoolean("selected", true);
+        if (!$manager || !$key) {
+            throw new BadRequestHttpException('missing key or value');
+        }
+        if (!$onlyScalar) {
+            throw new BadRequestHttpException('Id variables can be only scalar values');
+        }
 
-		$onlyScalar = count(array_filter($ids, fn($value) => !is_scalar($value))) === 0;
+        $selector = $this->getRowsSelector((string) $manager)->getSelection((string) $key);
 
-		if (!$manager || !$key) {
-			throw new BadRequestHttpException("missing key or value");
-		}
-		if (!$onlyScalar) {
-			throw new BadRequestHttpException("Id variables can be only scalar values");
-		}
+        if ($selected) {
+            $selector->selectMultiple($ids);
+        } else {
+            $selector->unselectMultiple($ids);
+        }
 
-		$selector = $this->getRowsSelector((string) $manager)->getSelection((string) $key);
+        return new Response(null, 202);
+    }
 
-		if ($selected) {
-			$selector->selectMultiple($ids);
-		} else {
-			$selector->unselectMultiple($ids);
-		}
+    public function rowSelectorSelectAll(Request $request): Response
+    {
+        $key = $request->query->getString('key', '');
+        $manager = $request->query->getString('manager', '');
+        $selected = $request->query->getBoolean('selected', true);
 
-		return new Response(null, 202);
-	}
+        if (!$manager || !$key) {
+            throw new BadRequestHttpException('missing key or value');
+        }
 
-	public function rowSelectorSelectAll(Request $request): Response {
-		$key      = $request->query->getString("key", "");
-		$manager  = $request->query->getString("manager", "");
-		$selected = $request->query->getBoolean("selected", true);
+        $selector = $this->getRowsSelector((string) $manager)->getSelection((string) $key);
 
-		if (!$manager || !$key) {
-			throw new BadRequestHttpException("missing key or value");
-		}
+        if ($selected) {
+            $selector->selectAll();
+        } else {
+            $selector->unselectAll();
+        }
 
-		$selector = $this->getRowsSelector((string) $manager)->getSelection((string) $key);
+        return new Response(null, 202);
+    }
 
-		if ($selected) {
-			$selector->selectAll();
-		} else {
-			$selector->unselectAll();
-		}
-
-
-		return new Response(null, 202);
-	}
-
-	private function getRowsSelector(string $manager): SelectionManagerInterface {
-		foreach ($this->selectionManagers as $id => $selectionManager) {
-			if ($id === $manager) {
-				return $selectionManager;
-			}
-		}
-		throw new BadRequestHttpException(sprintf('No selection manager found for manager "%s".', $manager));
-	}
+    private function getRowsSelector(string $manager): SelectionManagerInterface
+    {
+        foreach ($this->selectionManagers as $id => $selectionManager) {
+            if ($id === $manager) {
+                return $selectionManager;
+            }
+        }
+        throw new BadRequestHttpException(sprintf('No selection manager found for manager "%s".', $manager));
+    }
 }

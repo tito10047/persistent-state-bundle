@@ -19,11 +19,12 @@ final class Preference implements PreferenceInterface
      * @param iterable<ValueTransformerInterface> $transformers
      */
     public function __construct(
-        private readonly iterable                   $transformers,
-        private readonly string                     $context,
+        private readonly iterable $transformers,
+        private readonly string $context,
         private readonly PreferenceStorageInterface $storage,
-		private readonly EventDispatcherInterface   $dispatcher,
-    ) {}
+        private readonly EventDispatcherInterface $dispatcher,
+    ) {
+    }
 
     public function getContext(): string
     {
@@ -32,18 +33,18 @@ final class Preference implements PreferenceInterface
 
     public function set(string $key, mixed $value): self
     {
-		$event = new PreferenceEvent($this->context, $key, $value);
-		$this->dispatcher->dispatch($event, PreferenceEvents::PRE_SET);
+        $event = new PreferenceEvent($this->context, $key, $value);
+        $this->dispatcher->dispatch($event, PreferenceEvents::PRE_SET);
 
-		if ($event->isPropagationStopped()) {
-			return $this;
-		}
+        if ($event->isPropagationStopped()) {
+            return $this;
+        }
 
         $toStore = $this->applyTransform($value);
         $this->storage->set($this->context, $key, $toStore);
 
-		$postEvent = new PreferenceEvent($this->context, $key, $event->value);
-		$this->dispatcher->dispatch($postEvent, PreferenceEvents::POST_SET);
+        $postEvent = new PreferenceEvent($this->context, $key, $event->value);
+        $this->dispatcher->dispatch($postEvent, PreferenceEvents::POST_SET);
 
         return $this;
     }
@@ -51,29 +52,29 @@ final class Preference implements PreferenceInterface
     public function import(array $values): self
     {
         $prepared = [];
-		$processedEvents = [];
+        $processedEvents = [];
 
         foreach ($values as $key => $value) {
-			$event = new PreferenceEvent($this->context, $key, $value);
-			$this->dispatcher->dispatch($event, PreferenceEvents::PRE_SET);
+            $event = new PreferenceEvent($this->context, $key, $value);
+            $this->dispatcher->dispatch($event, PreferenceEvents::PRE_SET);
 
-			$processedEvents[$key] = $event;
+            $processedEvents[$key] = $event;
 
-			if ($event->isPropagationStopped()) {
-				return $this;
-			}
+            if ($event->isPropagationStopped()) {
+                return $this;
+            }
 
             $prepared[$key] = $this->applyTransform($value);
         }
 
-        if ($prepared !== []) {
+        if ([] !== $prepared) {
             $this->storage->setMultiple($this->context, $prepared);
         }
 
-		foreach ($processedEvents as $key => $preEvent) {
-			$postEvent = new PreferenceEvent($this->context, $key, $preEvent->value);
-			$this->dispatcher->dispatch($postEvent, PreferenceEvents::POST_SET);
-		}
+        foreach ($processedEvents as $key => $preEvent) {
+            $postEvent = new PreferenceEvent($this->context, $key, $preEvent->value);
+            $this->dispatcher->dispatch($postEvent, PreferenceEvents::POST_SET);
+        }
 
         return $this;
     }
@@ -114,6 +115,7 @@ final class Preference implements PreferenceInterface
         // Normalize common truthy/falsey strings and numbers
         if (is_string($value)) {
             $normalized = strtolower(trim($value));
+
             return match ($normalized) {
                 '1', 'true', 'yes', 'on' => true,
                 '0', 'false', 'no', 'off', '' => false,
@@ -136,6 +138,7 @@ final class Preference implements PreferenceInterface
     public function remove(string $key): self
     {
         $this->storage->remove($this->context, $key);
+
         return $this;
     }
 
@@ -158,18 +161,18 @@ final class Preference implements PreferenceInterface
             }
         }
 
-		throw  new \RuntimeException("No transformer found for value of type " . gettype($value));
+        throw new \RuntimeException('No transformer found for value of type '.gettype($value));
     }
 
     private function applyReverseTransform(array $value): mixed
     {
-		$value = StorableEnvelope::fromArray($value);
+        $value = StorableEnvelope::fromArray($value);
         foreach ($this->transformers as $transformer) {
             if ($transformer->supportsReverse($value)) {
                 return $transformer->reverseTransform($value);
             }
         }
 
-        throw new \RuntimeException("No reverse transformer found for value of type " . $value->className);
+        throw new \RuntimeException('No reverse transformer found for value of type '.$value->className);
     }
 }

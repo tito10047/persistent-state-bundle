@@ -4,29 +4,22 @@ namespace Tito10047\PersistentStateBundle\Tests\Integration\Selection;
 
 use PHPUnit\Framework\Attributes\TestWith;
 use stdClass;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Tito10047\PersistentStateBundle\Enum\SelectionMode;
-use Tito10047\PersistentStateBundle\Selection\Service\SelectionManagerInterface;
 use Tito10047\PersistentStateBundle\Selection\Service\SelectionInterface;
+use Tito10047\PersistentStateBundle\Selection\Service\SelectionManagerInterface;
 use Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity\User;
-use Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\ServiceHelper;
-use Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Support\TestList;
 use Tito10047\PersistentStateBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
 use Tito10047\PersistentStateBundle\Tests\Trait\SessionInterfaceTrait;
 
 class SelectionManagerTest extends AssetMapperKernelTestCase
 {
-	use SessionInterfaceTrait;
+    use SessionInterfaceTrait;
 
     public function testGetSelectionAndSelectFlow(): void
     {
-		$this->initSession();
-		$container = self::getContainer();
+        $this->initSession();
+        $container = self::getContainer();
 
-		/** @var SelectionInterface $manager */
+        /** @var SelectionInterface $manager */
         $manager = $container->get('persistent_state.selection.manager.scalar');
         $this->assertInstanceOf(SelectionManagerInterface::class, $manager);
 
@@ -35,10 +28,10 @@ class SelectionManagerTest extends AssetMapperKernelTestCase
         $this->assertInstanceOf(SelectionInterface::class, $selection);
 
         // Initially nothing selected
-        $this->assertFalse($selection->isSelected( 1));
+        $this->assertFalse($selection->isSelected(1));
 
         // Select single item and verify
-        $selection->select( 1);
+        $selection->select(1);
         $this->assertTrue($selection->isSelected(1));
 
         // Select multiple
@@ -47,8 +40,8 @@ class SelectionManagerTest extends AssetMapperKernelTestCase
             3,
         ]);
 
-        $this->assertTrue($selection->isSelected( 2));
-        $this->assertTrue($selection->isSelected( 3));
+        $this->assertTrue($selection->isSelected(2));
+        $this->assertTrue($selection->isSelected(3));
 
         $ids = $selection->getSelectedIdentifiers();
         sort($ids);
@@ -56,7 +49,7 @@ class SelectionManagerTest extends AssetMapperKernelTestCase
 
         // Unselect one and verify
         $selection->unselect(2);
-        $this->assertFalse($selection->isSelected( 2));
+        $this->assertFalse($selection->isSelected(2));
 
         $ids = $selection->getSelectedIdentifiers();
         sort($ids);
@@ -80,13 +73,13 @@ class SelectionManagerTest extends AssetMapperKernelTestCase
         $selection2 = $manager->getSelection('test_key_owner_obj', $owner2);
         $this->assertInstanceOf(SelectionInterface::class, $selection2);
 
-		$selection1->select(1);
-		$selection2->select(2);
+        $selection1->select(1);
+        $selection2->select(2);
 
-		$this->assertTrue( $selection1->isSelected(1) );
-		$this->assertTrue( $selection2->isSelected(2) );
-		$this->assertFalse( $selection1->isSelected(2) );
-		$this->assertFalse( $selection2->isSelected(1) );
+        $this->assertTrue($selection1->isSelected(1));
+        $this->assertTrue($selection2->isSelected(2));
+        $this->assertFalse($selection1->isSelected(2));
+        $this->assertFalse($selection2->isSelected(1));
     }
 
     public function testGetSelectionWithStringOwner(): void
@@ -117,20 +110,18 @@ class SelectionManagerTest extends AssetMapperKernelTestCase
         $manager->registerSelection('no_loader_key', new \stdClass());
     }
 
+    #[TestWith(['default', [['id' => 1, 'name' => 'A']]])]
+    #[TestWith(['scalar', [['id' => 1, 'name' => 'A']]])]
+    #[TestWith(['array', [new \stdClass()]])]
+    public function testThrowExceptionOnBadNormalizer($service, $data): void
+    {
+        $container = self::getContainer();
 
-	#[TestWith(['default',[['id' => 1, 'name' => 'A']]])]
-	#[TestWith(['scalar',[['id' => 1, 'name' => 'A']]])]
-	#[TestWith(['array',[new stdClass()]])]
-	public function testThrowExceptionOnBadNormalizer($service,$data):void {
+        /** @var SelectionManagerInterface $manager */
+        $manager = $container->get('persistent_state.selection.manager.'.$service);
 
-		$container = self::getContainer();
-
-		/** @var SelectionManagerInterface $manager */
-		$manager = $container->get('persistent_state.selection.manager.'.$service);
-
-		$this->expectException(\InvalidArgumentException::class);
-		$this->expectExceptionMessage('is not supported');
-		$manager->registerSelection("array_key_2", $data);
-	}
-
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('is not supported');
+        $manager->registerSelection('array_key_2', $data);
+    }
 }
