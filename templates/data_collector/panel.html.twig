@@ -3,8 +3,11 @@
 {% block toolbar %}
     {% set status_color = collector.enabled ? '' : 'red' %}
     {% set icon %}
-        <span class="sf-toolbar-value">Pref</span>
-        <span class="sf-toolbar-label">{{ collector.preferencesCount + collector.selectionsCount }}</span>
+        {{ source('@PersistentState/icons/debugbar.svg') }}
+        <span class="sf-toolbar-value">{{ collector.preferencesCount }}</span>
+        <span class="sf-toolbar-label"> Pref</span>
+        <span class="sf-toolbar-value">{{ collector.selectionsCount }}</span>
+        <span class="sf-toolbar-label"> Sel</span>
     {% endset %}
     {% set text %}
         <div class="sf-toolbar-info-piece">
@@ -22,7 +25,7 @@
 
 {% block menu %}
     <span class="label">
-        <span class="icon">⚙️</span>
+        <span class="icon">{{ source('@PersistentState/icons/debugbar.svg') }}</span>
         <strong>Preferences</strong>
     </span>
 {% endblock %}
@@ -50,11 +53,11 @@
         <h3>Preference Managers</h3>
         <table>
             <thead>
-                <tr>
-                    <th>Manager</th>
-                    <th>Contexts</th>
-                    <th>Count</th>
-                </tr>
+            <tr>
+                <th>Manager</th>
+                <th>Contexts</th>
+                <th>Count</th>
+            </tr>
             </thead>
             <tbody>
             {% for name, info in collector.context.managers %}
