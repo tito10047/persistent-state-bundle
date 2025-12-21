@@ -34,7 +34,7 @@ final class SelectionManager implements SelectionManagerInterface
 
         foreach ($source as $item) {
             if (!$this->transformer->supports($item)) {
-                throw new \InvalidArgumentException(sprintf('Item of type "%s" is not supported.', gettype($item)));
+                throw new \InvalidArgumentException(sprintf('Item of type "%s" is not supported by transformer "%s".', gettype($item), get_class($this->transformer)));
             }
         }
         $cacheKey = $loader->getCacheKey($source);

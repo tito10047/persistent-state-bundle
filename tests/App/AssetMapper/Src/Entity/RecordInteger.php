@@ -18,6 +18,11 @@ class RecordInteger
     #[ORM\ManyToOne(targetEntity: TestCategory::class)]
     private ?TestCategory $category = null;
 
+
+    public function __construct(int $id = 0) {
+        $this->id = $id;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

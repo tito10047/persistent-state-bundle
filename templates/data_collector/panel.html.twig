@@ -4,12 +4,16 @@
     {% set status_color = collector.enabled ? '' : 'red' %}
     {% set icon %}
         <span class="sf-toolbar-value">Pref</span>
-        <span class="sf-toolbar-label">{{ collector.preferencesCount }}</span>
+        <span class="sf-toolbar-label">{{ collector.preferencesCount + collector.selectionsCount }}</span>
     {% endset %}
     {% set text %}
         <div class="sf-toolbar-info-piece">
-            <b>Persistents</b>
-            <span>{{ collector.preferencesCount }} položiek</span>
+            <b>Preferences</b>
+            <span>{{ collector.preferencesCount }}</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Selections</b>
+            <span>{{ collector.selectionsCount }}</span>
         </div>
     {% endset %}
 
@@ -30,17 +34,20 @@
             <span class="value">{{ collector.preferencesCount }}</span>
             <span class="label">Počet preferencií</span>
         </div>
+        <div class="metric">
+            <span class="value">{{ collector.selectionsCount }}</span>
+            <span class="label">Počet vybraných položiek</span>
+        </div>
     </div>
 
     <h3>Kontext</h3>
     <div>
-        <p><strong>Storage:</strong> {{ collector.context.storage }}</p>
         <p><strong>Route:</strong> {{ collector.context.route ?: 'n/a' }}</p>
         <p><strong>Distinct contexts this request:</strong> {{ collector.context.contexts|length }}</p>
     </div>
 
     {% if collector.context.managers is defined and collector.context.managers %}
-        <h3>Managers</h3>
+        <h3>Preference Managers</h3>
         <table>
             <thead>
                 <tr>
@@ -61,6 +68,59 @@
                         {% endif %}
                     </td>
                     <td>{{ info.count|default(0) }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% if collector.context.selection_managers is defined and collector.context.selection_managers %}
+        <h3>Selection Managers</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Manager</th>
+                <th>Namespaces</th>
+                <th>Mode</th>
+                <th>Count</th>
+                <th>Identifiers</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for name, info in collector.context.selection_managers %}
+                <tr>
+                    <td><code>{{ name }}</code></td>
+                    <td>
+                        {% if info.namespaces is defined and info.namespaces %}
+                            {{ info.namespaces|join(', ') }}
+                        {% else %}
+                            <em>none</em>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if collector.context.selections[name] is defined %}
+                            {% for ns, data in collector.context.selections[name].namespaces %}
+                                <div><strong>{{ ns }}:</strong> {{ data.mode.value|default(data.mode) }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </td>
+                    <td>{{ info.count|default(0) }}</td>
+                    <td>
+                        {% if collector.context.selections[name] is defined %}
+                            {% for ns, data in collector.context.selections[name].namespaces %}
+                                <div>
+                                    <strong>{{ ns }}:</strong>
+                                    {% if data.mode.value == 'exclude' and data.identifiers|length == 0 %}
+                                        <span class="status-success">ALL</span>
+                                    {% else %}
+                                        {{ data.identifiers|join(', ') }}
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <em>none</em>
+                        {% endif %}
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>

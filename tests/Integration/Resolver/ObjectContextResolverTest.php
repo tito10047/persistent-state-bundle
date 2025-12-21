@@ -34,7 +34,7 @@ class ObjectContextResolverTest extends AssetMapperKernelTestCase
 
         $pm = static::getContainer()->get(PreferenceManagerInterface::class);
 
-        $user = (new User())->setId(10);
+        $user = new User(10);
         $company = (new Company())->setUuid(77);
 
         // Store via object contexts

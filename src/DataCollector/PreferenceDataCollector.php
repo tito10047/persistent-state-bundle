@@ -7,19 +7,18 @@ namespace Tito10047\PersistentStateBundle\DataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
+use Tito10047\PersistentStateBundle\Enum\SelectionMode;
 use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceStorageInterface;
 
 final class PreferenceDataCollector extends DataCollector
 {
-    public function __construct(private readonly PreferenceStorageInterface $storage)
+    public function __construct()
     {
         $this->reset();
     }
 
     public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
-        // Provide generic info; detailed stats are fed through trace hooks
-        $storage = $this->storage;
 
         $managers = (array) ($this->data['managers'] ?? []);
         $total = 0;
@@ -40,13 +39,32 @@ final class PreferenceDataCollector extends DataCollector
             ];
         }
 
+        $selections = (array) ($this->data['selections'] ?? []);
+        $totalSelections = 0;
+        $perSelectionManager = [];
+        foreach ($selections as $managerName => $info) {
+            $namespaces = (array) ($info['namespaces'] ?? []);
+            $nsCount = 0;
+            foreach ($namespaces as $nsId => $data) {
+                $identifiersCount = \is_array($data['identifiers'] ?? null) ? \count($data['identifiers']) : 0;
+                $totalSelections += $identifiersCount;
+                $nsCount += $identifiersCount;
+            }
+            $perSelectionManager[$managerName] = [
+                'namespaces' => array_keys($namespaces),
+                'count' => $nsCount,
+            ];
+        }
+
         $this->data['enabled'] = true;
         $this->data['preferencesCount'] = $total;
+        $this->data['selectionsCount'] = $totalSelections;
         $this->data['context'] = [
-            'storage' => \get_class($storage),
             'route' => $request->attributes->get('_route'),
             'contexts' => array_keys($flattenedContexts),
             'managers' => $perManager,
+            'selection_managers' => $perSelectionManager,
+            'selections' => $selections,
         ];
     }
 
@@ -55,8 +73,10 @@ final class PreferenceDataCollector extends DataCollector
         $this->data = [
             'enabled' => false,
             'preferencesCount' => 0,
+            'selectionsCount' => 0,
             'context' => [],
             'managers' => [],
+            'selections' => [],
         ];
     }
 
@@ -73,6 +93,11 @@ final class PreferenceDataCollector extends DataCollector
     public function getPreferencesCount(): int
     {
         return (int) ($this->data['preferencesCount'] ?? 0);
+    }
+
+    public function getSelectionsCount(): int
+    {
+        return (int) ($this->data['selectionsCount'] ?? 0);
     }
 
     /**
@@ -97,5 +122,23 @@ final class PreferenceDataCollector extends DataCollector
             $this->data['managers'][$managerName] = ['contexts' => []];
         }
         $this->data['managers'][$managerName]['contexts'][$contextId] = $allValues;
+    }
+
+    /**
+     * @param array<string|int> $identifiers
+     */
+    public function onSelectionChanged(string $managerName, string $namespace, array $identifiers, SelectionMode $mode = SelectionMode::INCLUDE, int $total = 0): void
+    {
+        if (!isset($this->data['selections']) || !\is_array($this->data['selections'])) {
+            $this->data['selections'] = [];
+        }
+        if (!isset($this->data['selections'][$managerName]) || !\is_array($this->data['selections'][$managerName])) {
+            $this->data['selections'][$managerName] = ['namespaces' => []];
+        }
+        $this->data['selections'][$managerName]['namespaces'][$namespace] = [
+            'identifiers' => $identifiers,
+            'mode' => $mode,
+            'total' => $total,
+        ];
     }
 }

@@ -20,7 +20,7 @@ final class ArrayLoader implements IdentityLoaderInterface
         $identifiers = [];
 
         foreach ($source as $item) {
-            $identifiers[] = $transformer->transform($item)->data;
+            $identifiers[] = $transformer->getIdentifier($item);
         }
 
         return $identifiers;

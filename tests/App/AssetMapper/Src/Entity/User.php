@@ -15,6 +15,11 @@ class User
     #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: true)]
     private ?string $name = null;
 
+    public function __construct(int $id, ?string $name = null) {
+        $this->id = $id;
+        $this->name = $name;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

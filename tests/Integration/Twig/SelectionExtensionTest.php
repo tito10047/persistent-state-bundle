@@ -49,9 +49,7 @@ class SelectionExtensionTest extends AssetMapperKernelTestCase
         // Prepare simple object list with "id" property
         $items = [];
         for ($i = 1; $i <= 3; ++$i) {
-            $o = new User();
-            $o->setId($i);
-            $o->setName('Item '.$i);
+            $o = new User($i,'Item '.$i);
             $items[] = $o;
         }
 
@@ -130,9 +128,7 @@ class SelectionExtensionTest extends AssetMapperKernelTestCase
         // Items
         $items = [];
         for ($i = 1; $i <= 1; ++$i) {
-            $o = new User();
-            $o->setId($i);
-            $o->setName('Item '.$i);
+            $o = new User($i,'Item '.$i);
             $items[] = $o;
         }
 
@@ -178,8 +174,7 @@ class SelectionExtensionTest extends AssetMapperKernelTestCase
         /** @var SelectionManagerInterface $manager */
         $manager = $container->get(SelectionManagerInterface::class);
 
-        $user = new User();
-        $user->setId(42);
+        $user = new User(42);
         $user->setName('John');
 
         $selection = $manager->registerSelection('twig_value_key', [$user]);

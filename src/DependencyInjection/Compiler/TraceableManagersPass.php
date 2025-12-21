@@ -31,27 +31,33 @@ final class TraceableManagersPass implements CompilerPassInterface
         $tag = AutoTagContextKeyResolverPass::TAG; // ensure class is loaded
         unset($tag);
 
-        // Find all managers tagged with our custom tag
-        $tagName = 'persistent_state.preference.manager';
-        foreach ($container->findTaggedServiceIds($tagName, true) as $serviceId => $tagAttrsList) {
-            // Determine manager name from tag attribute 'name' if available
-            $managerName = $tagAttrsList[0]['name'] ?? $serviceId;
+        // Find all managers tagged with our custom tags
+        $tags = [
+            'persistent_state.preference.manager' => 'persistent_state.preference.manager',
+            'persistent_state.selection.manager' => 'persistent_state.selection.manager',
+        ];
 
-            $decoratorId = $serviceId.'.traceable';
-            if ($container->hasDefinition($decoratorId)) {
-                continue; // already decorated
+        foreach ($tags as $tagName) {
+            foreach ($container->findTaggedServiceIds($tagName, true) as $serviceId => $tagAttrsList) {
+                // Determine manager name from tag attribute 'name' if available
+                $managerName = $tagAttrsList[0]['name'] ?? $serviceId;
+
+                $decoratorId = $serviceId.'.traceable';
+                if ($container->hasDefinition($decoratorId)) {
+                    continue; // already decorated
+                }
+
+                $definition = new Definition(TraceablePersistentManager::class);
+                $definition->setPublic(true);
+                $definition->setDecoratedService($serviceId);
+                $definition->setArguments([
+                    new Reference($decoratorId.'.inner'),
+                    new Reference(PreferenceDataCollector::class),
+                    $managerName,
+                ]);
+
+                $container->setDefinition($decoratorId, $definition);
             }
-
-            $definition = new Definition(TraceablePersistentManager::class);
-            $definition->setPublic(true);
-            $definition->setDecoratedService($serviceId);
-            $definition->setArguments([
-                new Reference($decoratorId.'.inner'),
-                new Reference(PreferenceDataCollector::class),
-                $managerName,
-            ]);
-
-            $container->setDefinition($decoratorId, $definition);
         }
     }
 }

@@ -147,7 +147,6 @@ return static function (ContainerConfigurator $container): void {
             $services
                 ->set(PreferenceDataCollector::class)
                     ->public()
-                    ->arg('$storage', service(PreferenceStorageInterface::class))
                     ->tag('data_collector', [
                         'id' => 'app.preference_collector',
                         'template' => '@PersistentState/data_collector/panel.html.twig',

@@ -38,7 +38,6 @@ final class PreferenceDataCollectorTest extends TestCase
         self::assertTrue($collector->isEnabled());
         self::assertSame(0, $collector->getPreferencesCount());
         $context = $collector->getContext();
-        self::assertArrayHasKey('storage', $context);
         self::assertArrayHasKey('route', $context);
         self::assertSame('test_route', $context['route']);
     }

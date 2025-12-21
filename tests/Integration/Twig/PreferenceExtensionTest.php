@@ -35,7 +35,7 @@ class PreferenceExtensionTest extends AssetMapperKernelTestCase
 
         $pm = static::getContainer()->get(PreferenceManagerInterface::class);
 
-        $user = (new User())->setId(5)->setName('Alice');
+        $user = new User(5,'Alice');
         $company = (new Company())->setUuid(10)->setName('ACME');
 
         $pm->getPreference($user)->set('foo', 'bar');

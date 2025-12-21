@@ -65,8 +65,8 @@ class SelectionManagerTest extends AssetMapperKernelTestCase
         $manager = $container->get('persistent_state.selection.manager.scalar');
         $this->assertInstanceOf(SelectionManagerInterface::class, $manager);
 
-        $owner1 = (new User())->setId(1);
-        $owner2 = (new User())->setId(2);
+        $owner1 = new User(1);
+        $owner2 = new User(2);
 
         $selection1 = $manager->getSelection('test_key_owner_obj', $owner1);
         $this->assertInstanceOf(SelectionInterface::class, $selection1);
