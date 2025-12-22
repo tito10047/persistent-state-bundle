@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tito10047\PersistentStateBundle\Transformer;
 
 use Tito10047\PersistentStateBundle\Storage\StorableEnvelope;

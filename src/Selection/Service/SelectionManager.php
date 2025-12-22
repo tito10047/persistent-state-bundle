@@ -1,22 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tito10047\PersistentStateBundle\Selection\Service;
 
-use Tito10047\PersistentStateBundle\Resolver\ContextKeyResolverInterface;
+use Tito10047\PersistentStateBundle\Resolver\ContextResolverInterface;
 use Tito10047\PersistentStateBundle\Selection\Loader\IdentityLoaderInterface;
-use Tito10047\PersistentStateBundle\Selection\Storage\SelectionStorageInterface;
 use Tito10047\PersistentStateBundle\Transformer\ValueTransformerInterface;
 
 final class SelectionManager implements SelectionManagerInterface
 {
     public function __construct(
-        private readonly SelectionStorageInterface $storage,
+        private readonly SelectionFactoryInterface $factory,
         private readonly ValueTransformerInterface $transformer,
-        private readonly ValueTransformerInterface $metadataTransformer,
         /** @var IdentityLoaderInterface[] */
         private readonly iterable $loaders,
-        /** @var iterable<ContextKeyResolverInterface> $resolvers */
-        private readonly iterable $resolvers,
+        private readonly ContextResolverInterface $contextResolver,
         private readonly ?string $ttl,
     ) {
     }
@@ -25,12 +24,7 @@ final class SelectionManager implements SelectionManagerInterface
     {
         $loader = $this->findLoader($source);
 
-        $selection = new Selection(
-            $namespace,
-            $this->storage,
-            $this->transformer,
-            $this->metadataTransformer,
-        );
+        $selection = $this->factory->create($namespace);
 
         foreach ($source as $item) {
             if (!$this->transformer->supports($item)) {
@@ -38,10 +32,14 @@ final class SelectionManager implements SelectionManagerInterface
             }
         }
         $cacheKey = $loader->getCacheKey($source);
-        if (!$selection->hasSource($cacheKey)) {
+        if ($selection instanceof RegisterSelectionInterface && !$selection->hasSource($cacheKey)) {
+            $ttl = $ttl ?? $this->ttl;
+            if (is_string($ttl)) {
+                $ttl = is_numeric($ttl) ? (int) $ttl : new \DateInterval($ttl);
+            }
             $selection->registerSource($cacheKey,
                 $loader->loadAllIdentifiers($this->transformer, $source),
-                $ttl ?? $this->ttl
+                $ttl
             );
         }
 
@@ -53,10 +51,10 @@ final class SelectionManager implements SelectionManagerInterface
         // If an owner is provided, scope the selection namespace by the owner's identity
         // to avoid collisions between different owners using the same logical namespace.
         if (null !== $owner) {
-            $namespace = $namespace.'::'.$this->resolveContextKey($owner);
+            $namespace = $namespace.'::'.$this->contextResolver->resolveContextKey($owner);
         }
 
-        return new Selection($namespace, $this->storage, $this->transformer, $this->metadataTransformer);
+        return $this->factory->create($namespace);
     }
 
     private function findLoader(mixed $source): IdentityLoaderInterface
@@ -73,22 +71,5 @@ final class SelectionManager implements SelectionManagerInterface
         }
 
         return $loader;
-    }
-
-    private function resolveContextKey(object|string $context): string
-    {
-        // 1. If it's already a string, just use it
-        if (is_string($context)) {
-            return $context;
-        }
-
-        // 3. Try external resolvers (e.g. for Symfony UserInterface)
-        foreach ($this->resolvers as $resolver) {
-            if ($resolver->supports($context)) {
-                return $resolver->resolve($context);
-            }
-        }
-
-        throw new \InvalidArgumentException(sprintf('Could not resolve persistent context for object of type "%s". Implement PersistentContextInterface or register a resolver.', get_class($context)));
     }
 }

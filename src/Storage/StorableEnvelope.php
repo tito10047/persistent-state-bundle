@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tito10047\PersistentStateBundle\Storage;
 
 /**
@@ -18,7 +20,7 @@ final class StorableEnvelope
         /**
          * Surové dáta objektu pripravené na serializáciu (napr. ['theme' => 'dark']).
          */
-        public readonly array|string|int|float|null $data,
+        public readonly array|string|int|float|bool|null $data,
     ) {
     }
 

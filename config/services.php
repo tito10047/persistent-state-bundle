@@ -13,14 +13,20 @@ use Tito10047\PersistentStateBundle\DependencyInjection\Compiler\AutoTagContextK
 use Tito10047\PersistentStateBundle\DependencyInjection\Compiler\AutoTagIdentityLoadersPass;
 use Tito10047\PersistentStateBundle\DependencyInjection\Compiler\AutoTagValueTransformerPass;
 use Tito10047\PersistentStateBundle\PersistentStateBundle;
+use Tito10047\PersistentStateBundle\Preference\Service\PreferenceFactory;
+use Tito10047\PersistentStateBundle\Preference\Service\PreferenceFactoryInterface;
 use Tito10047\PersistentStateBundle\Preference\Service\PreferenceManager;
 use Tito10047\PersistentStateBundle\Preference\Service\PreferenceManagerInterface;
 use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceSessionStorage;
 use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceStorageInterface;
+use Tito10047\PersistentStateBundle\Resolver\ContextResolver;
+use Tito10047\PersistentStateBundle\Resolver\ContextResolverInterface;
 use Tito10047\PersistentStateBundle\Selection\Loader\ArrayLoader;
 use Tito10047\PersistentStateBundle\Selection\Loader\DoctrineCollectionLoader;
 use Tito10047\PersistentStateBundle\Selection\Loader\DoctrineQueryBuilderLoader;
 use Tito10047\PersistentStateBundle\Selection\Loader\DoctrineQueryLoader;
+use Tito10047\PersistentStateBundle\Selection\Service\SelectionFactory;
+use Tito10047\PersistentStateBundle\Selection\Service\SelectionFactoryInterface;
 use Tito10047\PersistentStateBundle\Selection\Service\SelectionManager;
 use Tito10047\PersistentStateBundle\Selection\Service\SelectionManagerInterface;
 use Tito10047\PersistentStateBundle\Selection\Storage\SelectionSessionStorage;
@@ -59,29 +65,52 @@ return static function (ContainerConfigurator $container): void {
     ;
     $services->alias(MetadataConverterInterface::class, 'persistent_state.preference.converter.object_vars');
 
+    // --- Context Resolver ---
+    $services
+        ->set('persistent_state.resolver.context', ContextResolver::class)
+            ->arg('$resolvers', tagged_iterator(AutoTagContextKeyResolverPass::TAG))
+    ;
+    $services->alias(ContextResolverInterface::class, 'persistent_state.resolver.context');
+
+    // --- Factories ---
+    $services
+        ->set('persistent_state.preference.factory.default', PreferenceFactory::class)
+            ->arg('$transformers', tagged_iterator(PersistentStateBundle::TRANSFORMER_TAG))
+            ->arg('$storage', service('persistent_state.preference.storage.session'))
+            ->arg('$dispatcher', service('event_dispatcher'))
+    ;
+    $services->alias(PreferenceFactoryInterface::class, 'persistent_state.preference.factory.default');
+
+    $services
+        ->set('persistent_state.selection.factory.default', SelectionFactory::class)
+            ->arg('$storage', service('persistent_state.selection.storage.session'))
+            ->arg('$transformer',  service('persistent_state.transformer.scalar'))
+            ->arg('$metadataTransformer', service('persistent_state.transformer.array'))
+    ;
+    $services->alias(SelectionFactoryInterface::class, 'persistent_state.selection.factory.default');
+
     // --- PreferenceManager ---
     $services
         ->set('persistent_state.preference.manager.default', PreferenceManager::class)
             ->public()
-            ->arg('$resolvers', tagged_iterator(AutoTagContextKeyResolverPass::TAG))
-            ->arg('$transformers', tagged_iterator(PersistentStateBundle::TRANSFORMER_TAG))
+            ->arg('$contextResolver', service(ContextResolverInterface::class))
+            ->arg('$factory', service(PreferenceFactoryInterface::class))
             ->arg('$storage', service('persistent_state.preference.storage.session'))
             ->tag('persistent_state.preference.manager', ['name' => 'default'])
     ;
     $services->alias(PreferenceManagerInterface::class, 'persistent_state.preference.manager.default');
 
-	// --- SelectionManager ---
-	$services
-		->set('persistent_state.selection.manager.default', SelectionManager::class)
-		->public()
-		->arg('$storage', service('persistent_state.selection.storage.session'))
-		->arg('$transformer',  service('persistent_state.transformer.scalar'))
-		->arg('$metadataTransformer', service('persistent_state.transformer.array'))
-		->arg('$loaders', tagged_iterator(AutoTagIdentityLoadersPass::TAG))
-		->arg('$resolvers', tagged_iterator(AutoTagContextKeyResolverPass::TAG))
-		->arg('$ttl', null)
-		->tag('persistent_state.selection.manager', ['name' => 'default']);
-	$services->alias(SelectionManagerInterface::class, 'persistent_state.selection.manager.default');
+    // --- SelectionManager ---
+    $services
+        ->set('persistent_state.selection.manager.default', SelectionManager::class)
+        ->public()
+        ->arg('$factory', service(SelectionFactoryInterface::class))
+        ->arg('$transformer',  service('persistent_state.transformer.scalar'))
+        ->arg('$loaders', tagged_iterator(AutoTagIdentityLoadersPass::TAG))
+        ->arg('$contextResolver', service(ContextResolverInterface::class))
+        ->arg('$ttl', null)
+        ->tag('persistent_state.selection.manager', ['name' => 'default']);
+    $services->alias(SelectionManagerInterface::class, 'persistent_state.selection.manager.default');
 
 
 	// --- Twig Extension ---

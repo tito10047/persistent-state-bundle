@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tito10047\PersistentStateBundle\Selection\Storage;
 
 use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
