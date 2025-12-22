@@ -19,7 +19,7 @@ interface SelectionManagerInterface
      *
      * @return SelectionInterface Fluent API to manipulate selection state
      */
-    public function registerSelection(string $namespace, mixed $source, int|\DateInterval|null $ttl = null): SelectionInterface;
+    public function registerSelection(string $namespace, mixed $source, int|\DateInterval|null $ttl = null, object|string|null $owner = null): SelectionInterface;
 
     /**
      * Returns the Selection API for an already registered namespace.

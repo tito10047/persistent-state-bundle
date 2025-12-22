@@ -20,8 +20,12 @@ final class SelectionManager implements SelectionManagerInterface
     ) {
     }
 
-    public function registerSelection(string $namespace, mixed $source, int|\DateInterval|null $ttl = null): SelectionInterface
+    public function registerSelection(string $namespace, mixed $source, int|\DateInterval|null $ttl = null, object|string|null $owner = null): SelectionInterface
     {
+        if (null !== $owner) {
+            $namespace = $namespace.'::'.$this->contextResolver->resolveContextKey($owner);
+        }
+
         $loader = $this->findLoader($source);
 
         $selection = $this->factory->create($namespace);

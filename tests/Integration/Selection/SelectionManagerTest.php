@@ -124,4 +124,33 @@ class SelectionManagerTest extends AssetMapperKernelTestCase
         $this->expectExceptionMessage('is not supported');
         $manager->registerSelection('array_key_2', $data);
     }
+    public function testRegisterSelectionWithSameOwnerAsGetSelection(): void
+    {
+        $this->initSession();
+        $container = self::getContainer();
+
+        /** @var SelectionManagerInterface $manager */
+        $manager = $container->get('persistent_state.selection.manager.scalar');
+        $this->assertInstanceOf(SelectionManagerInterface::class, $manager);
+
+        $owner = new User(1);
+        $source = [1, 2, 3];
+        $namespace = 'test_owner_consistency';
+
+        // Register selection with owner
+        $manager->registerSelection($namespace, $source, null, $owner);
+
+        // Get selection with same owner
+        $selectionGet = $manager->getSelection($namespace, $owner);
+
+        $this->assertSame(3, $selectionGet->getTotal());
+
+        $selectionGet->selectAll();
+        $this->assertTrue($selectionGet->isSelectedAll());
+        $this->assertTrue($selectionGet->isSelected(1));
+
+
+        // If namespaces were different, $selectionGet->getTotal() might return 0
+        // because the source was registered under a different namespace.
+    }
 }

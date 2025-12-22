@@ -38,13 +38,13 @@ final class TraceablePersistentManager implements PreferenceManagerInterface, Se
         return $this->inner->getPreferenceStorage();
     }
 
-    public function registerSelection(string $namespace, mixed $source, int|\DateInterval|null $ttl = null): SelectionInterface
+    public function registerSelection(string $namespace, mixed $source, int|\DateInterval|null $ttl = null, object|string|null $owner = null): SelectionInterface
     {
         if (!$this->inner instanceof SelectionManagerInterface) {
             throw new \LogicException('Inner manager does not implement SelectionManagerInterface');
         }
 
-        $selection = $this->inner->registerSelection($namespace, $source, $ttl);
+        $selection = $this->inner->registerSelection($namespace, $source, $ttl, $owner);
 
         return new TraceableSelection($this->managerName, $namespace, $selection, $this->collector);
     }
