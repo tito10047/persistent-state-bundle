@@ -1,4 +1,4 @@
-![Tests](https://github.com//tito10047/persistent-state-bundle/actions/workflows/symfony.yml/badge.svg)
+![Tests](https://github.com/tito10047/persistent-state-bundle/actions/workflows/symfony.yml/badge.svg)
 
 # Persistent State Bundle
 
@@ -6,123 +6,197 @@
 <img src="docs/image/promo_small.png"><br>
 </p>
 
-This bundle provides a unified and robust solution for managing persistent user interface state in Symfony applications. It covers two key areas: Selections for efficient
-handling of bulk operations (e.g., "Select All" across pagination) and Preferences for storing key-value settings. With a flexible architecture based on context
-resolvers (e.g., binding to a user or company) and support for various storage backends (Session, Redis, Doctrine), it allows you to elegantly solve UI state persistence
-without cluttering your controllers with boilerplate code.
+This Symfony bundle provides a unified and robust solution for managing persistent user interface state. It handles two key areas:
+1. **Selections**: Efficient handling of bulk operations (e.g., "Select All" across multiple pages of a paginated list).
+2. **Preferences**: Storing key-value settings for various contexts (e.g., user, company).
 
-## Scenario 1 - Chart
+It features a flexible architecture based on context resolvers and support for various storage backends (Session, Redis, Doctrine), allowing you to elegantly solve UI state persistence without boilerplate code in your controllers.
+
+## Features
+
+- **Selection Management**: Track selected items (IDs) across pagination.
+- **Preference Management**: Store and retrieve arbitrary user/context settings.
+- **Context Resolvers**: Automatically resolve context (e.g., current user) for storage.
+- **Twig Integration**: Easy-to-use Twig functions and filters.
+- **Stimulus Integration**: Ready-to-use Stimulus controller for interactive selections.
+- **Multiple Storages**: Support for Session (default), Doctrine, and easily extensible for others (e.g., Redis).
+- **CLI Support**: Debug preferences directly from the terminal.
+
+## Requirements
+
+- **PHP**: ^8.1
+- **Symfony**: ^6.4 | ^7.4 | ^8.0
+
+## Installation
+
+Install the bundle via Composer:
+
+```bash
+composer require tito10047/persistent-state-bundle
+```
+
+If you are using Symfony Flex, the bundle will be registered automatically. Otherwise, add it to your `config/bundles.php`:
 
 ```php
-class MyController{
+return [
+    // ...
+    Tito10047\PersistentStateBundle\PersistentStateBundle::class => ['all' => true],
+];
+```
 
+For Stimulus integration, ensure you have [Symfony UX Stimulus](https://symfony.com/bundles/StimulusBundle/current/index.html) installed and configured.
+
+## Usage Scenarios
+
+### 1. Simple Selection (e.g., Shopping Cart)
+
+```php
+use Tito10047\PersistentStateBundle\Selection\Service\SelectionManagerInterface;
+
+class CartController
+{
     public function __construct(
         private readonly SelectionManagerInterface $selectionManager,
     ) {}
-    public function select(User $user, Product $product){
-        
-        $cartSelection = $this->selectionManager->getSelection($user,"cart");
-        
+
+    public function add(User $user, Product $product)
+    {
+        $cartSelection = $this->selectionManager->getSelection($user, 'cart');
         $cartSelection->select($product, [
-            'quantity' => $request->get('qty', 1),
+            'quantity' => 1,
             'added_at' => new \DateTime()
         ]);
-        $cart->destroy();
     }
-    
-    public function getCart(){
-        $cartSelection = $this->selectionManager->getSelection($user,"cart");
-        return $companySelection->getSelected();
-    }
-    
-    public function clearCart() {
-        $cartSelection = $this->selectionManager->getSelection($user,"cart");
-        $cart->destroy();
+
+    public function clear(User $user)
+    {
+        $this->selectionManager->getSelection($user, 'cart')->destroy();
     }
 }
 ```
 
-## Scenario 2 - Preferences
+### 2. User Preferences
 
 ```php
-class MyController{
+use Tito10047\PersistentStateBundle\Preference\Service\PreferenceManagerInterface;
 
+class SettingsController
+{
     public function __construct(
         private readonly PreferenceManagerInterface $prefManager,
     ) {}
-    public function save(User $user){
-        
+
+    public function updateTheme(User $user, string $theme)
+    {
         $preferences = $this->prefManager->getPreference($user);
-        
-        $preferences->set('foo', 'bar');
-        $preferences->set('baz', [1,2,3]);
-        
-        $foo = $preferences->get('foo');
-        $baz = $preferences->get('baz');
+        $preferences->set('theme', $theme);
     }
-    
 }
 ```
 
+In Twig:
 ```twig
-<div>
-    User Foo: {{ preference(user, 'foo') }}<br>
-    Company pref: {{ company|pref('foo2') }}
-</div>
+<body class="theme-{{ preference(app.user, 'theme', 'light') }}">
+    Company Setting: {{ company|pref('some_setting') }}
+</body>
 ```
 
-## Scenario 3 - Bulk Actions
+### 3. Bulk Actions with Stimulus
+
+This bundle provides a Stimulus controller to handle "Select All" and individual row selections.
 
 ```twig
-<div persistent_selection_stimulus_controller("main_logs", null,{
-	selectAllClass:'btn-primary',
-	unselectAllClass:'btn-outline-secondary',
-},"default",true)>
-        {# SELECT ROWS ON CURRENT PAGE #}
-            <button
-                    class="btn btn-primary btn-sm text-nowrap m-1"
-                    data-action="{{ persistent_selection_stimulus_controller_name }}#selectCurrentPage"
-            >
-                {{ 'Select visible'|trans }}
-            </button>
-        {# SELECT ROWS ALL PAGES #}
-            <button
-                    class="btn btn-primary btn-sm text-nowrap  m-1"
-                    data-action="{{ persistent_selection_stimulus_controller_name }}#selectAll"
-            >
-                {{ 'Select all'|trans }}
-            </button>
-        </div>
-
+<div {{ persistent_selection_stimulus_controller("main_logs", null, {
+    selectAllClass: 'btn-primary',
+    unselectAllClass: 'btn-outline-secondary',
+}) }}>
+    <div class="mb-2">
+        <button class="btn btn-sm" data-action="tito10047--persistent-state-bundle--selection#selectCurrentPage">
+            Select Visible
+        </button>
+        <button class="btn btn-sm" data-action="tito10047--persistent-state-bundle--selection#selectAll">
+            Select All
+        </button>
     </div>
+
     <ul class="list-group">
         {% for log in logs %}
-            <li>
-                {{ persistent_selection_row_selector("main_logs",log,{class:"m-1 align-bottom"}) }}
+            <li class="list-group-item">
+                {{ persistent_selection_row_selector("main_logs", log) }}
                 {{ log.name }}
             </li>
         {% endfor %}
     </ul>
 </div>
 ```
+
+In your controller to perform the action:
 ```php
-class MyController{
-    public function __construct(
-        private readonly SelectionManagerInterface $selectionManager,
-        private readonly EntityManagerInterface $em,
-    ) {}
-    public function performAction(User $user, Product $product){
-        
-        $logsSelection = $this->selectionManager->getSelection($user,"main_logs");
-        
-        foreach($logsSelection->getSelectedIdentifiers() as $logId){
-            $this->em->remove($this->em->getReference(Log::class,$logId));
-        }
-    }
+public function deleteSelected(User $user)
+{
+    $selection = $this->selectionManager->getSelection($user, 'main_logs');
+    $ids = $selection->getSelectedIdentifiers();
     
+    // ... perform deletion
 }
 ```
 
-## Full documentation
+## Configuration
 
-See [docs/full_config.md](docs/full_config.md) 
+Default configuration (optional to override in `config/packages/persistent_state.yaml`):
+
+```yaml
+persistent_state:
+    preference:
+        managers:
+            default:
+                storage: '@persistent_state.preference.storage.session'
+    selection:
+        managers:
+            default:
+                storage: '@persistent_state.selection.storage.session'
+```
+
+See [docs/full_config.md](docs/full_config.md) for more advanced configuration, including Doctrine storage setup.
+
+## Console Commands
+
+### `debug:preference`
+Inspect stored preferences for a specific context.
+
+```bash
+php bin/console debug:preference "user_15" --manager=default
+```
+
+## Scripts
+
+The following scripts are available via Composer:
+
+- `composer test`: Runs the PHPUnit test suite.
+
+## Project Structure
+
+- `assets/`: Stimulus controllers and frontend assets.
+- `config/`: Bundle configuration and service definitions.
+- `docs/`: Additional documentation and images.
+- `src/`: Core bundle logic.
+    - `Command/`: CLI commands.
+    - `Controller/`: Ajax endpoints for state updates.
+    - `Preference/`: Preference management logic.
+    - `Selection/`: Selection management logic.
+    - `Storage/`: Storage implementations (Session, Doctrine).
+    - `Twig/`: Twig extensions and runtimes.
+- `templates/`: Default templates and Twig components.
+- `tests/`: Integration and unit tests.
+
+## Testing
+
+Run tests using PHPUnit:
+
+```bash
+composer test
+```
+
+## License
+
+This bundle is released under the [MIT License](LICENSE).
