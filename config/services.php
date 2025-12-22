@@ -5,6 +5,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigura
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Tito10047\PersistentStateBundle\Command\DebugPreferenceCommand;
+use Tito10047\PersistentStateBundle\Command\DebugSelectionCommand;
 use Tito10047\PersistentStateBundle\Controller\SelectController;
 use Tito10047\PersistentStateBundle\Converter\MetadataConverterInterface;
 use Tito10047\PersistentStateBundle\Converter\ObjectVarsConverter;
@@ -203,4 +204,10 @@ return static function (ContainerConfigurator $container): void {
 		->arg('$router', service(UrlGeneratorInterface::class))
 		->tag('twig.runtime')
 	;
+    $services
+        ->set(DebugSelectionCommand::class)
+            ->public()
+            ->arg('$container', service('service_container'))
+            ->tag('console.command')
+    ;
 };

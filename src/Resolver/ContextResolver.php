@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tito10047\PersistentStateBundle\Resolver;
 
+use Tito10047\PersistentStateBundle\Exception\InvalidArgumentException;
+
 final readonly class ContextResolver implements ContextResolverInterface
 {
     /**
@@ -26,7 +28,7 @@ final readonly class ContextResolver implements ContextResolverInterface
             }
         }
 
-        throw new \InvalidArgumentException(sprintf(
+        throw new InvalidArgumentException(sprintf(
             'Could not resolve persistent context for object of type "%s". Implement PersistentContextInterface or register a resolver.',
             get_debug_type($context)
         ));

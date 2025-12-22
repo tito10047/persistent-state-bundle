@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tito10047\PersistentStateBundle\Storage;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Tito10047\PersistentStateBundle\Exception\RuntimeException;
 use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceEntityInterface;
 use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceStorageInterface;
 
@@ -25,17 +26,7 @@ final class DoctrinePreferenceStorage implements PreferenceStorageInterface
 
     public function set(string $context, string $key, mixed $value): void
     {
-        $entity = $this->findOne($context, $key);
-        if (!$entity) {
-            /** @var class-string<PreferenceEntityInterface> $cls */
-            $cls = $this->entityClass;
-            /** @var PreferenceEntityInterface $entity */
-            $entity = new $cls();
-            $entity->setContext($context)->setKey($key);
-            $this->em->persist($entity);
-        }
-
-        $entity->setValue($value);
+        $this->updateOrCreate($context, $key, $value);
         $this->em->flush();
     }
 
@@ -47,9 +38,25 @@ final class DoctrinePreferenceStorage implements PreferenceStorageInterface
 
         $this->em->wrapInTransaction(function () use ($context, $values): void {
             foreach ($values as $key => $value) {
-                $this->set($context, (string) $key, $value);
+                $this->updateOrCreate($context, (string) $key, $value);
             }
         });
+        $this->em->flush();
+    }
+
+    private function updateOrCreate(string $context, string $key, mixed $value): void
+    {
+        $entity = $this->findOne($context, $key);
+        if (!$entity) {
+            /** @var class-string<PreferenceEntityInterface> $cls */
+            $cls = $this->entityClass;
+            /** @var PreferenceEntityInterface $entity */
+            $entity = new $cls();
+            $entity->setContext($context)->setKey($key);
+            $this->em->persist($entity);
+        }
+
+        $entity->setValue($value);
     }
 
     public function remove(string $context, string $key): void
@@ -88,7 +95,7 @@ final class DoctrinePreferenceStorage implements PreferenceStorageInterface
             return null;
         }
         if (!$entity instanceof PreferenceEntityInterface) {
-            throw new \RuntimeException(sprintf('Entity %s must implement %s', get_debug_type($entity), PreferenceEntityInterface::class));
+            throw new RuntimeException(sprintf('Entity %s must implement %s', get_debug_type($entity), PreferenceEntityInterface::class));
         }
 
         return $entity;

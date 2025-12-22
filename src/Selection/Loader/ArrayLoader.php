@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tito10047\PersistentStateBundle\Selection\Loader;
 
+use Tito10047\PersistentStateBundle\Exception\InvalidArgumentException;
 use Tito10047\PersistentStateBundle\Transformer\ValueTransformerInterface;
 
 final class ArrayLoader implements IdentityLoaderInterface
@@ -16,7 +17,7 @@ final class ArrayLoader implements IdentityLoaderInterface
     public function loadAllIdentifiers(?ValueTransformerInterface $transformer, mixed $source): array
     {
         if (!is_array($source)) {
-            throw new \InvalidArgumentException('Source must be an array.');
+            throw new InvalidArgumentException('Source must be an array.');
         }
 
         $identifiers = [];
@@ -36,7 +37,7 @@ final class ArrayLoader implements IdentityLoaderInterface
     public function getCacheKey(mixed $source): string
     {
         if (!is_array($source)) {
-            throw new \InvalidArgumentException('Source must be an array.');
+            throw new InvalidArgumentException('Source must be an array.');
         }
 
         // Use a deterministic hash of the full source structure. serialize() preserves

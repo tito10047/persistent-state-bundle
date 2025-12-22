@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tito10047\PersistentStateBundle\Selection\Service;
 
 use Tito10047\PersistentStateBundle\Enum\SelectionMode;
+use Tito10047\PersistentStateBundle\Exception\LogicException;
 use Tito10047\PersistentStateBundle\Selection\Storage\SelectionStorageInterface;
 use Tito10047\PersistentStateBundle\Storage\StorableEnvelope;
 use Tito10047\PersistentStateBundle\Transformer\ValueTransformerInterface;
@@ -63,7 +64,7 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
         // If metadata is provided as a map per-id, we need to process per item.
         // When metadata is null, we can batch add in INCLUDE mode.
         if (SelectionMode::EXCLUDE === $mode) {
-            throw new \LogicException('Cannot select multiple items in EXCLUDE mode.');
+            throw new LogicException('Cannot select multiple items in EXCLUDE mode.');
         }
         if (null === $metadata) {
             $ids = [];
@@ -81,7 +82,7 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
             if (array_key_exists($id, $metadata) || array_key_exists((string) $id, $metadata)) {
                 $metaForId = $metadata[$id] ?? $metadata[(string) $id];
             } else {
-                throw new \LogicException("No metadata found for id $id");
+                throw new LogicException("No metadata found for id $id");
             }
 
             $metaForId = $this->metadataTransformer->transform($metaForId)->toArray();

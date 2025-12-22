@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tito10047\PersistentStateBundle\Selection\Loader;
 
 use Doctrine\Common\Collections\Collection;
+use Tito10047\PersistentStateBundle\Exception\InvalidArgumentException;
 use Tito10047\PersistentStateBundle\Transformer\ValueTransformerInterface;
 
 /**

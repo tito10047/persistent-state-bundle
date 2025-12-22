@@ -19,12 +19,8 @@ class SymfonySerializerConverter implements MetadataConverterInterface
         return $this->serializer->normalize($metadataObject, 'array');
     }
 
-    public function convertFromStorable(array $storedData, ?string $targetClass): ?object
+    public function convertFromStorable(array $storedData, string $targetClass): ?object
     {
-        if (!$targetClass) {
-            throw new \LogicException('Missing target class for denormalization.');
-        }
-
-        return $this->serializer->denormalize($storedData['data'], $targetClass, 'array');
+        return $this->serializer->denormalize($storedData, $targetClass, 'array');
     }
 }

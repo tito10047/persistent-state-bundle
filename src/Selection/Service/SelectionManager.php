@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tito10047\PersistentStateBundle\Selection\Service;
 
+use Tito10047\PersistentStateBundle\Exception\InvalidArgumentException;
 use Tito10047\PersistentStateBundle\Resolver\ContextResolverInterface;
 use Tito10047\PersistentStateBundle\Selection\Loader\IdentityLoaderInterface;
 use Tito10047\PersistentStateBundle\Transformer\ValueTransformerInterface;
@@ -32,7 +33,7 @@ final class SelectionManager implements SelectionManagerInterface
 
         foreach ($source as $item) {
             if (!$this->transformer->supports($item)) {
-                throw new \InvalidArgumentException(sprintf('Item of type "%s" is not supported by transformer "%s".', gettype($item), get_class($this->transformer)));
+                throw new InvalidArgumentException(sprintf('Item of type "%s" is not supported by transformer "%s".', gettype($item), get_class($this->transformer)));
             }
         }
         $cacheKey = $loader->getCacheKey($source);
@@ -71,7 +72,7 @@ final class SelectionManager implements SelectionManagerInterface
             }
         }
         if (null === $loader) {
-            throw new \InvalidArgumentException('No suitable loader found for the given source.');
+            throw new InvalidArgumentException('No suitable loader found for the given source.');
         }
 
         return $loader;
