@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Tito10047\PersistentStateBundle;
 
+use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 use Tito10047\PersistentStateBundle\Converter\MetadataConverterInterface;
@@ -98,6 +100,37 @@ class PersistentStateBundle extends AbstractBundle
                 ->tag('persistent_state.selection.manager', ['name' => $name])
             ;
         }
+    }
+
+    /**
+     * @see https://symfony.com/doc/current/frontend/create_ux_bundle.html
+     */
+    public function prependExtension(ContainerConfigurator $container, ContainerBuilder $builder): void
+    {
+        if ($this->isAssetMapperAvailable($builder)) {
+            $builder->prependExtensionConfig('framework', [
+                'asset_mapper' => [
+                    'paths' => [
+                        __DIR__.'/../assets/controllers' => '@tito10047/persistent-state-bundle',
+                    ],
+                ],
+            ]);
+        }
+    }
+
+    private function isAssetMapperAvailable(ContainerBuilder $container): bool
+    {
+        if (!interface_exists(AssetMapperInterface::class)) {
+            return false;
+        }
+
+        // check that FrameworkBundle 6.3 or higher is installed
+        $bundlesMetadata = $container->getParameter('kernel.bundles_metadata');
+        if (!isset($bundlesMetadata['FrameworkBundle'])) {
+            return false;
+        }
+
+        return is_file($bundlesMetadata['FrameworkBundle']['path'].'/Resources/config/asset_mapper.php');
     }
 
     public function build(ContainerBuilder $container): void
