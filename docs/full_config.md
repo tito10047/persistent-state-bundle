@@ -29,7 +29,7 @@ services:
             $class: App\Entity\User\User
             $prefix: "user_"
     app.storage.doctrine:
-        class: Tito10047\PersistentStateBundle\Storage\DoctrinePreferenceStorage
+        class: Tito10047\PersistentStateBundle\Preference\Storage\PreferenceEntityInterface
         arguments:
             - '@doctrine.orm.entity_manager'
             - App\Entity\User\UserPreference

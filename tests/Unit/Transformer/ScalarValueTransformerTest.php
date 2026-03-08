@@ -3,7 +3,7 @@
 namespace Tito10047\PersistentStateBundle\Tests\Unit\Transformer;
 
 use PHPUnit\Framework\TestCase;
-use Tito10047\PersistentStateBundle\Storage\StorableEnvelope;
+use Tito10047\PersistentStateBundle\Preference\Storage\StorableEnvelope;
 use Tito10047\PersistentStateBundle\Transformer\ScalarValueTransformer;
 
 class ScalarValueTransformerTest extends TestCase

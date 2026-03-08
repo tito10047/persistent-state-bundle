@@ -6,8 +6,8 @@ namespace Tito10047\PersistentStateBundle\Selection\Service;
 
 use Tito10047\PersistentStateBundle\Enum\SelectionMode;
 use Tito10047\PersistentStateBundle\Exception\LogicException;
+use Tito10047\PersistentStateBundle\Preference\Storage\StorableEnvelope;
 use Tito10047\PersistentStateBundle\Selection\Storage\SelectionStorageInterface;
-use Tito10047\PersistentStateBundle\Storage\StorableEnvelope;
 use Tito10047\PersistentStateBundle\Transformer\ValueTransformerInterface;
 
 final class Selection implements SelectionInterface, HasModeInterface, RegisterSelectionInterface

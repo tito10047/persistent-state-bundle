@@ -11,7 +11,7 @@ services:
             $prefix: 'company_'
             $identifierMethod: 'getUuid'
     app.storage.doctrine:
-        class: Tito10047\PersistentStateBundle\Storage\DoctrinePreferenceStorage
+        class: Tito10047\PersistentStateBundle\Preference\Storage\PreferenceDoctrineStorage
         arguments:
             - '@doctrine.orm.entity_manager'
             - Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity\UserPreference

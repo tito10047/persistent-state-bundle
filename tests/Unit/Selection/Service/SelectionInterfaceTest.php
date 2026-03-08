@@ -3,7 +3,6 @@
 namespace Tito10047\PersistentStateBundle\Tests\Unit\Selection\Service;
 
 use PHPUnit\Framework\TestCase;
-use stdClass;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Tito10047\PersistentStateBundle\Enum\SelectionMode;
 use Tito10047\PersistentStateBundle\Selection\Service\Selection;
@@ -308,7 +307,7 @@ class SelectionInterfaceTest extends TestCase
         // Create a custom metadata transformer mock
         $custom = $this->createMock(ValueTransformerInterface::class);
         $custom->method('supports')->willReturnCallback(static fn ($v) => is_array($v));
-        $custom->method('transform')->willReturnCallback(static fn ($v) => new \Tito10047\PersistentStateBundle\Storage\StorableEnvelope('custom', $v));
+        $custom->method('transform')->willReturnCallback(static fn ($v) => new \Tito10047\PersistentStateBundle\Preference\Storage\StorableEnvelope('custom', $v));
         $custom->method('supportsReverse')->willReturnCallback(static fn ($env) => 'custom' === $env->className);
         $custom->method('reverseTransform')->willReturnCallback(static function ($env) {
             $o = new \stdClass();

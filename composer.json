@@ -61,7 +61,7 @@
     "symfony/dotenv": "^6.4|^7.4|^8.0",
     "symfony/http-client": "^6.4|^7.4|^8.0",
     "symfony/maker-bundle": "^1.39",
-    "symfony/orm-pack": "^2.5",
+    "symfony/orm-pack": "^2.7",
     "symfony/phpunit-bridge": "^6.4|^7.4|^8.0",
     "symfony/profiler-pack": "^1.0",
     "symfony/runtime": "^6.4|^7.4|^8.0",

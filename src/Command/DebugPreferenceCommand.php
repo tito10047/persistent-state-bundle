@@ -13,9 +13,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Tito10047\PersistentStateBundle\Preference\Service\PreferenceManagerInterface;
+use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceDoctrineStorage;
 use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceSessionStorage;
 use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceStorageInterface;
-use Tito10047\PersistentStateBundle\Storage\DoctrinePreferenceStorage;
 
 #[AsCommand(name: 'debug:preference', description: 'Print preferences for a given context and manager')]
 final class DebugPreferenceCommand extends Command
@@ -85,7 +85,7 @@ final class DebugPreferenceCommand extends Command
     private function detectStorageName(PreferenceStorageInterface $storage): string
     {
         return match (true) {
-            $storage instanceof DoctrinePreferenceStorage => 'doctrine',
+            $storage instanceof PreferenceDoctrineStorage => 'doctrine',
             $storage instanceof PreferenceSessionStorage => 'session',
             default => (new \ReflectionClass($storage))->getShortName(),
         };

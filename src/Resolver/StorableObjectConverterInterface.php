@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tito10047\PersistentStateBundle\Resolver;
 
-use Tito10047\PersistentStateBundle\Storage\StorableEnvelope;
+use Tito10047\PersistentStateBundle\Preference\Storage\StorableEnvelope;
 
 interface StorableObjectConverterInterface
 {

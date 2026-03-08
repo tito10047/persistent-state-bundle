@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tito10047\PersistentStateBundle\Storage;
+namespace Tito10047\PersistentStateBundle\Preference\Storage;
 
 /**
  * Toto je "obálka", ktorá drží dáta objektu a informáciu o jeho type,

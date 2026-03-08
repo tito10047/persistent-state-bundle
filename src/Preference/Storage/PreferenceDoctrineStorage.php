@@ -2,14 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Tito10047\PersistentStateBundle\Storage;
+namespace Tito10047\PersistentStateBundle\Preference\Storage;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Tito10047\PersistentStateBundle\Exception\RuntimeException;
-use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceEntityInterface;
-use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceStorageInterface;
 
-final class DoctrinePreferenceStorage implements PreferenceStorageInterface
+final class PreferenceDoctrineStorage implements PreferenceStorageInterface
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
