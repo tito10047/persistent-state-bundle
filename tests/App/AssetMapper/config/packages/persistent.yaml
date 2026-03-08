@@ -15,6 +15,11 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
             - Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity\UserPreference
+    app.selection.storage.doctrine:
+        class: Tito10047\PersistentStateBundle\Selection\Storage\SelectionDoctrineStorage
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity\UserSelection
     app.transformer.id:
         class: Tito10047\PersistentStateBundle\Transformer\ObjectIdValueTransformer
         arguments:
@@ -42,3 +47,7 @@ persistent_state:
             array:
                 transformer: '@persistent_state.transformer.scalar'
                 metadata_transformer: '@app.transformer.id'
+            db_selection:
+                storage: '@app.selection.storage.doctrine'
+                transformer: '@persistent_state.transformer.scalar'
+                metadata_transformer: '@persistent_state.transformer.array'

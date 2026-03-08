@@ -18,6 +18,23 @@ class UserPreference extends BasePreference
     }
 }
 
+#[ORM\Entity]
+#[ORM\Table(name: 'user_selections')]
+class UserSelection extends BaseSelection
+{
+    #[ORM\Id]
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    private ?Uuid $id = null;
+
+
+    public function getId(): ?Uuid
+    {
+        return $this->id;
+    }
+}
+
 ```
 
 
@@ -29,10 +46,15 @@ services:
             $class: App\Entity\User\User
             $prefix: "user_"
     app.storage.doctrine:
-        class: Tito10047\PersistentStateBundle\Preference\Storage\PreferenceEntityInterface
+        class: Tito10047\PersistentStateBundle\Preference\Storage\PreferenceDoctrineStorage
         arguments:
             - '@doctrine.orm.entity_manager'
-            - App\Entity\User\UserPreference
+            - App\Entity\UserPreference
+    app.selection.storage.doctrine:
+        class: Tito10047\PersistentStateBundle\Selection\Storage\SelectionDoctrineStorage
+        arguments:
+            - '@doctrine.orm.entity_manager'
+            - App\Entity\UserSelection
 persistent_state:
     preference:
         managers:
@@ -43,15 +65,20 @@ persistent_state:
     selection:
         managers:
             default:
-                storage: 'persistent.selection.storage.session'
-            simple:
-                storage: 'persistent.selection.storage.doctrine'
+                storage: '@persistent_state.selection.storage.session'
+            db:
+                storage: '@app.selection.storage.doctrine'
 ```
 
 ```php
-namespace ;
-
 use \Symfony\Component\DependencyInjection\Attribute\Autowire;
+use \Symfony\Component\HttpFoundation\Request;
+use \Tito10047\PersistentStateBundle\Preference\Service\PreferenceInterface;
+use \Tito10047\PersistentStateBundle\Preference\Service\PreconfiguredPreferenceInterface;
+use \Tito10047\PersistentStateBundle\Preference\Service\PreferenceManagerInterface;
+use \Tito10047\PersistentStateBundle\Selection\Service\SelectionManagerInterface;
+use \Tito10047\PersistentStateBundle\Selection\Service\SelectionInterface;
+use \Doctrine\ORM\EntityManagerInterface;
 use \App\Entity\User;
 use \App\Entity\Company;
 use \App\Entity\Product;
@@ -61,12 +88,12 @@ class Foo{
     private ?PreferenceInterface $storage = null;
     
     public function __construct(
-        private readonly PreconfiguredPreferenceInterface $sessionPrefManager
+        private readonly PreconfiguredPreferenceInterface $sessionPrefManager,
         #[Autowire(service: 'persistent_state.preference.manager.doctrine')]
         private readonly PreferenceManagerInterface                 $doctrinePrefManager,
-        private readonly PreferenceManagerInterface                 $sessionPrefManager,
-        #[Autowire('persistent.selection.my_sel_manager')]
-        private readonly SelectionManagerInterface $doctrinePrefManager,
+        #[Autowire(service: 'persistent_state.selection.manager.db')]
+        private readonly SelectionManagerInterface                  $dbSelectionManager,
+        private readonly SelectionManagerInterface                  $selectionManager,
         private readonly EntityManagerInterface $em
     ) {
     
@@ -77,13 +104,13 @@ class Foo{
         }
     }
     
-    public function bar(User $user, Company $company, Product $product){
+    public function bar(User $user, Company $company, Product $product, Request $request){
         
         $userPref = $this->storage;
         $companyPref = $this->doctrinePrefManager->getPreference($company);
         
-        $cartSelection =  $selectionManager->getSelection("card", $this->getUser());
-        $companySelection = $selectionManager->getSelection("products", $this->getUser());
+        $cartSelection =  $this->selectionManager->getSelection("card", $this->getUser());
+        $companySelection = $this->dbSelectionManager->getSelection("products", $company);
         
         $cartSelection->select($product, [
             'quantity' => $request->get('qty', 1),
@@ -98,7 +125,7 @@ class Foo{
         $companyPref->set('foo2', 'bar');
         $companyPref->set('baz2', [1,2,3]);
         
-        $em->flush();
+        $this->em->flush();
         
         $foo = $userPref->get('foo');
         $baz = $userPref->get('baz');
@@ -106,11 +133,11 @@ class Foo{
         $foo2 = $companyPref->get('foo2');
         $baz2 = $companyPref->get('baz2');
         
-        $selectedItems = $cartSelection->getSelectedObjects(); 
-        $selectedProducts = $companySelection->getSelectedObjects(); 
+        $selectedItems = $cartSelection->getSelectedIdentifiers(); 
+        $selectedProducts = $companySelection->getSelectedIdentifiers(); 
         
         
-        $cart->destroy();
+        $cartSelection->destroy();
     }
 }
 ```

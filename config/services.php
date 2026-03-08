@@ -30,6 +30,7 @@ use Tito10047\PersistentStateBundle\Selection\Service\SelectionFactory;
 use Tito10047\PersistentStateBundle\Selection\Service\SelectionFactoryInterface;
 use Tito10047\PersistentStateBundle\Selection\Service\SelectionManager;
 use Tito10047\PersistentStateBundle\Selection\Service\SelectionManagerInterface;
+use Tito10047\PersistentStateBundle\Selection\Storage\SelectionDoctrineStorage;
 use Tito10047\PersistentStateBundle\Selection\Storage\SelectionSessionStorage;
 use Tito10047\PersistentStateBundle\Selection\Storage\SelectionStorageInterface;
 use Tito10047\PersistentStateBundle\Transformer\ArrayValueTransformer;
@@ -163,11 +164,17 @@ return static function (ContainerConfigurator $container): void {
             ->arg('$container', service('service_container'))
             ->tag('console.command')
     ;
-	$services
-		->set('persistent_state.selection.storage.session', SelectionSessionStorage::class)
-		->arg('$requestStack', service(RequestStack::class))
-	;
-	$services->alias(SelectionStorageInterface::class, SelectionSessionStorage::class);
+    $services
+        ->set('persistent_state.selection.storage.session', SelectionSessionStorage::class)
+        ->arg('$requestStack', service(RequestStack::class))
+    ;
+    $services->alias(SelectionStorageInterface::class, SelectionSessionStorage::class);
+
+    $services
+        ->set('persistent_state.selection.storage.doctrine', SelectionDoctrineStorage::class)
+        ->abstract()
+        ->arg('$em', service('doctrine.orm.entity_manager'))
+    ;
 
     // --- Data Collector ---
     // Register only when WebProfiler is installed AND Symfony debug is enabled
