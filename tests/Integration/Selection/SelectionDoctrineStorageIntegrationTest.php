@@ -24,6 +24,9 @@ class SelectionDoctrineStorageIntegrationTest extends AssetMapperKernelTestCase
         $selection->select(123, ['foo' => 'bar']);
         $selection->select(456);
 
+        $em = $container->get('doctrine.orm.entity_manager');
+        $em->flush();
+
         // Overenie cez API selekcie
         $this->assertTrue($selection->isSelected(123));
         $this->assertTrue($selection->isSelected(456));
@@ -49,6 +52,7 @@ class SelectionDoctrineStorageIntegrationTest extends AssetMapperKernelTestCase
         $selection->selectAll();
         $selection->unselect(123);
 
+        $em->flush();
         $em->clear(); // Clear identity map to force reload from DB
 
         $entity = $repo->findOneBy(['context' => 'test_context']);

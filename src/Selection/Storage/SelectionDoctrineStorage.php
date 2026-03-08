@@ -10,6 +10,9 @@ use Tito10047\PersistentStateBundle\Exception\RuntimeException;
 
 final class SelectionDoctrineStorage implements SelectionStorageInterface
 {
+    /** @var array<string, SelectionEntityInterface|null> */
+    private array $cache = [];
+
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly string $entityClass,
@@ -32,8 +35,6 @@ final class SelectionDoctrineStorage implements SelectionStorageInterface
             $meta[$key] = $metadata;
             $entity->setMetadata($meta);
         }
-
-        $this->em->flush();
     }
 
     public function setMultiple(string $context, array $identifiers): void
@@ -51,7 +52,6 @@ final class SelectionDoctrineStorage implements SelectionStorageInterface
 
         if ($changed) {
             $entity->setIdentifiers(array_values($ids));
-            $this->em->flush();
         }
     }
 
@@ -88,7 +88,6 @@ final class SelectionDoctrineStorage implements SelectionStorageInterface
         if ($changed) {
             $entity->setIdentifiers(array_values($remaining));
             $entity->setMetadata($meta);
-            $this->em->flush();
         }
     }
 
@@ -99,7 +98,6 @@ final class SelectionDoctrineStorage implements SelectionStorageInterface
             $entity->setIdentifiers([]);
             $entity->setMetadata([]);
             $entity->setMode(SelectionMode::INCLUDE);
-            $this->em->flush();
         }
     }
 
@@ -134,7 +132,6 @@ final class SelectionDoctrineStorage implements SelectionStorageInterface
     {
         $entity = $this->findOrCreate($context);
         $entity->setMode($mode);
-        $this->em->flush();
     }
 
     public function getMode(string $context): SelectionMode
@@ -154,6 +151,7 @@ final class SelectionDoctrineStorage implements SelectionStorageInterface
             $entity = new $cls();
             $entity->setContext($context);
             $this->em->persist($entity);
+            $this->cache[$context] = $entity;
         }
 
         return $entity;
@@ -161,17 +159,19 @@ final class SelectionDoctrineStorage implements SelectionStorageInterface
 
     private function findOne(string $context): ?SelectionEntityInterface
     {
+        if (array_key_exists($context, $this->cache)) {
+            return $this->cache[$context];
+        }
+
         $repo = $this->em->getRepository($this->entityClass);
         /** @var object|null $entity */
         $entity = $repo->findOneBy(['context' => $context]);
-        if (null === $entity) {
-            return null;
-        }
-        if (!$entity instanceof SelectionEntityInterface) {
+
+        if (null !== $entity && !$entity instanceof SelectionEntityInterface) {
             throw new RuntimeException(sprintf('Entity %s must implement %s', get_debug_type($entity), SelectionEntityInterface::class));
         }
 
-        return $entity;
+        return $this->cache[$context] = $entity;
     }
 
     private function metaKey(int|array|string $identifier): string
