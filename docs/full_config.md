@@ -23,16 +23,16 @@ class UserPreference extends BasePreference
 
 ```yaml
 services:
-    app.users_resolver:
+    app.persistent_state.users_resolver:
         class: Tito10047\PersistentStateBundle\Resolver\ObjectContextResolver
         arguments:
-            $class: App\Entity\User
+            $class: App\Entity\User\User
+            $prefix: "user_"
     app.storage.doctrine:
         class: Tito10047\PersistentStateBundle\Storage\DoctrinePreferenceStorage
         arguments:
             - '@doctrine.orm.entity_manager'
-            - App\Entity\UserPreference
-
+            - App\Entity\User\UserPreference
 persistent_state:
     preference:
         managers:
@@ -62,9 +62,9 @@ class Foo{
     
     public function __construct(
         private readonly PreconfiguredPreferenceInterface $sessionPrefManager
-        #[Autowire('persistent.preference.doctrine')]
-        PreferenceManagerInterface                 $doctrinePrefManager,
-        PreferenceManagerInterface                 $sessionPrefManager,
+        #[Autowire(service: 'persistent_state.preference.manager.doctrine')]
+        private readonly PreferenceManagerInterface                 $doctrinePrefManager,
+        private readonly PreferenceManagerInterface                 $sessionPrefManager,
         #[Autowire('persistent.selection.my_sel_manager')]
         private readonly SelectionManagerInterface $doctrinePrefManager,
         private readonly EntityManagerInterface $em
