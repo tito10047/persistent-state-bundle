@@ -1,27 +1,44 @@
+```php
+namespace App\Entity;
+#[ORM\Entity(repositoryClass: UserPreferenceRepository::class)]
+#[ORM\Table(name: 'user_preferences')]
+#[ORM\UniqueConstraint(name: 'uniq_preference_context_key', columns: ['context', 'name'])]
+class UserPreference extends BasePreference
+{
+    #[ORM\Id]
+    #[ORM\Column(type: UuidType::NAME, unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    private ?Uuid $id = null;
+
+
+    public function getId(): ?Uuid
+    {
+        return $this->id;
+    }
+}
+
+```
+
 
 ```yaml
 services:
     app.users_resolver:
         class: Tito10047\PersistentStateBundle\Resolver\ObjectContextResolver
         arguments:
-            $targetClass: App\Entity\User
-            $identifierMethod: 'getName'
-    app.companies_resolver:
-        class: Tito10047\PersistentStateBundle\Resolver\ObjectContextResolver
-        arguments:
-            $targetClass: App\Entity\Company
+            $class: App\Entity\User
     app.storage.doctrine:
         class: Tito10047\PersistentStateBundle\Storage\DoctrinePreferenceStorage
         arguments:
             - '@doctrine.orm.entity_manager'
-            - Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity\UserPreference
+            - App\Entity\UserPreference
 
-persistent:
+persistent_state:
     preference:
         managers:
             default:
-                storage: '@persistent.preference.storage.session'
-            my_pref_manager:
+                storage: '@persistent_state.preference.storage.session'
+            doctrine:
                 storage: '@app.storage.doctrine'
     selection:
         managers:
@@ -41,23 +58,32 @@ use \App\Entity\Product;
 
 class Foo{
 
+    private ?PreferenceInterface $storage = null;
+    
     public function __construct(
         private readonly PreconfiguredPreferenceInterface $sessionPrefManager
-        #[Autowire('persistent.preference.my_pref_manager')]
-        private readonly PreconfiguredPreferenceInterface $doctrinePrefManager,
-        private readonly PreconfiguredSelectionInterface $sessionPrefManager,
+        #[Autowire('persistent.preference.doctrine')]
+        PreferenceManagerInterface                 $doctrinePrefManager,
+        PreferenceManagerInterface                 $sessionPrefManager,
         #[Autowire('persistent.selection.my_sel_manager')]
-        private readonly PreconfiguredSelectionInterface $doctrinePrefManager,
+        private readonly SelectionManagerInterface $doctrinePrefManager,
         private readonly EntityManagerInterface $em
-    ) {}
+    ) {
+    
+        if ($user = $this->getUser()) {
+            $this->storage = $doctrinePrefManager->getPreference($user);
+        } else {
+            $this->storage = $sessionPrefManager->getPreference("user");
+        }
+    }
     
     public function bar(User $user, Company $company, Product $product){
         
-        $userPref = $this->sessionPrefManager->getPreference($user);
+        $userPref = $this->storage;
         $companyPref = $this->doctrinePrefManager->getPreference($company);
         
-        $cartSelection = $this->sessionPrefManager->getSelection($user,"cart");
-        $companySelection = $this->doctrinePrefManager->getSelection($company, "products");
+        $cartSelection =  $selectionManager->getSelection("card", $this->getUser());
+        $companySelection = $selectionManager->getSelection("products", $this->getUser());
         
         $cartSelection->select($product, [
             'quantity' => $request->get('qty', 1),

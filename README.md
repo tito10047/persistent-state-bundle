@@ -61,7 +61,7 @@ class CartController
 
     public function add(User $user, Product $product)
     {
-        $cartSelection = $this->selectionManager->getSelection($user, 'cart');
+        $cartSelection = $this->selectionManager->getSelection( 'cart',$user);
         $cartSelection->select($product, [
             'quantity' => 1,
             'added_at' => new \DateTime()
@@ -70,7 +70,7 @@ class CartController
 
     public function clear(User $user)
     {
-        $this->selectionManager->getSelection($user, 'cart')->destroy();
+        $this->selectionManager->getSelection('cart',$user)->destroy();
     }
 }
 ```
@@ -134,7 +134,7 @@ In your controller to perform the action:
 ```php
 public function deleteSelected(User $user)
 {
-    $selection = $this->selectionManager->getSelection($user, 'main_logs');
+    $selection = $this->selectionManager->getSelection('main_logs', $user);
     $ids = $selection->getSelectedIdentifiers();
     
     // ... perform deletion
@@ -167,27 +167,6 @@ Inspect stored preferences for a specific context.
 ```bash
 php bin/console debug:preference "user_15" --manager=default
 ```
-
-## Scripts
-
-The following scripts are available via Composer:
-
-- `composer test`: Runs the PHPUnit test suite.
-
-## Project Structure
-
-- `assets/`: Stimulus controllers and frontend assets.
-- `config/`: Bundle configuration and service definitions.
-- `docs/`: Additional documentation and images.
-- `src/`: Core bundle logic.
-    - `Command/`: CLI commands.
-    - `Controller/`: Ajax endpoints for state updates.
-    - `Preference/`: Preference management logic.
-    - `Selection/`: Selection management logic.
-    - `Storage/`: Storage implementations (Session, Doctrine).
-    - `Twig/`: Twig extensions and runtimes.
-- `templates/`: Default templates and Twig components.
-- `tests/`: Integration and unit tests.
 
 ## Testing
 
