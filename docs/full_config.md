@@ -55,6 +55,10 @@ services:
         arguments:
             - '@doctrine.orm.entity_manager'
             - App\Entity\UserSelection
+    persistent_state.transformer.card_transformer:
+        class:  Tito10047\PersistentStateBundle\Transformer\ObjectIdValueTransformer
+        arguments:
+            $class: App\Entity\Card
 persistent_state:
     preference:
         managers:
@@ -66,6 +70,7 @@ persistent_state:
         managers:
             default:
                 storage: '@persistent_state.selection.storage.session'
+                transformer: '@persistent_state.transformer.card_transformer'
             db:
                 storage: '@app.selection.storage.doctrine'
 ```
