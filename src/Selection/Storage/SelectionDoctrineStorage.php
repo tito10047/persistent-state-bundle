@@ -25,10 +25,8 @@ final class SelectionDoctrineStorage implements SelectionStorageInterface
         $ids = $entity->getIdentifiers();
         $meta = $entity->getMetadata();
 
-        if (!in_array($identifier, $ids, false)) {
-            $ids[] = $identifier;
-            $entity->setIdentifiers(array_values($ids));
-        }
+        $ids[] = $identifier;
+        $entity->setIdentifiers(array_values($ids));
 
         if (null !== $metadata) {
             $key = $this->metaKey($identifier);
