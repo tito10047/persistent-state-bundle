@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Tito10047\PersistentStateBundle\Selection\Service;
 
-interface SelectionInterface
-{
+use Tito10047\PersistentStateBundle\Enum\SelectionMode;
+
+interface SelectionInterface {
+
     /**
      * Destroys all data for this selection namespace and resets to default state.
      * Typically clears identifiers and sets mode back to INCLUDE.
@@ -23,6 +25,8 @@ interface SelectionInterface
      * This is usually when mode is EXCLUDE and no exclusions are stored.
      */
     public function isSelectedAll(): bool;
+
+    public function getMode(): SelectionMode;
 
     /**
      * Marks an item as selected, optionally attaching metadata.

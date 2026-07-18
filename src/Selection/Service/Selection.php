@@ -277,7 +277,11 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
 
     public function isSelectedAll(): bool
     {
-        return count($this->getSelectedIdentifiers()) == $this->getTotal();
+        if ($this->getMode()==SelectionMode::EXCLUDE){
+            return count($this->getSelectedIdentifiers())==0;
+        }else {
+            return count($this->getSelectedIdentifiers()) == $this->getTotal();
+        }
     }
 
     public function getTotal(): int
