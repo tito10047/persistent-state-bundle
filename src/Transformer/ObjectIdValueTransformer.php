@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tito10047\PersistentStateBundle\Transformer;
 
-use InvalidArgumentException;
 use Tito10047\PersistentStateBundle\Preference\Storage\StorableEnvelope;
 
 class ObjectIdValueTransformer implements ValueTransformerInterface
@@ -23,7 +22,7 @@ class ObjectIdValueTransformer implements ValueTransformerInterface
     public function transform(mixed $value): StorableEnvelope
     {
         if (!$value instanceof $this->class) {
-            throw new InvalidArgumentException('Expected instance of '.$this->class);
+            throw new \InvalidArgumentException('Expected instance of '.$this->class);
         }
 
         return new StorableEnvelope($this->class, $value->{$this->identifierMethod}());
@@ -45,6 +44,7 @@ class ObjectIdValueTransformer implements ValueTransformerInterface
         if (is_scalar($var)) {
             return $var;
         }
+
         return (string) $var;
     }
 }

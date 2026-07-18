@@ -28,9 +28,6 @@ final readonly class ContextResolver implements ContextResolverInterface
             }
         }
 
-        throw new InvalidArgumentException(sprintf(
-            'Could not resolve persistent context for object of type "%s". Implement PersistentContextInterface or register a resolver.',
-            get_debug_type($context)
-        ));
+        throw new InvalidArgumentException(sprintf('Could not resolve persistent context for object of type "%s". Implement PersistentContextInterface or register a resolver.', get_debug_type($context)));
     }
 }

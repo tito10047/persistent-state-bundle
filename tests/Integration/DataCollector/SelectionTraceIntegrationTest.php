@@ -8,12 +8,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Tito10047\PersistentStateBundle\DataCollector\PreferenceDataCollector;
 use Tito10047\PersistentStateBundle\Enum\SelectionMode;
-use Tito10047\PersistentStateBundle\Preference\Service\PreferenceManagerInterface;
-use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceStorageInterface;
-use Tito10047\PersistentStateBundle\Selection\Service\SelectionInterface;
 use Tito10047\PersistentStateBundle\Selection\Service\SelectionManagerInterface;
 use Tito10047\PersistentStateBundle\Selection\Service\TraceableSelection;
-use Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity\RecordInteger;
 use Tito10047\PersistentStateBundle\Tests\App\AssetMapper\Src\Entity\User;
 use Tito10047\PersistentStateBundle\Tests\Integration\Kernel\AssetMapperKernelTestCase;
 use Tito10047\PersistentStateBundle\Tests\Trait\SessionInterfaceTrait;
@@ -21,6 +17,7 @@ use Tito10047\PersistentStateBundle\Tests\Trait\SessionInterfaceTrait;
 final class SelectionTraceIntegrationTest extends AssetMapperKernelTestCase
 {
     use SessionInterfaceTrait;
+
     public function testSelectionTracingOnRead(): void
     {
         self::bootKernel();

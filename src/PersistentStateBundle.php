@@ -7,7 +7,6 @@ namespace Tito10047\PersistentStateBundle;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 use Tito10047\PersistentStateBundle\Converter\MetadataConverterInterface;
@@ -16,12 +15,10 @@ use Tito10047\PersistentStateBundle\DependencyInjection\Compiler\AutoTagContextK
 use Tito10047\PersistentStateBundle\DependencyInjection\Compiler\AutoTagIdentityLoadersPass;
 use Tito10047\PersistentStateBundle\DependencyInjection\Compiler\TraceableManagersPass;
 use Tito10047\PersistentStateBundle\Preference\Service\PreferenceFactory;
-use Tito10047\PersistentStateBundle\Preference\Service\PreferenceFactoryInterface;
 use Tito10047\PersistentStateBundle\Preference\Service\PreferenceManager;
 use Tito10047\PersistentStateBundle\Resolver\ContextResolver;
 use Tito10047\PersistentStateBundle\Resolver\ContextResolverInterface;
 use Tito10047\PersistentStateBundle\Selection\Service\SelectionFactory;
-use Tito10047\PersistentStateBundle\Selection\Service\SelectionFactoryInterface;
 use Tito10047\PersistentStateBundle\Selection\Service\SelectionManager;
 
 use function Symfony\Component\DependencyInjection\Loader\Configurator\service;

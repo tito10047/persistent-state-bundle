@@ -141,6 +141,9 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
         } else {
             $excluded = $this->storage->getStored($this->key);
             $all = $this->storage->getStored($this->getAllContext());
+            if (!$all) {
+                throw new \LogicException("You can't call getSelectedIdentifiers without previous call registerSelection");
+            }
             $data = array_diff($all, $excluded);
         }
         foreach ($data as $key => $value) {
@@ -277,11 +280,7 @@ final class Selection implements SelectionInterface, HasModeInterface, RegisterS
 
     public function isSelectedAll(): bool
     {
-        if ($this->getMode()==SelectionMode::EXCLUDE){
-            return count($this->getSelectedIdentifiers())==0;
-        }else {
-            return count($this->getSelectedIdentifiers()) == $this->getTotal();
-        }
+        return count($this->getSelectedIdentifiers()) == $this->getTotal();
     }
 
     public function getTotal(): int

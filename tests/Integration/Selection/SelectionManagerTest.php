@@ -124,6 +124,7 @@ class SelectionManagerTest extends AssetMapperKernelTestCase
         $this->expectExceptionMessage('is not supported');
         $manager->registerSelection('array_key_2', $data);
     }
+
     public function testRegisterSelectionWithSameOwnerAsGetSelection(): void
     {
         $this->initSession();
@@ -148,7 +149,6 @@ class SelectionManagerTest extends AssetMapperKernelTestCase
         $selectionGet->selectAll();
         $this->assertTrue($selectionGet->isSelectedAll());
         $this->assertTrue($selectionGet->isSelected(1));
-
 
         // If namespaces were different, $selectionGet->getTotal() might return 0
         // because the source was registered under a different namespace.

@@ -338,6 +338,53 @@ class SelectionInterfaceTest extends TestCase
         $this->assertSame(9, $m->n);
     }
 
+    public function testGetSelectedIdentifiersThrowsLogicExceptionInExcludeModeWithoutRememberAll(): void
+    {
+        $selection = new Selection('ctx_exc_no_all', $this->storage, $this->normalizer, $this->converter);
+        $selection->setMode(SelectionMode::EXCLUDE);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessageMatches('/registerSelection/');
+        $selection->getSelectedIdentifiers();
+    }
+
+    public function testIsSelectedAllReturnsTrueInIncludeModeWhenAllSelected(): void
+    {
+        $selection = new Selection('ctx_isall_inc_true', $this->storage, $this->normalizer, $this->converter);
+        $selection->rememberAll([1, 2, 3]);
+        $selection->select(1)->select(2)->select(3);
+
+        $this->assertTrue($selection->isSelectedAll());
+    }
+
+    public function testIsSelectedAllReturnsFalseInIncludeModeWhenNotAllSelected(): void
+    {
+        $selection = new Selection('ctx_isall_inc_false', $this->storage, $this->normalizer, $this->converter);
+        $selection->rememberAll([1, 2, 3]);
+        $selection->select(1)->select(2);
+
+        $this->assertFalse($selection->isSelectedAll());
+    }
+
+    public function testIsSelectedAllReturnsTrueInExcludeModeWhenNothingExcluded(): void
+    {
+        $selection = new Selection('ctx_isall_exc_true', $this->storage, $this->normalizer, $this->converter);
+        $selection->rememberAll([1, 2, 3]);
+        $selection->selectAll();
+
+        $this->assertTrue($selection->isSelectedAll());
+    }
+
+    public function testIsSelectedAllReturnsFalseInExcludeModeWhenSomeExcluded(): void
+    {
+        $selection = new Selection('ctx_isall_exc_false', $this->storage, $this->normalizer, $this->converter);
+        $selection->rememberAll([1, 2, 3]);
+        $selection->selectAll();
+        $selection->unselect(1);
+
+        $this->assertFalse($selection->isSelectedAll());
+    }
+
     public function testObjectIdValueTransformerAsMetadata(): void
     {
         // Dummy object with getId()

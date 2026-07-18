@@ -8,7 +8,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Tito10047\PersistentStateBundle\Enum\SelectionMode;
-use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceStorageInterface;
 
 final class PreferenceDataCollector extends DataCollector
 {
@@ -19,7 +18,6 @@ final class PreferenceDataCollector extends DataCollector
 
     public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
-
         $managers = (array) ($this->data['managers'] ?? []);
         $total = 0;
         $flattenedContexts = [];

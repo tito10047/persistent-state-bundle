@@ -173,10 +173,15 @@ final class TraceableSelection implements SelectionInterface, HasModeInterface, 
 
     private function notify(): void
     {
+        try {
+            $identifiers = $this->inner->getSelectedIdentifiers();
+        } catch (\Throwable) {
+            $identifiers = [];
+        }
         $this->collector->onSelectionChanged(
             $this->managerName,
             $this->namespace,
-            $this->inner->getSelectedIdentifiers(),
+            $identifiers,
             $this->getMode(),
             $this->inner->getTotal()
         );

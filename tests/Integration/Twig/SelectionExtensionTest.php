@@ -49,7 +49,7 @@ class SelectionExtensionTest extends AssetMapperKernelTestCase
         // Prepare simple object list with "id" property
         $items = [];
         for ($i = 1; $i <= 3; ++$i) {
-            $o = new User($i,'Item '.$i);
+            $o = new User($i, 'Item '.$i);
             $items[] = $o;
         }
 
@@ -128,7 +128,7 @@ class SelectionExtensionTest extends AssetMapperKernelTestCase
         // Items
         $items = [];
         for ($i = 1; $i <= 1; ++$i) {
-            $o = new User($i,'Item '.$i);
+            $o = new User($i, 'Item '.$i);
             $items[] = $o;
         }
 

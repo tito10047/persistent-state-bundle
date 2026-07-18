@@ -9,10 +9,7 @@ interface ContextResolverInterface
     /**
      * Resolves a unique, stable context identifier for the given object or string.
      *
-     * @param object|string $context
-     * @return string
-     *
-     * @throws \InvalidArgumentException if the context cannot be resolved.
+     * @throws \InvalidArgumentException if the context cannot be resolved
      */
     public function resolveContextKey(object|string $context): string;
 }

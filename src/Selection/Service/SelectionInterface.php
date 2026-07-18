@@ -6,8 +6,8 @@ namespace Tito10047\PersistentStateBundle\Selection\Service;
 
 use Tito10047\PersistentStateBundle\Enum\SelectionMode;
 
-interface SelectionInterface {
-
+interface SelectionInterface
+{
     /**
      * Destroys all data for this selection namespace and resets to default state.
      * Typically clears identifiers and sets mode back to INCLUDE.

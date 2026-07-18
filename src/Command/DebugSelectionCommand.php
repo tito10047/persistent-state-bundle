@@ -72,7 +72,7 @@ final class DebugSelectionCommand extends Command
         }
 
         $io->title($isAll ? 'Exclusions' : 'Selected Identifiers');
-        $io->listing(array_map(fn($id) => (string) $id, $ids));
+        $io->listing(array_map(fn ($id) => (string) $id, $ids));
 
         return Command::SUCCESS;
     }

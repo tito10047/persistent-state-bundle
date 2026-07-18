@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tito10047\PersistentStateBundle\Preference\Service;
 
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Tito10047\PersistentStateBundle\Preference\Storage\PreferenceStorageInterface;
 use Tito10047\PersistentStateBundle\Resolver\ContextResolverInterface;
 
